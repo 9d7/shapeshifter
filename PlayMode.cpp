@@ -9,6 +9,7 @@
 #include "data_path.hpp"
 
 #include <glm/gtc/type_ptr.hpp>
+#include <reactphysics3d/reactphysics3d.h>
 
 #include <random>
 
@@ -41,6 +42,38 @@ Load< Sound::Sample > dusty_floor_sample(LoadTagDefault, []() -> Sound::Sample c
 });
 
 PlayMode::PlayMode() : scene(*hexapod_scene) {
+
+	{ // test reactphysics3d
+		// First you need to create the PhysicsCommon object. This is a factory module
+		// that you can use to create physics world and other objects. It is also responsible
+		// for logging and memory management
+		reactphysics3d::PhysicsCommon physicsCommon;
+
+		// Create a physics world
+		reactphysics3d::PhysicsWorld* world = physicsCommon.createPhysicsWorld();
+
+		// Create a rigid body in the world
+		reactphysics3d::Vector3 position(0, 20, 0);
+		reactphysics3d::Quaternion orientation = reactphysics3d::Quaternion::identity();
+		reactphysics3d::Transform transform(position, orientation);
+		reactphysics3d::RigidBody* body = world->createRigidBody(transform);
+
+		const reactphysics3d::decimal timeStep = 1.0f / 60.0f;
+
+		// Step the simulation a few steps
+		for (int i=0; i < 20; i++) {
+
+			world->update(timeStep);
+
+			// Get the updated position of the body
+			const reactphysics3d::Transform& transform = body->getTransform();
+			const reactphysics3d::Vector3& position = transform.getPosition();
+
+			// Display the position of the body
+			std::cout << "Body Position: (" << position.x << ", " << position.y << ", " << position.z << ")" << std::endl;
+		}
+	}
+
 	//get pointers to leg for convenience:
 	for (auto &transform : scene.transforms) {
 		if (transform.name == "Hip.FL") hip = &transform;
