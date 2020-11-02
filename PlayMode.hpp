@@ -4,6 +4,7 @@
 #include "Sound.hpp"
 
 #include <glm/glm.hpp>
+#include <reactphysics3d/reactphysics3d.h>
 
 #include <vector>
 #include <deque>
@@ -18,24 +19,32 @@ struct PlayMode : Mode {
 	virtual void draw(glm::uvec2 const &drawable_size) override;
 
 	//----- game state -----
+	reactphysics3d::PhysicsCommon physicsCommon;
+	reactphysics3d::PhysicsWorld* world;
+	reactphysics3d::RigidBody* bodyPlayer;
+	reactphysics3d::RigidBody* bodyEnemy;
+	reactphysics3d::RigidBody* bodyFloor;
+	reactphysics3d::Collider* collider1; 
+	reactphysics3d::Collider* collider2; 
+	reactphysics3d::Collider* collider3; 
 
 	//input tracking:
 	struct Button {
 		uint8_t downs = 0;
 		uint8_t pressed = 0;
-	} left, right, down, up;
+	} left, right, down, up, space;
 
 	//local copy of the game scene (so code can change it during gameplay):
 	Scene scene;
+	Scene::Transform *player = nullptr;
+	Scene::Transform *shifted = nullptr;
+	Scene::Transform *sphere = nullptr;
+	Scene::Transform *plane = nullptr;
+	Scene::Transform *playerSphere = nullptr;
 
-	//hexapod leg to wobble:
-	Scene::Transform *hip = nullptr;
-	Scene::Transform *upper_leg = nullptr;
-	Scene::Transform *lower_leg = nullptr;
-	glm::quat hip_base_rotation;
-	glm::quat upper_leg_base_rotation;
-	glm::quat lower_leg_base_rotation;
-	float wobble = 0.0f;
+	bool isHuman = true;
+	float transformDelay = 0.0f;
+	float transformTimer = 0.0f;
 
 	glm::vec3 get_leg_tip_position();
 
