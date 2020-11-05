@@ -9,9 +9,12 @@
 #include "data_path.hpp"
 
 #include <algorithm>
+#include <bits/stdint-uintn.h>
+#include <cstdio>
 #include <glm/gtc/type_ptr.hpp>
 #include <reactphysics3d/collision/shapes/BoxShape.h>
 #include <reactphysics3d/engine/PhysicsCommon.h>
+#include <reactphysics3d/mathematics/Transform.h>
 #include <reactphysics3d/mathematics/Vector3.h>
 #include <reactphysics3d/reactphysics3d.h>
 
@@ -51,15 +54,6 @@ PlayMode::PlayMode() : scene(*hexapod_scene) {
 		rp3d::PhysicsWorld::WorldSettings settings;
 		settings.gravity = rp3d::Vector3(0.0f, 0.0f, -9.81f);
 		world = common.createPhysicsWorld(settings);
-		for (size_t i = 0; i < 1; i++) {
-			prisms.emplace_back(
-				scene,
-				common,
-				world,
-				glm::vec3(1.0f, 1.0f, 2.0f),
-				glm::vec3(0.0f, 0.0f, 10.0f)
-			);
-		}
 
 		rp3d::Vector3 rpos = rp3d::Vector3(0.0f, 0.0f, -1.0f);
 		rp3d::Quaternion rquat = rp3d::Quaternion::identity();

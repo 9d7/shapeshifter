@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <reactphysics3d/body/RigidBody.h>
 #include <reactphysics3d/collision/shapes/BoxShape.h>
+#include <reactphysics3d/components/RigidBodyComponents.h>
 #include <reactphysics3d/engine/PhysicsCommon.h>
 #include <reactphysics3d/engine/PhysicsWorld.h>
 #include <reactphysics3d/mathematics/Quaternion.h>
@@ -41,6 +42,7 @@ Prism::Prism(
 	rp3d::Transform rtrans = rp3d::Transform(rpos, rquat);
 
 	rp3d::RigidBody *body = world->createRigidBody(rtrans);
+	body->setType(rp3d::BodyType::DYNAMIC);
 
 	const rp3d::Vector3 rsize = rp3d::Vector3(size.x, size.y, size.z);
 	shape = common.createBoxShape(rsize);
