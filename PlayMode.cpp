@@ -115,50 +115,25 @@ PlayMode::~PlayMode() {
 }
 
 bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size) {
-
+	SDL_KeyCode key = (SDL_KeyCode)evt.key.keysym.sym;
 	if (evt.type == SDL_KEYDOWN) {
-		if (evt.key.keysym.sym == SDLK_ESCAPE) {
+		if (key == SDLK_ESCAPE) {
 			SDL_SetRelativeMouseMode(SDL_FALSE);
 			return true;
-		} else if (evt.key.keysym.sym == SDLK_a) {
-			left.downs += 1;
-			left.pressed = true;
-			return true;
-		} else if (evt.key.keysym.sym == SDLK_d) {
-			right.downs += 1;
-			right.pressed = true;
-			return true;
-		} else if (evt.key.keysym.sym == SDLK_w) {
-			up.downs += 1;
-			up.pressed = true;
-			return true;
-		} else if (evt.key.keysym.sym == SDLK_s) {
-			down.downs += 1;
-			down.pressed = true;
-			return true;
-		}  else if (evt.key.keysym.sym == SDLK_SPACE) {
-			space.downs += 1;
-			space.pressed = true;
-			return true;
-		} 
-	} else if (evt.type == SDL_KEYUP) {
-		if (evt.key.keysym.sym == SDLK_a) {
-			left.pressed = false;
-			return true;
-		} else if (evt.key.keysym.sym == SDLK_d) {
-			right.pressed = false;
-			return true;
-		} else if (evt.key.keysym.sym == SDLK_w) {
-			up.pressed = false;
-			return true;
-		} else if (evt.key.keysym.sym == SDLK_s) {
-			down.pressed = false;
-			return true;
-		}  else if (evt.key.keysym.sym == SDLK_SPACE) {
-			space.pressed = false;
+		}
+		if (buttons.find(key) != buttons.end()) {
+			buttons[key].downs += 1;
+			buttons[key].pressed = true;
 			return true;
 		}
-	} else if (evt.type == SDL_MOUSEBUTTONDOWN) {
+	}
+	else if (evt.type == SDL_KEYUP) {
+		if (buttons.find(key) != buttons.end()) {
+			buttons[key].pressed = false;
+			return true;
+		}
+	}	
+	else if (evt.type == SDL_MOUSEBUTTONDOWN) {
 		if (SDL_GetRelativeMouseMode() == SDL_FALSE) {
 			SDL_SetRelativeMouseMode(SDL_TRUE);
 			return true;
@@ -209,16 +184,20 @@ void PlayMode::update(float elapsed) {
 	//move camera:
 	{
 		//combine inputs into a move:
-		constexpr float PlayerSpeed = 30.0f;
-		glm::vec2 move = glm::vec2(0.0f);
-		if (left.pressed && !right.pressed) move.x =-1.0f;
-		if (!left.pressed && right.pressed) move.x = 1.0f;
-		if (down.pressed && !up.pressed) move.y =-1.0f;
-		if (!down.pressed && up.pressed) move.y = 1.0f;
-		if (space.pressed && transformTimer > transformDelay) {
+		constexpr float PlayerSpeed = 20.0f;
+		glm::vec2 move;
+
+		if (is_human) {
+			move = move_character(buttons[SDLK_w].pressed, buttons[SDLK_s].pressed, buttons[SDLK_a].pressed, buttons[SDLK_d].pressed);
+		}
+		else {
+			move = move_character(buttons[SDLK_q].pressed, buttons[SDLK_e].pressed, buttons[SDLK_r].pressed, buttons[SDLK_t].pressed);
+		}
+
+		if (buttons[SDLK_SPACE].pressed && transformTimer > transformDelay) {
 			bodyPlayer->removeCollider(collider1);
 			reactphysics3d::Transform t =  reactphysics3d::Transform::identity(); 
-			if (isHuman) { //to sphere
+			if (is_human) { //to sphere
 				playerSphere->position = shifted->position;
 				player->position = glm::vec3(0.0f, 0.0f, -10.0f);
 				shifted = playerSphere;
@@ -234,7 +213,7 @@ void PlayMode::update(float elapsed) {
 				collider1 = bodyPlayer->addCollider(boxShape, t);
 			}
 			transformDelay = transformTimer + 1.0f;
-			isHuman = !isHuman;
+			is_human = !is_human;
 		}
 
 		//make it so that moving diagonally doesn't go faster:
@@ -263,10 +242,7 @@ void PlayMode::update(float elapsed) {
 	}
 
 	//reset button press counters:
-	left.downs = 0;
-	right.downs = 0;
-	up.downs = 0;
-	down.downs = 0;
+
 }
 
 void PlayMode::draw(glm::uvec2 const &drawable_size) {
@@ -312,4 +288,16 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 			glm::u8vec4(0xff, 0xff, 0xff, 0x00));
 	}
 	GL_ERRORS();
+}
+
+glm::vec2 PlayMode::move_character(bool up, bool down, bool left, bool right) {
+	glm::vec2 move = glm::vec2(0.0f);
+	if (left && !right) move.x = -1.0f;
+	if (!left && right) move.x = 1.0f;
+	if (down && !up) move.y = -1.0f;
+	if (!down && up) move.y = 1.0f;
+	//if (buttons[SDLK_o].pressed); //TODO reset position
+
+	return move;
+
 }
