@@ -14,3 +14,6 @@ scenes/show-scene*
 # clangd config files
 .clangd/
 compile_commands.json
+
+# cache?
+.cache/

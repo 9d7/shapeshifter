@@ -2,8 +2,11 @@
 
 #include "Scene.hpp"
 #include "Sound.hpp"
+#include "Prism.hpp"
 
 #include <glm/glm.hpp>
+#include <reactphysics3d/engine/PhysicsCommon.h>
+#include <reactphysics3d/engine/PhysicsWorld.h>
 #include <reactphysics3d/reactphysics3d.h>
 
 #include <vector>
@@ -19,14 +22,9 @@ struct PlayMode : Mode {
 	virtual void draw(glm::uvec2 const &drawable_size) override;
 
 	//----- game state -----
-	reactphysics3d::PhysicsCommon physicsCommon;
-	reactphysics3d::PhysicsWorld* world;
-	reactphysics3d::RigidBody* bodyPlayer;
-	reactphysics3d::RigidBody* bodyEnemy;
-	reactphysics3d::RigidBody* bodyFloor;
-	reactphysics3d::Collider* collider1; 
-	reactphysics3d::Collider* collider2; 
-	reactphysics3d::Collider* collider3; 
+	reactphysics3d::PhysicsCommon common;
+	reactphysics3d::PhysicsWorld *world = nullptr;
+	std::vector<Prism> prisms;
 
 	//input tracking:
 	struct Button {
