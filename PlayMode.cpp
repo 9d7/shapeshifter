@@ -58,8 +58,8 @@ PlayMode::PlayMode() : scene(*hexapod_scene) {
 		reactphysics3d::Quaternion orientation = reactphysics3d::Quaternion::identity();
 		reactphysics3d::Transform transform1(position1, orientation);
 		reactphysics3d::Transform transform2(position2, orientation);
-		bodyPlayer = world->createRigidBody(transform1);
-		bodyEnemy = world->createRigidBody(transform2);
+		body_player = world->createRigidBody(transform1);
+		body_enemy = world->createRigidBody(transform2);
 
 		// Half extents of the box in the x, y and z directions 
 		const reactphysics3d::Vector3 halfExtents(1.0, 1.0, 1.0); 
@@ -70,7 +70,7 @@ PlayMode::PlayMode() : scene(*hexapod_scene) {
  
 		// Add the collider to the rigid body 
 		
-		collider1 = bodyPlayer->addCollider(boxShape, t);
+		collider1 = body_player->addCollider(boxShape, t);
 
 		// Instantiate a sphere collision shape 
 		reactphysics3d::SphereShape* sphereShape = physicsCommon.createSphereShape(1.0f); 
@@ -79,19 +79,19 @@ PlayMode::PlayMode() : scene(*hexapod_scene) {
 		//reactphysics3d::Transform transform = Transform::identity(); 
 		
 		// Add the collider to the rigid body 
-		collider2 = bodyEnemy->addCollider(sphereShape, t);
+		collider2 = body_enemy->addCollider(sphereShape, t);
 
 		//floor
 		reactphysics3d::Vector3 position3(0.0, -1, 0.0); 
 		reactphysics3d::Transform transform3(position3, orientation); 
-		bodyFloor = world->createRigidBody(transform3);
-		bodyFloor->setType(reactphysics3d::BodyType::STATIC);
+		body_floor = world->createRigidBody(transform3);
+		body_floor->setType(reactphysics3d::BodyType::STATIC);
 
 		const reactphysics3d::Vector3 floorSize(20.0, 1.0, 20.0); 
 		
 		// Create the box shape 
 		reactphysics3d::BoxShape* floorShape = physicsCommon.createBoxShape(floorSize);
-		collider3 = bodyFloor->addCollider(floorShape, t);
+		collider3 = body_floor->addCollider(floorShape, t);
 	}
 
 	//get pointers to leg for convenience:
@@ -122,7 +122,7 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 			return true;
 		}
 		if (buttons.find(key) != buttons.end()) {
-			buttons[key].downs += 1;
+			//buttons[key].downs += 1;
 			buttons[key].pressed = true;
 			return true;
 		}
@@ -162,30 +162,44 @@ void PlayMode::update(float elapsed) {
 	world->update(timeStep);
 
 	// Get the updated position of the body
-	const reactphysics3d::Transform& transform1 = bodyPlayer->getTransform();
-	const reactphysics3d::Vector3& pos1 = transform1.getPosition();
-	const reactphysics3d::Transform& transform2 = bodyEnemy->getTransform();
-	const reactphysics3d::Vector3& pos2 = transform2.getPosition();
-	const reactphysics3d::Transform& transform3 = bodyFloor->getTransform();
-	const reactphysics3d::Vector3& pos3 = transform3.getPosition();
-	shifted->position = glm::vec3(pos1.x, pos1.z, pos1.y);
-	sphere->position = glm::vec3(pos2.x, pos2.z, pos2.y);
-	plane->position = glm::vec3(pos3.x, pos3.z, pos3.y);
+	reactphysics3d::Transform transform_player = body_player->getTransform();
+	reactphysics3d::Vector3 position_player = transform_player.getPosition(); // default 0,y,0
+	reactphysics3d::Transform transform_enemy = body_enemy->getTransform();
+	reactphysics3d::Vector3 position_enemy = transform_enemy.getPosition(); // default 0,y,10
+	const reactphysics3d::Transform& transform_floor = body_floor->getTransform();
+	const reactphysics3d::Vector3& position_floor = transform_floor.getPosition();
+	shifted->position = glm::vec3(position_player.x, position_player.z, position_player.y);
+	sphere->position = glm::vec3(position_enemy.x, position_enemy.z, position_enemy.y);
+	plane->position = glm::vec3(position_floor.x, position_floor.z, position_floor.y);
 	//reactphysics3d::AABB flooraabb = collider3->getWorldAABB();
 	//if (collider1->testAABBOverlap(flooraabb)) {
 		//printf("collide\n");
 	//}
 
 	// Display the position of the body
-	//std::cout << "Body Position: (" << pos3.x << ", " << pos3.y << ", " << pos3.z << ")" << std::endl;
+	//std::cout << "Body Position: (" << position_floor.x << ", " << position_floor.y << ", " << position_floor.z << ")" << std::endl;
 
 	transformTimer += elapsed;
+
+	// Check if player is within a certain distance with enemy
+	//std::cout << (position_enemy - position_player).length() << "\n";
+	//std::cout << position_enemy.to_string() << "\n";
+	if (is_human && (position_enemy - position_player).length() < 2.0f) {
+		is_dead = true;
+	}
+
+	// Reset if reset button pressed
+	if (buttons[SDLK_k].pressed) {
+		is_dead = false;
+		position_enemy = reactphysics3d::Vector3(0.0f, 1.0f, 10.0f);
+		position_player = reactphysics3d::Vector3(0.0f, 1.0f, 0.0f);
+	}
 
 	//move camera:
 	{
 		//combine inputs into a move:
 		constexpr float PlayerSpeed = 20.0f;
-		glm::vec2 move;
+		reactphysics3d::Vector3 move;
 
 		if (is_human) {
 			move = move_character(buttons[SDLK_w].pressed, buttons[SDLK_s].pressed, buttons[SDLK_a].pressed, buttons[SDLK_d].pressed);
@@ -195,14 +209,14 @@ void PlayMode::update(float elapsed) {
 		}
 
 		if (buttons[SDLK_SPACE].pressed && transformTimer > transformDelay) {
-			bodyPlayer->removeCollider(collider1);
+			body_player->removeCollider(collider1);
 			reactphysics3d::Transform t =  reactphysics3d::Transform::identity(); 
 			if (is_human) { //to sphere
 				playerSphere->position = shifted->position;
 				player->position = glm::vec3(0.0f, 0.0f, -10.0f);
 				shifted = playerSphere;
 				reactphysics3d::SphereShape* sphereShape = physicsCommon.createSphereShape(1.0f); 
-				collider1 = bodyPlayer->addCollider(sphereShape, t);
+				collider1 = body_player->addCollider(sphereShape, t);
 
 			} else { //back to human (cube)
 				player->position = shifted->position;
@@ -210,21 +224,35 @@ void PlayMode::update(float elapsed) {
 				shifted = player;
 				const reactphysics3d::Vector3 halfExtents(1.0, 1.0, 1.0); 
 				reactphysics3d::BoxShape* boxShape = physicsCommon.createBoxShape(halfExtents);
-				collider1 = bodyPlayer->addCollider(boxShape, t);
+				collider1 = body_player->addCollider(boxShape, t);
 			}
 			transformDelay = transformTimer + 1.0f;
 			is_human = !is_human;
 		}
 
 		//make it so that moving diagonally doesn't go faster:
-		if (move != glm::vec2(0.0f)) move = glm::normalize(move) * PlayerSpeed * elapsed;
+		if (move != reactphysics3d::Vector3::zero()) {
+			move.normalize();
+			move = move * PlayerSpeed * elapsed;
+		}
 
-		reactphysics3d::Vector3 position(pos1.x + move.x, pos1.y, pos1.z + move.y); 
-		reactphysics3d::Quaternion orientation = reactphysics3d::Quaternion::identity(); 
-		reactphysics3d::Transform newTransform(position, orientation); 
+		// If player is currently human, enemy goes towards them
+		if (is_human) {
+			reactphysics3d::Vector3 move_enemy = position_player - position_enemy;
+			move_enemy.normalize();
+			move_enemy = move_enemy * PlayerSpeed * .25f * elapsed;
+			transform_enemy.setPosition(position_enemy + move_enemy);
+		}
+
 		
+		//const reactphysics3d::Vector3& position(position_player.x + move.x, position_player.y, position_player.z + move.y); 
+		//reactphysics3d::Quaternion orientation = reactphysics3d::Quaternion::identity(); 
+		//reactphysics3d::Transform new_transform_player(position_player + move, transform_player.getOrientation()); 
+		//reactphysics3d::Vector3 position = position_player + move;
+		transform_player.setPosition(position_player + move);
 		// Move the collision body 
-		bodyPlayer->setTransform(newTransform);
+		body_player->setTransform(transform_player);
+		body_enemy->setTransform(transform_enemy);
 
 		// glm::mat4x3 frame = camera->transform->make_local_to_parent();
 		// glm::vec3 right = frame[0];
@@ -275,28 +303,60 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 			0.0f, 0.0f, 1.0f, 0.0f,
 			0.0f, 0.0f, 0.0f, 1.0f
 		));
+		
+		std::string const instructions = controls_text[!is_human];
 
 		constexpr float H = 0.09f;
-		lines.draw_text("Mouse motion rotates camera; WASD moves; escape ungrabs mouse",
+		lines.draw_text(instructions,
 			glm::vec3(-aspect + 0.1f * H, -1.0 + 0.1f * H, 0.0),
-			glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
+			glm::vec3(1.4f * H, 0.0f, 0.0f), glm::vec3(0.0f, 1.4f * H, 0.0f),
 			glm::u8vec4(0x00, 0x00, 0x00, 0x00));
 		float ofs = 2.0f / drawable_size.y;
-		lines.draw_text("Mouse motion rotates camera; WASD moves; escape ungrabs mouse",
-			glm::vec3(-aspect + 0.1f * H + ofs, -1.0 + + 0.1f * H + ofs, 0.0),
-			glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
+		lines.draw_text(instructions,
+			glm::vec3(-aspect + 0.1f * H + ofs, -1.0 + 0.1f * H + ofs, 0.0),
+			glm::vec3(1.4f * H, 0.0f, 0.0f), glm::vec3(0.0f, 1.4f * H, 0.0f),
 			glm::u8vec4(0xff, 0xff, 0xff, 0x00));
+
+		if (is_dead) {
+			lines.draw_text("YOU DIED",
+				glm::vec3(-7.0f * H,0.0f, 0.0f),
+				glm::vec3(5.0f * H, 0.0f, 0.0f), glm::vec3(0.0f, 5.0f * H, 0.0f),
+				glm::u8vec4(0xff, 0x00, 0x00, 0x00));
+			lines.draw_text("YOU DIED",
+				glm::vec3(-7.0f * H + ofs, 0.0f + ofs, 0.0f),
+				glm::vec3(5.0f * H, 0.0f, 0.0f), glm::vec3(0.0f, 5.0f * H, 0.0f),
+				glm::u8vec4(0x4f, 0x0f, 0x0f, 0x00));
+		}
+		if (is_human) {
+			lines.draw_text("NORMAL",
+				glm::vec3(-aspect + 0.1f * H, 0.7f - 0.1f * H, 0.0f),
+				glm::vec3(3.0f * H, 0.0f, 0.0f), glm::vec3(0.0f, 3.0f * H, 0.0f),
+				glm::u8vec4(0x00, 0x00, 0xff, 0x00));
+			lines.draw_text("NORMAL",
+				glm::vec3(-aspect + 0.1f * H + ofs, .7f - 0.1f * H - ofs, 0.0f),
+				glm::vec3(3.0f * H, 0.0f, 0.0f), glm::vec3(0.0f, 3.0f * H, 0.0f),
+				glm::u8vec4(0xaf, 0xaf, 0xff, 0x00));
+		}
+		else {
+			lines.draw_text("SHAPESHIFTED",
+				glm::vec3(-aspect + 0.1f * H, 0.7f - 0.1f * H, 0.0f),
+				glm::vec3(3.0f * H, 0.0f, 0.0f), glm::vec3(0.0f, 3.0f * H, 0.0f),
+				glm::u8vec4(0x00, 0xff, 0x00, 0x00));
+			lines.draw_text("SHAPESHIFTED",
+				glm::vec3(-aspect + 0.1f * H + ofs, .7f - 0.1f * H - ofs, 0.0f),
+				glm::vec3(3.0f * H, 0.0f, 0.0f), glm::vec3(0.0f, 3.0f * H, 0.0f),
+				glm::u8vec4(0x0f, 0x4f, 0x0f, 0x00));
+		}
 	}
 	GL_ERRORS();
 }
 
-glm::vec2 PlayMode::move_character(bool up, bool down, bool left, bool right) {
-	glm::vec2 move = glm::vec2(0.0f);
+reactphysics3d::Vector3 PlayMode::move_character(bool up, bool down, bool left, bool right) {
+	reactphysics3d::Vector3 move = reactphysics3d::Vector3::zero();
 	if (left && !right) move.x = -1.0f;
 	if (!left && right) move.x = 1.0f;
-	if (down && !up) move.y = -1.0f;
-	if (!down && up) move.y = 1.0f;
-	//if (buttons[SDLK_o].pressed); //TODO reset position
+	if (down && !up) move.z = -1.0f;
+	if (!down && up) move.z = 1.0f;
 
 	return move;
 
