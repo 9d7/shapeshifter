@@ -9,7 +9,6 @@
 #include "data_path.hpp"
 
 #include <algorithm>
-#include <bits/stdint-uintn.h>
 #include <cstdio>
 #include <glm/gtc/type_ptr.hpp>
 #include <reactphysics3d/collision/shapes/BoxShape.h>
