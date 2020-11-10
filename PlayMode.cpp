@@ -13,6 +13,7 @@
 #include <cstdio>
 #include <glm/gtc/type_ptr.hpp>
 #include <reactphysics3d/collision/shapes/BoxShape.h>
+#include <reactphysics3d/constraint/HingeJoint.h>
 #include <reactphysics3d/engine/PhysicsCommon.h>
 #include <reactphysics3d/mathematics/Transform.h>
 #include <reactphysics3d/mathematics/Vector3.h>

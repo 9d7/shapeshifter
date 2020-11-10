@@ -120,6 +120,7 @@ GAME_NAMES =
 
 COMMON_NAMES =
 	Prism
+	Quadruped
 	data_path
 	PathFont
 	PathFont-font
