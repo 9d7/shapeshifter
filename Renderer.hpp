@@ -2,6 +2,8 @@
 
 #include <glm/glm.hpp>
 #include "GL.hpp"
+#include "glm/fwd.hpp"
+#include <vector>
 
 // Notes about the renderer:
 // 1) It operates in pixel space: The full screen is 320x240 pixels.
@@ -37,11 +39,28 @@ private:
 	GLuint tiny_tex;
 	GLuint tiny_rbo; // for depth
 
+	// For tiny sprites
+	GLuint tiny_vbo;
+	GLuint tiny_vao;
+
 	// for framebuffer renders--simple quad that fills the screen.
 	// vertices here only store texture coordinates and position, both
 	// as vec2s. This is used for the texture_program program.
 	GLuint quad_vbo;
 	GLuint quad_vao;
+
+	// texture atlas
+	GLuint atlas_tex;
+	glm::uvec2 atlas_size;
+
+	struct Vertex{
+		glm::vec2 position;
+		glm::vec2 tex_coord;
+		glm::vec4 color;
+	};
+	static_assert(sizeof(Vertex) == sizeof(float) * 8, "Vertex is not packed");
+
+	std::vector<Vertex> small_verts;
 
 
 };

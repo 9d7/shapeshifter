@@ -4,6 +4,12 @@
 #include "data_path.hpp"
 #include "gl_compile_program.hpp"
 #include "gl_errors.hpp"
+#include <cstdio>
+#include <glm/glm.hpp>
+#include "glm/ext/matrix_clip_space.hpp"
+#include "glm/fwd.hpp"
+#include "glm/gtc/type_ptr.hpp"
+#include "load_save_png.hpp"
 #include <algorithm>
 #include <iterator>
 #include <vector>
@@ -67,6 +73,44 @@ Load < BackgroundProgram > background_program(LoadTagDefault, []() -> Background
 	return new BackgroundProgram {
 		program,
 		glGetUniformLocation(program, "Time")
+	};
+
+});
+
+struct SpriteSmallProgram {
+	GLuint program;
+	GLint ScreenToClip_mat4;
+};
+
+Load < SpriteSmallProgram > sprite_small_program(LoadTagDefault, []() -> SpriteSmallProgram *{
+
+	std::ifstream vfs(data_path("shaders/sprite_small_vertex.glsl"));
+	std::string vertex_shader(
+		(std::istreambuf_iterator<char>(vfs)),
+		(std::istreambuf_iterator<char>())
+	);
+
+	std::ifstream ffs(data_path("shaders/sprite_small_fragment.glsl"));
+	std::string fragment_shader(
+		(std::istreambuf_iterator<char>(ffs)),
+		(std::istreambuf_iterator<char>())
+	);
+
+	GLuint program = gl_compile_program(
+		vertex_shader,
+		fragment_shader
+	);
+
+	GLuint TEX_sampler2D = glGetUniformLocation(program, "TEX");
+
+	//set TEX to always refer to texture binding zero:
+	glUseProgram(program); //bind program -- glUniform* calls refer to this program now
+	glUniform1i(TEX_sampler2D, 0); //set TEX to sample from GL_TEXTURE0
+	glUseProgram(0); //unbind program -- glUniform* calls refer to ??? now
+
+	return new SpriteSmallProgram {
+		program,
+		glGetUniformLocation(program, "ScreenToClip")
 	};
 
 });
@@ -151,6 +195,7 @@ Renderer::Renderer() {
 				(GLbyte *)0 + offset * sizeof(float)
 			);
 			glEnableVertexAttribArray(i);
+			offset += sizes[i];
 
 		}
 
@@ -174,29 +219,149 @@ Renderer::Renderer() {
 	);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+	make_vb(&tiny_vbo, &tiny_vao, {2, 2, 4}, 8);
+
+
+	// make texture atlas
+	std::vector<glm::u8vec4> atlas_data;
+
+	load_png(
+		data_path("stars.png"),
+		&atlas_size,
+		&atlas_data,
+		OriginLocation::LowerLeftOrigin
+	);
+
+	glGenTextures(1, &atlas_tex);
+	glBindTexture(GL_TEXTURE_2D, atlas_tex);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, atlas_size.x, atlas_size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, atlas_data.data());
+	glBindTexture(GL_TEXTURE_2D, 0);
+
 }
 
 Renderer::~Renderer() {}
 
 void Renderer::draw(const glm::uvec2 &drawable_size) {
 
+	small_verts.clear();
+
+	auto draw_rect = [this](
+		glm::uvec2  location,
+		glm::uvec2  tex,
+		glm::uvec2  size,
+		glm::u8vec4 color
+	) {
+		
+		glm::vec2 p_min = glm::vec2(location);
+		glm::vec2 p_max = glm::vec2(location + size);
+
+		glm::vec2 t_min = glm::vec2(tex) / glm::vec2(atlas_size);
+		glm::vec2 t_max = glm::vec2(tex + size) / glm::vec2(atlas_size);
+
+		glm::vec4 c = glm::vec4(color) / 255.0f;
+
+		printf("%f %f\n %f %f\n %f %f\n %f %f\n %f %f %f %f\n====\n",
+				p_min.x, p_min.y, p_max.x, p_max.y, t_min.x, t_min.y,
+				t_max.x, t_max.y, c.r, c.g, c.b, c.a);
+
+		this->small_verts.push_back(Vertex {
+			glm::vec2(p_min.x, p_max.y),
+			glm::vec2(t_min.x, t_max.y),
+			c
+		});
+
+		this->small_verts.push_back(Vertex {
+			glm::vec2(p_min.x, p_min.y),
+			glm::vec2(t_min.x, t_min.y),
+			c
+		});
+
+		this->small_verts.push_back(Vertex {
+			glm::vec2(p_max.x, p_min.y),
+			glm::vec2(t_max.x, t_min.y),
+			c
+		});
+
+		this->small_verts.push_back(Vertex {
+			glm::vec2(p_min.x, p_max.y),
+			glm::vec2(t_min.x, t_max.y),
+			c
+		});
+
+		this->small_verts.push_back(Vertex {
+			glm::vec2(p_max.x, p_min.y),
+			glm::vec2(t_max.x, t_min.y),
+			c
+		});
+
+		this->small_verts.push_back(Vertex {
+			glm::vec2(p_max.x, p_max.y),
+			glm::vec2(t_max.x, t_max.y),
+			c
+		});
+
+	};
+
+	draw_rect(
+		glm::uvec2(100, 100),
+		glm::uvec2(0, 0),
+		glm::uvec2(32, 32),
+		glm::u8vec4(255, 255, 255, 255)
+	);
+
 	// first pass
 	glBindFramebuffer(GL_FRAMEBUFFER, tiny_fbo);
 	glViewport(0, 0, ScreenWidth, ScreenHeight);
 	glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-
-	// draw all pixel things here
+	// draw background
+	glDisable(GL_DEPTH_TEST);
 	glUseProgram(background_program->program);
-
 	glUniform1f(background_program->Time_float, total_elapsed);
-
 	glBindVertexArray(quad_vao);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindVertexArray(0);
+	glUseProgram(0);
+
+	// draw tiny textures
+	glDisable(GL_DEPTH_TEST);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
+
+	glBindBuffer(GL_ARRAY_BUFFER, tiny_vbo);
+	glBufferData(
+		GL_ARRAY_BUFFER,
+		small_verts.size() * sizeof(Vertex),
+		small_verts.data(),
+		GL_DYNAMIC_DRAW
+	);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glUseProgram(sprite_small_program->program);
+
+	glUniformMatrix4fv(
+		sprite_small_program->ScreenToClip_mat4,
+		1,
+		GL_FALSE,
+		glm::value_ptr(glm::ortho(
+			0.0f,
+			(float)ScreenWidth,
+			0.0f,
+			(float)ScreenHeight
+		))
+	);
+
+	glBindVertexArray(tiny_vao);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, atlas_tex);
+	glDrawArrays(GL_TRIANGLES, 0, small_verts.size());
+
+	glBindTexture(GL_TEXTURE_2D, 0);
 	glBindVertexArray(0);
 	glUseProgram(0);
 
