@@ -7,7 +7,6 @@
 #include "Load.hpp"
 #include "gl_errors.hpp"
 #include "data_path.hpp"
-#include <math.h> 
 
 #include <glm/gtc/type_ptr.hpp>
 #include <reactphysics3d/reactphysics3d.h>
@@ -38,6 +37,10 @@ Load< Scene > hexapod_scene(LoadTagDefault, []() -> Scene const * {
 	});
 });
 
+Load< Sound::Sample > dusty_floor_sample(LoadTagDefault, []() -> Sound::Sample const * {
+	return new Sound::Sample(data_path("dusty-floor.opus"));
+});
+
 PlayMode::PlayMode() : scene(*hexapod_scene) {
 
 	{ // test reactphysics3d
@@ -47,15 +50,11 @@ PlayMode::PlayMode() : scene(*hexapod_scene) {
 		
 
 		// Create a physics world
-		rp3d::PhysicsWorld::WorldSettings settings;
-		settings.gravity = rp3d::Vector3(0.0f, 0.0f, -9.81f);
-		world = physicsCommon.createPhysicsWorld(settings); 
-		// Register your event listener class 
-		world->setEventListener(&listener);
+		world = physicsCommon.createPhysicsWorld();
 		
 		// Create a rigid body in the world
-		reactphysics3d::Vector3 position1(0, -10, 2);
-		reactphysics3d::Vector3 position2(0, 1, 2);
+		reactphysics3d::Vector3 position1(0, 1, 0);
+		reactphysics3d::Vector3 position2(0, 1, 10);
 		reactphysics3d::Quaternion orientation = reactphysics3d::Quaternion::identity();
 		reactphysics3d::Transform transform1(position1, orientation);
 		reactphysics3d::Transform transform2(position2, orientation);
@@ -83,7 +82,16 @@ PlayMode::PlayMode() : scene(*hexapod_scene) {
 		collider2 = body_enemy->addCollider(sphereShape, t);
 
 		//floor
-		level_1();
+		reactphysics3d::Vector3 position3(0.0, -1, 0.0); 
+		reactphysics3d::Transform transform3(position3, orientation); 
+		body_floor = world->createRigidBody(transform3);
+		body_floor->setType(reactphysics3d::BodyType::STATIC);
+
+		const reactphysics3d::Vector3 floorSize(20.0, 1.0, 20.0); 
+		
+		// Create the box shape 
+		reactphysics3d::BoxShape* floorShape = physicsCommon.createBoxShape(floorSize);
+		collider3 = body_floor->addCollider(floorShape, t);
 	}
 
 	//get pointers to leg for convenience:
@@ -97,7 +105,10 @@ PlayMode::PlayMode() : scene(*hexapod_scene) {
 	//get pointer to camera for convenience:
 	//if (scene.cameras.size() != 1) throw std::runtime_error("Expecting scene to have exactly one camera, but it has " + std::to_string(scene.cameras.size()));
 	camera = &scene.cameras.front();
-	printf("%f %f\n", camera->transform->position.x, camera->transform->position.x);
+
+	//start music loop playing:
+	// (note: position will be over-ridden in update())
+	leg_tip_loop = Sound::loop_3D(*dusty_floor_sample, 1.0f, glm::vec3(0.0f), 10.0f);
 }
 
 PlayMode::~PlayMode() {
@@ -133,14 +144,11 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 				evt.motion.xrel / float(window_size.y),
 				-evt.motion.yrel / float(window_size.y)
 			);
-			auto rx = glm::angleAxis(motion.y * camera->fovy, glm::vec3(1.0f, 0.0f, 0.0f));
-			auto ry = glm::angleAxis(-motion.x * camera->fovy, glm::vec3(0.0f, 1.0f, 0.0f));
 			camera->transform->rotation = glm::normalize(
 				camera->transform->rotation
 				* glm::angleAxis(-motion.x * camera->fovy, glm::vec3(0.0f, 1.0f, 0.0f))
 				* glm::angleAxis(motion.y * camera->fovy, glm::vec3(1.0f, 0.0f, 0.0f))
 			);
-			// printf("%f %f %f \n", rot.x, rot.y, rot.z);
 			return true;
 		}
 	}
@@ -158,11 +166,11 @@ void PlayMode::update(float elapsed) {
 	reactphysics3d::Vector3 position_player = transform_player.getPosition(); // default 0,y,0
 	reactphysics3d::Transform transform_enemy = body_enemy->getTransform();
 	reactphysics3d::Vector3 position_enemy = transform_enemy.getPosition(); // default 0,y,10
-	//const reactphysics3d::Transform& transform_floor = body_floor->getTransform();
-	//const reactphysics3d::Vector3& position_floor = transform_floor.getPosition();
-	shifted->position = glm::vec3(position_player.x, position_player.y, position_player.z);
-	sphere->position = glm::vec3(position_enemy.x, position_enemy.y, position_enemy.z);
-	//plane->position = glm::vec3(position_floor.x, position_floor.y, position_floor.z);
+	const reactphysics3d::Transform& transform_floor = body_floor->getTransform();
+	const reactphysics3d::Vector3& position_floor = transform_floor.getPosition();
+	shifted->position = glm::vec3(position_player.x, position_player.z, position_player.y);
+	sphere->position = glm::vec3(position_enemy.x, position_enemy.z, position_enemy.y);
+	plane->position = glm::vec3(position_floor.x, position_floor.z, position_floor.y);
 	//reactphysics3d::AABB flooraabb = collider3->getWorldAABB();
 	//if (collider1->testAABBOverlap(flooraabb)) {
 		//printf("collide\n");
@@ -176,14 +184,15 @@ void PlayMode::update(float elapsed) {
 	// Check if player is within a certain distance with enemy
 	//std::cout << (position_enemy - position_player).length() << "\n";
 	//std::cout << position_enemy.to_string() << "\n";
-	handle_triggers();
-	handle_dynamic_collisions();
+	if (is_human && (position_enemy - position_player).length() < 2.0f) {
+		is_dead = true;
+	}
 
 	// Reset if reset button pressed
 	if (buttons[SDLK_k].pressed) {
 		is_dead = false;
-		position_enemy = reactphysics3d::Vector3(0.0f, -10.0f, 2);
-		position_player = reactphysics3d::Vector3(0.0f, 1.0f, 2);
+		position_enemy = reactphysics3d::Vector3(0.0f, 1.0f, 10.0f);
+		position_player = reactphysics3d::Vector3(0.0f, 1.0f, 0.0f);
 	}
 
 	//move camera:
@@ -226,10 +235,6 @@ void PlayMode::update(float elapsed) {
 			move.normalize();
 			move = move * PlayerSpeed * elapsed;
 		}
-		camera->transform->position.x += move.x;
-		camera->transform->position.y += move.y;
-		glm::mat4 view = glm::lookAt(camera->transform->position, shifted->position, glm::vec3(0.0, 1.0, 0.0));
-		camera->transform->rotation = glm::conjugate(glm::quat_cast(view));
 
 		// If player is currently human, enemy goes towards them
 		if (is_human) {
@@ -350,73 +355,9 @@ reactphysics3d::Vector3 PlayMode::move_character(bool up, bool down, bool left, 
 	reactphysics3d::Vector3 move = reactphysics3d::Vector3::zero();
 	if (left && !right) move.x = -1.0f;
 	if (!left && right) move.x = 1.0f;
-	if (down && !up) move.y = -1.0f;
-	if (!down && up) move.y = 1.0f;
+	if (down && !up) move.z = -1.0f;
+	if (!down && up) move.z = 1.0f;
 
 	return move;
 
-}
-
-void PlayMode::handle_triggers() {
-
-	for (size_t i = 0; i < listener.trigs.size(); i++) {
-		if (listener.trigs[i] == collider1) continue;
-		if (listener.trigs[i] == current_map.flagcol) {
-			level_cleared = true;
-			printf("cleared!\n");
-			return ;
-		} else {
-			is_dead = true;
-		}
-	}
-}
-
-void PlayMode::handle_dynamic_collisions() {
-	for (size_t i = 0; i < listener.cols.size(); i += 2) {
-		if (current_map.walkables.find(listener.cols[i]) == current_map.walkables.end() && listener.cols[i+1] == collider1 ||
-		    current_map.walkables.find(listener.cols[i+1]) == current_map.walkables.end() && listener.cols[i] == collider1) {
-			if (is_human) {
-				is_dead = true;
-			}
-		}
-	}
-}
-
-void PlayMode::create_rigid_box(reactphysics3d::Vector3 pos, reactphysics3d::Vector3 size, bool trigger) {
-    reactphysics3d::Transform transform1(pos, rp3d::Quaternion::identity()); 
-    rp3d::RigidBody *body = world->createRigidBody(transform1);
-    body->setType(rp3d::BodyType::STATIC);
-    reactphysics3d::BoxShape* shape = physicsCommon.createBoxShape(size);
-    rp3d::Collider *col = body->addCollider(shape, rp3d::Transform::identity());
-
-	if (trigger) {
-		col->setIsTrigger(true);
-		current_map.triggers[col] = body;
-	} else {
-		current_map.walkables[col] = body;
-	}
-}
-
-void PlayMode::level_1() {
-    create_rigid_box(rp3d::Vector3(0.0, 0, -1), rp3d::Vector3(20.0, 20.0, 1.0), false);
-    create_rigid_box(rp3d::Vector3(0.0, 25, -1), rp3d::Vector3(5.0, 5.0, 1.0), false);
-	create_rigid_box(rp3d::Vector3(0.0, 35, -1), rp3d::Vector3(20.0, 5.0, 1.0), false);
-	create_rigid_box(rp3d::Vector3(15, 45, -1), rp3d::Vector3(5.0, 5.0, 1.0), false);
-	create_rigid_box(rp3d::Vector3(0, 55, -1), rp3d::Vector3(20.0, 5.0, 1.0), false);
-	create_rigid_box(rp3d::Vector3(-15, 65, -1), rp3d::Vector3(5.0, 5.0, 1.0), false);
-	create_rigid_box(rp3d::Vector3(-10, 75, -1), rp3d::Vector3(10.0, 5.0, 1.0), false);
-	create_rigid_box(rp3d::Vector3(10, 75, -1), rp3d::Vector3(10.0, 10.0, 1.0), false);
-
-	create_rigid_box(rp3d::Vector3(0, 25, -8), rp3d::Vector3(20.0, 5.0, 5), true);
-	create_rigid_box(rp3d::Vector3(0, 45, -8), rp3d::Vector3(20.0, 5.0, 5), true);
-	create_rigid_box(rp3d::Vector3(0, 65, -8), rp3d::Vector3(20.0, 5.0, 5), true);
-
-	reactphysics3d::Transform transform1(rp3d::Vector3(10, 75, 3), rp3d::Quaternion::identity()); 
-    rp3d::RigidBody *body = world->createRigidBody(transform1);
-    body->setType(rp3d::BodyType::STATIC);
-    reactphysics3d::BoxShape* shape = physicsCommon.createBoxShape(rp3d::Vector3(1, 1, 3));
-    rp3d::Collider *col = body->addCollider(shape, rp3d::Transform::identity());
-	col->setIsTrigger(true);
-	current_map.flagrb = body;
-	current_map.flagcol = col;
 }
