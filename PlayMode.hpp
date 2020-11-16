@@ -22,9 +22,9 @@ struct PlayMode : Mode {
 	//----- game state -----
 	reactphysics3d::PhysicsCommon physicsCommon;
 	reactphysics3d::PhysicsWorld* world;
-	reactphysics3d::RigidBody* body_player;
-	reactphysics3d::RigidBody* body_enemy;
-	reactphysics3d::RigidBody* body_floor;
+	reactphysics3d::RigidBody* bodyPlayer;
+	reactphysics3d::RigidBody* bodyEnemy;
+	reactphysics3d::RigidBody* bodyFloor;
 	reactphysics3d::Collider* collider1; 
 	reactphysics3d::Collider* collider2; 
 	reactphysics3d::Collider* collider3; 
@@ -44,13 +44,8 @@ struct PlayMode : Mode {
 		{SDLK_e, Button()},
 		{SDLK_r, Button()},
 		{SDLK_t, Button()},
-		{SDLK_k, Button()},
+		{SDLK_o, Button()},
 		{SDLK_SPACE, Button()}
-	};
-
-	std::string controls_text[2] = {
-		"WASD moves your character; SPACE to shapeshift; K to reset",
-		"QERT moves your character; SPACE to shapeshift; K to reset"
 	};
 
 	//local copy of the game scene (so code can change it during gameplay):
@@ -62,13 +57,12 @@ struct PlayMode : Mode {
 	Scene::Transform *playerSphere = nullptr;
 
 	bool is_human = true;
-	bool is_dead = false;
 	float transformDelay = 0.0f;
 	float transformTimer = 0.0f;
 
 	glm::vec3 get_leg_tip_position();
 
-	reactphysics3d::Vector3 move_character(bool up, bool down, bool left, bool right);
+	glm::vec2 move_character(bool up, bool down, bool left, bool right);
 
 	//music coming from the tip of the leg (as a demonstration):
 	std::shared_ptr< Sound::PlayingSample > leg_tip_loop;
