@@ -15,7 +15,7 @@ if $(OS) = NT { #Windows
 		/I"$(NEST_LIBS)/harfbuzz/include"
 		/I"$(NEST_LIBS)/freetype/include"
 		/experimental:external # VS compilation, allow marking "external"
-		/external:I"libs/windows/rp3d/include"
+		/external:I"reactphysics3d/out/install/x64-Release/include"
 		/external:W0 # disable warnings on external libraries
 		#disable a few warnings:
 		/wd4146 #-1U is still unsigned
@@ -30,7 +30,7 @@ if $(OS) = NT { #Windows
 		/LIBPATH:"$(NEST_LIBS)/libogg/lib"
 		/LIBPATH:"$(NEST_LIBS)/harfbuzz/lib"
 		/LIBPATH:"$(NEST_LIBS)/freetype/lib"
-		/LIBPATH:"libs/windows/rp3d/lib"
+		/LIBPATH:"reactphysics3d/out/install/x64-Release/lib"
 	;
 	LINKLIBS =
 		SDL2main.lib SDL2.lib OpenGL32.lib Shell32.lib

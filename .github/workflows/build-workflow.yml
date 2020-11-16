@@ -70,13 +70,7 @@ jobs:
         shell: bash
         run: |
           sudo apt-get update
-          sudo apt-get install ftjam libgl-dev cmake
-          echo -e "\nBuilding RP3D...\n"
-          cd reactphysics3d
-          cmake .
-          make
-          cd ..
-          echo -e "\nDone Building RP3D.\n"
+          sudo apt-get install ftjam libgl-dev
           ls
           jam -j3 -q && cp README.md dist
       - name: Upload Artifact
@@ -120,14 +114,9 @@ jobs:
         shell: bash
         run: |
           brew install ftjam
-          brew install cmake
           ls
-          echo -e "\nBuilding RP3D...\n"
           cd reactphysics3d
-          cmake .
-          make
-          cd ..
-          echo -e "\nDone Building RP3D.\n"
+          ls
           jam -j3 -q && cp README.md dist
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
