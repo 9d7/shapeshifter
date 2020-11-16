@@ -30,7 +30,14 @@ public:
 	void update_char_position(const glm::vec2 &position, float rotation);
 	void update_char_thrusters(bool thrust);
 
+	// position: [(0, 0), (320, 240)]
+	void update_camera_position(const glm::vec2 &position);
+
 private:
+
+	glm::vec2 char_position = glm::vec2(0, 0);
+	glm::vec2 camera_position = glm::vec2(0, 0);
+	float     char_rotation = 0.0f;
 
 	float total_elapsed = 0.0f;
 

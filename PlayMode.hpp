@@ -16,6 +16,15 @@ struct PlayMode : Mode {
 	virtual void update(float elapsed) override;
 	virtual void draw(glm::uvec2 const &drawable_size) override;
 
+	bool left_pressed;
+	bool right_pressed;
+	bool up_pressed;
+	bool down_pressed;
+
+	glm::vec2 char_velocity = glm::vec2(0, 0);
+	glm::vec2 char_position = glm::vec2(0, 0);
+	glm::vec2 camera_position = glm::vec2(0, 0);
+
 	Renderer renderer;
 
 };

@@ -250,23 +250,19 @@ void Renderer::draw(const glm::uvec2 &drawable_size) {
 	small_verts.clear();
 
 	auto draw_rect = [this](
-		glm::uvec2  location,
+		glm::ivec2  location,
 		glm::uvec2  tex,
 		glm::uvec2  size,
 		glm::u8vec4 color
 	) {
-		
+
 		glm::vec2 p_min = glm::vec2(location);
-		glm::vec2 p_max = glm::vec2(location + size);
+		glm::vec2 p_max = glm::vec2(location + glm::ivec2(size));
 
 		glm::vec2 t_min = glm::vec2(tex) / glm::vec2(atlas_size);
 		glm::vec2 t_max = glm::vec2(tex + size) / glm::vec2(atlas_size);
 
 		glm::vec4 c = glm::vec4(color) / 255.0f;
-
-		printf("%f %f\n %f %f\n %f %f\n %f %f\n %f %f %f %f\n====\n",
-				p_min.x, p_min.y, p_max.x, p_max.y, t_min.x, t_min.y,
-				t_max.x, t_max.y, c.r, c.g, c.b, c.a);
 
 		this->small_verts.push_back(Vertex {
 			glm::vec2(p_min.x, p_max.y),
@@ -307,10 +303,10 @@ void Renderer::draw(const glm::uvec2 &drawable_size) {
 	};
 
 	draw_rect(
-		glm::uvec2(100, 100),
-		glm::uvec2(0, 0),
-		glm::uvec2(32, 32),
-		glm::u8vec4(255, 255, 255, 255)
+		glm::ivec2(char_position - camera_position + glm::vec2(ScreenWidth, ScreenHeight) / 2.0f),
+		glm::uvec2(0, 16),
+		glm::uvec2(8, 8),
+		glm::u8vec4(0, 255, 255, 255)
 	);
 
 	// first pass
@@ -404,4 +400,13 @@ void Renderer::draw(const glm::uvec2 &drawable_size) {
 
 void Renderer::update(float elapsed) {
 	total_elapsed += elapsed;
+}
+
+void Renderer::update_camera_position(const glm::vec2 &position) {
+	camera_position = position;
+}
+
+void Renderer::update_char_position(const glm::vec2 &position, float rotation) {
+	char_position = position;
+	char_rotation = rotation;
 }
