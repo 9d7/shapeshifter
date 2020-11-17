@@ -38,7 +38,7 @@ struct PlayMode : Mode {
 
 	// Additional functions
 	void update_force_vector(glm::vec2 &force_vector);
-	void reset_downs();
+	//void reset_downs();
 	void dev_mode_update();
 	void shoot_bullet();
 

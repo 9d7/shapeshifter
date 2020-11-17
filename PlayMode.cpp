@@ -98,6 +98,21 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 
 void PlayMode::update(float elapsed) {
 	// Do actions
+
+	/*if (dead) {
+		player_position = glm::vec2(0, 0);
+		camera_position = glm::vec2(0, 0);
+		for (auto enem_it = enemies.begin(); enem_it != enemies.end(); ++enem_it) {
+			renderer.destroy_enemy(enem_it->e);
+		}
+		enemies.clear();
+		for (auto bull_it = enemy_bullets.begin(); bull_it != enemy_bullets.end(); ++bull_it) {
+			renderer.destroy_bullet(bull_it->b);
+		}
+		enemy_bullets.clear();
+		dead = false;
+	}*/
+
 	force_vector = glm::vec2(0, 0);
 	update_force_vector(force_vector);
 
@@ -136,9 +151,10 @@ void PlayMode::update(float elapsed) {
 	
 
 	update_bullets(player_bullets, elapsed);
+	update_bullets(enemy_bullets, elapsed);
 	check_collisions();
 	
-	if (enemies.size() < 10) generate_enemy();
+	if (enemies.size() < 5) generate_enemy();
 
 	for (size_t i = 0; i < enemies.size(); i++) {
 		enemies[i].bullet_timer -= elapsed;
@@ -212,6 +228,14 @@ void PlayMode::dev_mode_update() {
 	if (buttons[SDLK_r].pressed) {
 		player_position = glm::vec2(0, 0);
 		camera_position = glm::vec2(0, 0);
+		for (auto enem_it = enemies.begin(); enem_it != enemies.end(); ++enem_it) {
+			renderer.destroy_enemy(enem_it->e);
+		}
+		enemies.clear();
+		for (auto bull_it = enemy_bullets.begin(); bull_it != enemy_bullets.end(); ++bull_it) {
+			renderer.destroy_bullet(bull_it->b);
+		}
+		enemy_bullets.clear();
 	}
 	if (buttons[SDLK_j].pressed && dev_velocity_multiplier > .01f) {
 		dev_velocity_multiplier -= .01f;
@@ -260,19 +284,28 @@ void PlayMode::shoot_bullet() {
 
 void PlayMode::check_collisions() {
 	// Just checks player bullets and enemie bodys for now
-	for (bullet_wrapper bullet : enemy_bullets) {
-		glm::vec2 distance_vector = bullet.b->position - player_position;
+	for (auto bull_it = enemy_bullets.begin(); bull_it != enemy_bullets.end(); ++bull_it) {
+		if (bull_it->b->color == player_color) continue;
+		glm::vec2 distance_vector = bull_it->b->position - player_position;
 		float dist = glm::length(distance_vector);
 		if (dist < 10.0f) {
 			dead = true;
+			renderer.destroy_bullet(bull_it->b);
+			enemy_bullets.erase(bull_it);
 		}
 	}
-	for (bullet_wrapper bullet : player_bullets) {
-		for (enemy_wrapper enemy : enemies) {
-			glm::vec2 distance_vector = bullet.b->position - enemy.e->position;
+	for (auto bull_it = player_bullets.begin(); bull_it != player_bullets.end(); ++bull_it) {
+		//for (enemy_wrapper enemy : enemies) {
+		for (auto enem_it = enemies.begin(); enem_it != enemies.end(); ++enem_it){
+			if (bull_it->b->color == enem_it->e->color) continue;
+			glm::vec2 distance_vector = bull_it->b->position - enem_it->e->position;
 			float dist = glm::length(distance_vector);
 			if (dist < 10.0f) {
-				renderer.destroy_enemy(enemy.e);
+				renderer.destroy_enemy(enem_it->e);
+				renderer.destroy_bullet(bull_it->b);
+				enemies.erase(enem_it);
+				player_bullets.erase(bull_it);
+				return;
 			}
 		}
 	}
