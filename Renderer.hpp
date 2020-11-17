@@ -35,22 +35,22 @@ public:
 
 	// character controls
 
-	// position: [(0, 0), (320, 240)], rotation: [0, 2*pi]
-	void update_char_position(const glm::vec2 &position, float rotation);
-	void update_char_thrusters(bool thrust);
-
-	// position: [(0, 0), (320, 240)]
-	void update_camera_position(const glm::vec2 &position);
-
-	// cursor
-	void update_cursor_position(const glm::vec2 &position);
-
 	// bullets
 	enum BulletColor {
 		Red,
 		Blue,
 		Purple
 	};
+
+	// position: [(0, 0), (320, 240)], rotation: [0, 2*pi]
+	void update_char_position(const glm::vec2 &position, float rotation);
+	void update_char_color(BulletColor color);
+
+	// position: [(0, 0), (320, 240)]
+	void update_camera_position(const glm::vec2 &position);
+
+	// cursor
+	void update_cursor_position(const glm::vec2 &position);
 
 	struct Bullet_ {
 		glm::vec2   position;
@@ -98,6 +98,7 @@ private:
 	Stars stars;
 
 	glm::vec2 player_position = glm::vec2(0, 0);
+	BulletColor char_color    = BulletColor::Red;
 	glm::vec2 camera_position = glm::vec2(0, 0);
 	glm::vec2 cursor_position = glm::vec2(-8, -8);
 	float     char_rotation = 0.0f;
