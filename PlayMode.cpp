@@ -74,16 +74,16 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 }
 
 void PlayMode::update(float elapsed) {
-	
+
 	// Do actions
-	
+
 	// Comment out the following line to allow for linear acceleration and exponential velocity
 	force_vector = glm::vec2(0, 0);
 	update_force_vector(force_vector);
 
 	// Clear downs after all key presses are accounted for
 	//reset_downs();
-	
+
 	player_velocity += force_vector * elapsed;
 
 	// velocity cap
@@ -162,7 +162,7 @@ void PlayMode::update_force_vector(glm::vec2& force_vector)
 
 void PlayMode::reset_downs()
 {
-	for (std::pair<SDL_KeyCode, Button> button : buttons) {
+	for (std::pair<const SDL_KeyCode, Button> &button : buttons) {
 		button.second.downs = 0;
 	}
 	return;
