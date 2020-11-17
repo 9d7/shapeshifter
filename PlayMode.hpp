@@ -6,6 +6,7 @@
 
 #include <vector>
 #include <deque>
+#include <unordered_map>
 
 struct PlayMode : Mode {
 	PlayMode();
@@ -22,4 +23,20 @@ struct PlayMode : Mode {
 
 	Renderer renderer;
 
+	// Tracking inputs
+	struct Button {
+		uint8_t downs = 0;
+		uint8_t pressed = 0;
+	};
+
+	std::unordered_map<SDL_KeyCode, Button> buttons{
+		{SDLK_w, Button()},
+		{SDLK_a, Button()},
+		{SDLK_s, Button()},
+		{SDLK_d, Button()},
+		{SDLK_r, Button()}
+	};
+
+	glm::vec2 camera_position = glm::vec2(0, 0);
+	glm::vec2 camera_vector_from_player = glm::vec2(0, 0);
 };

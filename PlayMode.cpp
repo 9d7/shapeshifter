@@ -30,6 +30,24 @@ PlayMode::~PlayMode() {
 }
 
 bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size) {
+	SDL_KeyCode key = (SDL_KeyCode)evt.key.keysym.sym;
+	if (evt.type == SDL_KEYDOWN) {
+		if (buttons.find(key) != buttons.end()) {
+			buttons[key].downs += 1;
+			buttons[key].pressed = true;
+			return true;
+		}
+	}
+	else if (evt.type == SDL_KEYUP) {
+		if (buttons.find(key) != buttons.end()) {
+			buttons[key].pressed = false;
+			return true;
+		}
+	}
+	else if (evt.type == SDL_MOUSEMOTION) {
+
+	}
+
 	return false;
 }
 
