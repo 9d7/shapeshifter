@@ -332,66 +332,66 @@ Renderer::Renderer() {
 
 Renderer::~Renderer() {}
 
-void Renderer::draw_rect(
-	std::vector<Renderer::Vertex> &verts,
-	const glm::uvec2 &atlas_size,
-	const glm::ivec2 &location,
-	const glm::uvec2 &tex,
-	const glm::uvec2 &size,
-	const glm::u8vec4 &color
-	) {
-
-	glm::vec2 p_min = glm::vec2(location);
-	glm::vec2 p_max = glm::vec2(location + glm::ivec2(size));
-
-	glm::vec2 t_min = glm::vec2(tex) / glm::vec2(atlas_size);
-	glm::vec2 t_max = glm::vec2(tex + size) / glm::vec2(atlas_size);
-
-	glm::vec4 c = glm::vec4(color) / 255.0f;
-
-	verts.push_back(Vertex {
-		glm::vec2(p_min.x, p_max.y),
-		glm::vec2(t_min.x, t_max.y),
-		c
-	});
-
-	verts.push_back(Vertex {
-		glm::vec2(p_min.x, p_min.y),
-		glm::vec2(t_min.x, t_min.y),
-		c
-	});
-
-	verts.push_back(Vertex {
-		glm::vec2(p_max.x, p_min.y),
-		glm::vec2(t_max.x, t_min.y),
-		c
-	});
-
-	verts.push_back(Vertex {
-		glm::vec2(p_min.x, p_max.y),
-		glm::vec2(t_min.x, t_max.y),
-		c
-	});
-
-	verts.push_back(Vertex {
-		glm::vec2(p_max.x, p_min.y),
-		glm::vec2(t_max.x, t_min.y),
-		c
-	});
-
-	verts.push_back(Vertex {
-		glm::vec2(p_max.x, p_max.y),
-		glm::vec2(t_max.x, t_max.y),
-		c
-	});
-
-}
 
 
 void Renderer::draw(const glm::uvec2 &drawable_size) {
 
 	small_verts.clear();
 
+	auto draw_rect = [](
+		std::vector<Renderer::Vertex> &verts,
+		const glm::uvec2 &atlas_size,
+		const glm::ivec2 &location,
+		const glm::uvec2 &tex,
+		const glm::uvec2 &size,
+		const glm::u8vec4 &color
+	) {
+
+		glm::vec2 p_min = glm::vec2(location);
+		glm::vec2 p_max = glm::vec2(location + glm::ivec2(size));
+
+		glm::vec2 t_min = glm::vec2(tex) / glm::vec2(atlas_size);
+		glm::vec2 t_max = glm::vec2(tex + size) / glm::vec2(atlas_size);
+
+		glm::vec4 c = glm::vec4(color) / 255.0f;
+
+		verts.push_back(Vertex {
+			glm::vec2(p_min.x, p_max.y),
+			glm::vec2(t_min.x, t_max.y),
+			c
+		});
+
+		verts.push_back(Vertex {
+			glm::vec2(p_min.x, p_min.y),
+			glm::vec2(t_min.x, t_min.y),
+			c
+		});
+
+		verts.push_back(Vertex {
+			glm::vec2(p_max.x, p_min.y),
+			glm::vec2(t_max.x, t_min.y),
+			c
+		});
+
+		verts.push_back(Vertex {
+			glm::vec2(p_min.x, p_max.y),
+			glm::vec2(t_min.x, t_max.y),
+			c
+		});
+
+		verts.push_back(Vertex {
+			glm::vec2(p_max.x, p_min.y),
+			glm::vec2(t_max.x, t_min.y),
+			c
+		});
+
+		verts.push_back(Vertex {
+			glm::vec2(p_max.x, p_max.y),
+			glm::vec2(t_max.x, t_max.y),
+			c
+		});
+
+	};
 
 	draw_rect(
 		small_verts,
@@ -548,3 +548,31 @@ void Renderer::update_char_position(const glm::vec2 &position, float rotation) {
 	char_position = position;
 	char_rotation = rotation;
 }
+
+Renderer::Enemy Renderer::new_enemy(const glm::vec2 &position, float rotation, EnemyType type) {
+	enemies.push_front(Renderer::Enemy_ {
+		position,
+		rotation,
+		0.0f,
+		0.0f,
+		type
+	});
+	return enemies.begin();
+}
+
+void Renderer::update_enemy_position(Enemy e, const glm::vec2 &position) {}
+void Renderer::update_enemy_rotation(Enemy e, float rotation) {}
+void Renderer::invuln_enemy(Enemy e) {}
+void Renderer::destroy_enemy(Enemy e) {}
+
+Renderer::Bullet Renderer::new_bullet(const glm::vec2 &position, BulletColor color) {
+	bullets.push_front(Renderer::Bullet_ {
+		position,
+		color
+	});
+	return bullets.begin();
+}
+
+void Renderer::update_bullet_position(Bullet b, const glm::vec2 &position) {}
+void Renderer::update_bullet_color(Bullet b, BulletColor color) {}
+void Renderer::destroy_bullet(Bullet b) {}

@@ -4,6 +4,7 @@
 #include "GL.hpp"
 #include "Stars.hpp"
 #include "glm/fwd.hpp"
+#include <iterator>
 #include <vector>
 
 // Notes about the renderer:
@@ -41,17 +42,52 @@ public:
 	// position: [(0, 0), (320, 240)]
 	void update_camera_position(const glm::vec2 &position);
 
-	// other rendering helper functions
-	static void draw_rect(
-		std::vector<Vertex> &verts,
-		const glm::uvec2  &atlas_size,
-		const glm::ivec2  &location,
-		const glm::uvec2  &tex,
-		const glm::uvec2  &size,
-		const glm::u8vec4 &color
-	);
+	// bullets
+	enum BulletColor {
+		Red,
+		Blue,
+		Purple
+	};
+
+	struct Bullet_ {
+		glm::vec2 position;
+		BulletColor color;
+	};
+
+	typedef std::list<Bullet_>::iterator Bullet;
+
+	Bullet new_bullet(const glm::vec2 &position, BulletColor color);
+	void update_bullet_position(Bullet b, const glm::vec2 &position);
+	void update_bullet_color(Bullet b, BulletColor color);
+	void destroy_bullet(Bullet b);
+
+	enum EnemyType {
+		Regular,
+		Soldier,
+		Turret,
+		Shifter
+	};
+
+	struct Enemy_ {
+		glm::vec2 position;
+		float     rotation;
+		float     elapsed; // for animation
+		float     invuln_time; // for animation
+		EnemyType type;
+	};
+	
+	typedef std::list<Enemy_>::iterator Enemy;
+	Enemy new_enemy(const glm::vec2 &position, float rotation, EnemyType type);
+	void update_enemy_position(Enemy e, const glm::vec2 &position);
+	void update_enemy_rotation(Enemy e, float rotation);
+	void invuln_enemy(Enemy e);
+	void destroy_enemy(Enemy e);
+
 
 private:
+
+	std::list<Bullet_> bullets;
+	std::list<Enemy_> enemies;
 
 	Stars stars;
 
