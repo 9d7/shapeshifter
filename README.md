@@ -18,3 +18,13 @@ Sources: (TODO: list a source URL for any assets you did not create yourself. Ma
 
 This game was built with [NEST](NEST.md).
 
+
+DEV MODE:
+P - enable/disable dev mode
+J/K - reduce/increase speed
+V - enable velocity based player rotation
+M - enable mouse base player rotation
+L - enable debug output
+H - enable dev values output (enabled by default)
+O - turn off all console outputs
+
