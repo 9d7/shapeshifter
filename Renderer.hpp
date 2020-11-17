@@ -67,24 +67,24 @@ public:
 
 	// enemies
 	enum EnemyType {
-		Regular,
+		Hunter,
 		Soldier,
 		Turret,
-		Shifter
 	};
 
 	struct Enemy_ {
 		glm::vec2 position;
 		float     rotation;
-		float     elapsed; // for animation
 		float     invuln_time; // for animation
 		EnemyType type;
+		BulletColor color;
 	};
-	
+
 	typedef std::list<Enemy_>::iterator Enemy;
-	Enemy new_enemy(const glm::vec2 &position, float rotation, EnemyType type);
+	Enemy new_enemy(const glm::vec2 &position, float rotation, EnemyType type, BulletColor color);
 	void update_enemy_position(Enemy e, const glm::vec2 &position);
 	void update_enemy_rotation(Enemy e, float rotation);
+	void update_enemy_color(Enemy e, BulletColor color);
 	void invuln_enemy(Enemy e);
 	void destroy_enemy(Enemy e);
 
@@ -93,6 +93,7 @@ private:
 
 	std::list<Bullet_> bullets;
 	std::list<Enemy_> enemies;
+
 
 	Stars stars;
 

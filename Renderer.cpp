@@ -608,6 +608,48 @@ void Renderer::draw(const glm::uvec2 &drawable_size) {
 
 		}
 
+		for (Enemy_ &e : enemies) {
+			glm::uvec2 size;
+			glm::uvec2 blue;
+			glm::uvec2 red;
+
+			if (e.type == EnemyType::Hunter) {
+				size = {8, 8};
+				blue = {32, 24};
+				red = {32, 16};
+			} else if (e.type == EnemyType::Soldier) {
+				size = {16, 16};
+				blue = {32, 32};
+				red = {48, 32};
+			} else if (e.type == EnemyType::Turret) {
+				size = {16, 16};
+				blue = {0, 32};
+				red = {16, 32};
+			} else {
+				throw std::runtime_error("EnemyType not found");
+			}
+
+			glm::uvec2 tex;
+			if (e.color == BulletColor::Blue) {
+				tex = blue;
+			} else if (e.color == BulletColor::Red) {
+				tex = red;
+			} else {
+				throw std::runtime_error("Color not supported on enemy");
+			}
+
+			draw_rect(
+				small_verts,
+				atlas_size,
+				e.position,
+				e.rotation,
+				tex,
+				size,
+				glm::u8vec4(255, 255, 255, 255)
+			);
+
+		}
+
 		// draw player
 		draw_rect(
 			small_verts,
@@ -741,21 +783,33 @@ void Renderer::update_char_position(const glm::vec2 &position, float rotation) {
 	char_rotation = rotation;
 }
 
-Renderer::Enemy Renderer::new_enemy(const glm::vec2 &position, float rotation, EnemyType type) {
+Renderer::Enemy Renderer::new_enemy(const glm::vec2 &position, float rotation, EnemyType type, BulletColor color) {
 	enemies.push_front(Renderer::Enemy_ {
 		position,
 		rotation,
 		0.0f,
-		0.0f,
-		type
+		type,
+		color
 	});
 	return enemies.begin();
 }
 
-void Renderer::update_enemy_position(Enemy e, const glm::vec2 &position) {}
-void Renderer::update_enemy_rotation(Enemy e, float rotation) {}
-void Renderer::invuln_enemy(Enemy e) {}
-void Renderer::destroy_enemy(Enemy e) {}
+void Renderer::update_enemy_position(Enemy e, const glm::vec2 &position) {
+	e->position = position;
+}
+void Renderer::update_enemy_rotation(Enemy e, float rotation) {
+	e->rotation = rotation;
+}
+void Renderer::update_enemy_color(Enemy e, BulletColor color) {
+	e->color = color;
+}
+void Renderer::invuln_enemy(Enemy e) {
+	static constexpr float INVULN_TIME = 0.2f;
+	e->invuln_time = INVULN_TIME;
+}
+void Renderer::destroy_enemy(Enemy e) {
+	enemies.erase(e);
+}
 
 Renderer::Bullet Renderer::new_bullet(const glm::vec2 &position, BulletColor color) {
 	bullets.push_front(Renderer::Bullet_ {
