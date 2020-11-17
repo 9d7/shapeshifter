@@ -1,6 +1,7 @@
 #include "Renderer.hpp"
 #include "GL.hpp"
 #include "Load.hpp"
+#include "SDL_mouse.h"
 #include "Stars.hpp"
 #include "data_path.hpp"
 #include "gl_compile_program.hpp"
@@ -323,8 +324,8 @@ Renderer::Renderer() {
 	glBindTexture(GL_TEXTURE_2D, atlas_tex);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, atlas_size.x, atlas_size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, atlas_data.data());
 	glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -342,13 +343,28 @@ void Renderer::draw(const glm::uvec2 &drawable_size) {
 		std::vector<Renderer::Vertex> &verts,
 		const glm::uvec2 &atlas_size,
 		const glm::ivec2 &location,
+		float             rotation,
 		const glm::uvec2 &tex,
 		const glm::uvec2 &size,
 		const glm::u8vec4 &color
 	) {
 
-		glm::vec2 p_min = glm::vec2(location);
-		glm::vec2 p_max = glm::vec2(location + glm::ivec2(size));
+		glm::vec2 p_min = glm::vec2(-0.5f, -0.5f);
+		glm::vec2 p_max = glm::vec2( 0.5f,  0.5f);
+
+		glm::mat2 rot = glm::mat2x2(
+			glm::vec2(glm::cos(rotation), glm::sin(rotation)),
+			glm::vec2(-glm::sin(rotation), glm::cos(rotation))
+		);
+
+		p_min *= glm::vec2(size);
+		p_max *= glm::vec2(size);
+
+		p_min = rot * p_min;
+		p_max = rot * p_max;
+
+		p_min += glm::vec2(location);
+		p_max += glm::vec2(location);
 
 		glm::vec2 t_min = glm::vec2(tex) / glm::vec2(atlas_size);
 		glm::vec2 t_max = glm::vec2(tex + size) / glm::vec2(atlas_size);
@@ -393,144 +409,271 @@ void Renderer::draw(const glm::uvec2 &drawable_size) {
 
 	};
 
-	draw_rect(
-		small_verts,
-		atlas_size,
-		glm::ivec2(char_position + glm::vec2(ScreenWidth, ScreenHeight) / 2.0f),
-		glm::uvec2(0, 16),
-		glm::uvec2(8, 8),
-		glm::u8vec4(0, 255, 255, 255)
-	);
+	{ // first pass: draw background
 
-	// first pass
-	glBindFramebuffer(GL_FRAMEBUFFER, tiny_fbo);
-	glViewport(0, 0, ScreenWidth, ScreenHeight);
-	glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		// first pass
+		glBindFramebuffer(GL_FRAMEBUFFER, tiny_fbo);
+		glViewport(0, 0, ScreenWidth, ScreenHeight);
+		glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// draw background
-	glDisable(GL_DEPTH_TEST);
-	glUseProgram(background_program->program);
+		// draw background
+		glDisable(GL_DEPTH_TEST);
+		glUseProgram(background_program->program);
 
-	glUniform1f(background_program->Time_float, total_elapsed);
-	glUniform2i(background_program->Camera_ivec2, (int)camera_position.x, (int)camera_position.y);
-	glBindVertexArray(quad_vao);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
-	glBindVertexArray(0);
-	glUseProgram(0);
+		glUniform1f(background_program->Time_float, total_elapsed);
+		glUniform2i(background_program->Camera_ivec2, (int)camera_position.x, (int)camera_position.y);
+		glBindVertexArray(quad_vao);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glBindVertexArray(0);
+		glUseProgram(0);
 
-	// draw stars
-	glDisable(GL_DEPTH_TEST);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_BLEND);
-	GL_ERRORS();
+	}
 
-	glUseProgram(star_program->program);
+	{ // second pass: draw stars
 
-	glUniform2i(star_program->Camera_ivec2, (int)camera_position.x, (int)camera_position.y);
-	glUniformMatrix4fv(
-		star_program->ScreenToClip_mat4,
-		1,
-		GL_FALSE,
-		glm::value_ptr(glm::ortho(0.0f, (float)ScreenWidth, 0.0f, (float)ScreenHeight))
-	);
-	glUniform2ui(star_program->AtlasSize_uvec2, atlas_size.x, atlas_size.y);
+		glDisable(GL_DEPTH_TEST);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glEnable(GL_BLEND);
+		GL_ERRORS();
 
-	stars.draw(
-		star_program->TexCoords_vec2,
-		star_program->Colors_vec4,
-		star_program->Positions_ivec2,
-		star_program->Parallax_float
-	);
+		glUseProgram(star_program->program);
 
-	glBindVertexArray(star_vao);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, atlas_tex);
-	glDrawArraysInstanced(GL_TRIANGLES, 0, 6, NUM_INSTANCES);
+		glUniform2i(star_program->Camera_ivec2, (int)camera_position.x, (int)camera_position.y);
+		glUniformMatrix4fv(
+			star_program->ScreenToClip_mat4,
+			1,
+			GL_FALSE,
+			glm::value_ptr(glm::ortho(0.0f, (float)ScreenWidth, 0.0f, (float)ScreenHeight))
+		);
+		glUniform2ui(star_program->AtlasSize_uvec2, atlas_size.x, atlas_size.y);
 
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glBindVertexArray(0);
-	glUseProgram(0);
-	GL_ERRORS();
+		stars.draw(
+			star_program->TexCoords_vec2,
+			star_program->Colors_vec4,
+			star_program->Positions_ivec2,
+			star_program->Parallax_float
+		);
 
-	// draw tiny textures
-	glDisable(GL_DEPTH_TEST);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_BLEND);
+		glBindVertexArray(star_vao);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, atlas_tex);
+		glDrawArraysInstanced(GL_TRIANGLES, 0, 6, NUM_INSTANCES);
 
-	glBindBuffer(GL_ARRAY_BUFFER, tiny_vbo);
-	glBufferData(
-		GL_ARRAY_BUFFER,
-		small_verts.size() * sizeof(Vertex),
-		small_verts.data(),
-		GL_DYNAMIC_DRAW
-	);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glBindVertexArray(0);
+		glUseProgram(0);
+		GL_ERRORS();
 
-	glUseProgram(sprite_small_program->program);
+	}
 
-	glUniformMatrix4fv(
-		sprite_small_program->ScreenToClip_mat4,
-		1,
-		GL_FALSE,
-		glm::value_ptr(
-			glm::ortho(
-				0.0f,
-				(float)ScreenWidth,
-				0.0f,
-				(float)ScreenHeight
-			) *
-			glm::mat4(
-				glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
-				glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
-				glm::vec4(0.0f, 0.0f, 1.0f, 0.0f),
-				glm::vec4((float)(-(int)(camera_position.x)), (float)(-(int)(camera_position.y)), 0.0f, 1.0f)
+// currently, we have no use for this--but i suspect we will
+//#define TINY_ABSOLUTE
+#ifdef TINY_ABSOLUTE
+	{ // third pass: draw absolute position on tiny screen
+		glDisable(GL_DEPTH_TEST);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glEnable(GL_BLEND);
+
+		glBindBuffer(GL_ARRAY_BUFFER, tiny_vbo);
+		glBufferData(
+			GL_ARRAY_BUFFER,
+			small_verts.size() * sizeof(Vertex),
+			small_verts.data(),
+			GL_DYNAMIC_DRAW
+		);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		glUseProgram(sprite_small_program->program);
+
+		glUniformMatrix4fv(
+			sprite_small_program->ScreenToClip_mat4,
+			1,
+			GL_FALSE,
+			glm::value_ptr(
+				glm::ortho(
+					0.0f,
+					(float)ScreenWidth,
+					0.0f,
+					(float)ScreenHeight
+				) *
+				glm::mat4(
+					glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
+					glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
+					glm::vec4(0.0f, 0.0f, 1.0f, 0.0f),
+					glm::vec4((float)(-(int)(camera_position.x)), (float)(-(int)(camera_position.y)), 0.0f, 1.0f)
+				)
 			)
-		)
-	);
+		);
 
-	glBindVertexArray(tiny_vao);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, atlas_tex);
-	glDrawArrays(GL_TRIANGLES, 0, (GLsizei)small_verts.size());
+		glBindVertexArray(tiny_vao);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, atlas_tex);
+		glDrawArrays(GL_TRIANGLES, 0, (GLsizei)small_verts.size());
 
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glBindVertexArray(0);
-	glUseProgram(0);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glBindVertexArray(0);
+		glUseProgram(0);
+	}
+#endif
 
-	// clear entire screen
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glViewport(0, 0, drawable_size.x, drawable_size.y);
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
-	glDisable(GL_DEPTH_TEST);
+	glm::uvec2 actual_drawable_size;
+	{ // draw to actual screen
+		// clear entire screen
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glViewport(0, 0, drawable_size.x, drawable_size.y);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+		glDisable(GL_DEPTH_TEST);
 
-	// get real drawable size
-	size_t real_drawable_scale = std::min(
-		drawable_size.x * ScreenHeight,
-		drawable_size.y * ScreenWidth
-	);
-	glm::uvec2 actual_drawable_size = glm::uvec2(
-		real_drawable_scale / ScreenHeight,
-		real_drawable_scale / ScreenWidth
-	);
-	glViewport(
-		(drawable_size.x - actual_drawable_size.x) / 2,
-		(drawable_size.y - actual_drawable_size.y) / 2,
-		actual_drawable_size.x,
-		actual_drawable_size.y
-	);
+		// get real drawable size
+		size_t real_drawable_scale = std::min(
+			drawable_size.x * ScreenHeight,
+			drawable_size.y * ScreenWidth
+		);
+		actual_drawable_size = glm::uvec2(
+			real_drawable_scale / ScreenHeight,
+			real_drawable_scale / ScreenWidth
+		);
+		glViewport(
+			(drawable_size.x - actual_drawable_size.x) / 2,
+			(drawable_size.y - actual_drawable_size.y) / 2,
+			actual_drawable_size.x,
+			actual_drawable_size.y
+		);
 
-	glUseProgram(*texture_program);
-	glBindVertexArray(quad_vao);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, tiny_tex);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+		glUseProgram(*texture_program);
+		glBindVertexArray(quad_vao);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, tiny_tex);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
 
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glBindVertexArray(0);
-	glUseProgram(0);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glBindVertexArray(0);
+		glUseProgram(0);
 
+	}
+
+	{ // relative position -- all enemies, bullets, etc. get drawn here
+
+		glDisable(GL_DEPTH_TEST);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glEnable(GL_BLEND);
+
+		small_verts.clear();
+		draw_rect(
+			small_verts,
+			atlas_size,
+			char_position,
+			0.0f,
+			glm::uvec2(8, 0),
+			glm::uvec2(8, 8),
+			glm::u8vec4(255, 255, 255, 255)
+		);
+
+		glBindBuffer(GL_ARRAY_BUFFER, tiny_vbo);
+		glBufferData(
+			GL_ARRAY_BUFFER,
+			small_verts.size() * sizeof(Vertex),
+			small_verts.data(),
+			GL_DYNAMIC_DRAW
+		);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		glUseProgram(sprite_small_program->program);
+
+		glUniformMatrix4fv(
+			sprite_small_program->ScreenToClip_mat4,
+			1,
+			GL_FALSE,
+			glm::value_ptr(
+				glm::ortho(
+					0.0f,
+					(float)ScreenWidth,
+					0.0f,
+					(float)ScreenHeight
+				) *
+				glm::mat4(
+					glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
+					glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
+					glm::vec4(0.0f, 0.0f, 1.0f, 0.0f),
+					glm::vec4((float)(-(int)(camera_position.x)), (float)(-(int)(camera_position.y)), 0.0f, 1.0f)
+				)
+			)
+		);
+
+		glBindVertexArray(tiny_vao);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, atlas_tex);
+		glDrawArrays(GL_TRIANGLES, 0, (GLsizei)small_verts.size());
+
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glBindVertexArray(0);
+		glUseProgram(0);
+
+	}
+
+	{ // absolute position
+
+		glDisable(GL_DEPTH_TEST);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glEnable(GL_BLEND);
+
+		int x, y;
+		SDL_GetMouseState(&x, &y);
+		y = drawable_size.y - y;
+
+		glm::vec2 mouse_pos;
+		// map(x, (drawable_size.x - actual_drawable_size.x) / 2.0f, (drawable_size.x + actual_drawable_size.x) / 2.0f, 0, ScreenWidth)
+		mouse_pos.x = ((float)x - (drawable_size.x - actual_drawable_size.x) / 2.0f) * (float)ScreenWidth / actual_drawable_size.x;
+		mouse_pos.y = ((float)y - (drawable_size.y - actual_drawable_size.y) / 2.0f) * (float)ScreenHeight / actual_drawable_size.y;
+
+		small_verts.clear();
+		draw_rect(
+			small_verts,
+			atlas_size,
+			mouse_pos,
+			0.0f,
+			glm::uvec2(56, 0),
+			glm::uvec2(8, 8),
+			glm::u8vec4(255, 255, 255, 255)
+		);
+
+		glBindBuffer(GL_ARRAY_BUFFER, tiny_vbo);
+		glBufferData(
+			GL_ARRAY_BUFFER,
+			small_verts.size() * sizeof(Vertex),
+			small_verts.data(),
+			GL_DYNAMIC_DRAW
+		);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		glUseProgram(sprite_small_program->program);
+
+		glUniformMatrix4fv(
+			sprite_small_program->ScreenToClip_mat4,
+			1,
+			GL_FALSE,
+			glm::value_ptr(
+				glm::ortho(
+					0.0f,
+					(float)ScreenWidth,
+					0.0f,
+					(float)ScreenHeight
+				)
+			)
+		);
+
+		glBindVertexArray(tiny_vao);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, atlas_tex);
+		glDrawArrays(GL_TRIANGLES, 0, (GLsizei)small_verts.size());
+
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glBindVertexArray(0);
+		glUseProgram(0);
+
+	}
 	GL_ERRORS();
 
 }
@@ -541,7 +684,7 @@ void Renderer::update(float elapsed) {
 }
 
 void Renderer::update_camera_position(const glm::vec2 &position) {
-	camera_position = position;
+	camera_position = position - glm::vec2(ScreenWidth, ScreenHeight) / 2.0f;
 }
 
 void Renderer::update_char_position(const glm::vec2 &position, float rotation) {

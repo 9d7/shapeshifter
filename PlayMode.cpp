@@ -8,6 +8,7 @@
 #include "Renderer.hpp"
 #include "SDL_events.h"
 #include "SDL_keyboard.h"
+#include "SDL_mouse.h"
 #include "gl_errors.hpp"
 #include "data_path.hpp"
 #include "glm/ext/quaternion_geometric.hpp"
@@ -22,7 +23,7 @@ Load < Renderer > renderer_(LoadTagDefault, []() -> Renderer const * {
 });
 
 PlayMode::PlayMode() : renderer(*renderer_) {
-
+	SDL_ShowCursor(SDL_DISABLE);
 }
 
 PlayMode::~PlayMode() {
