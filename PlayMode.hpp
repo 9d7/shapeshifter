@@ -20,6 +20,7 @@ struct PlayMode : Mode {
 	glm::vec2 char_velocity = glm::vec2(0, 0);
 	glm::vec2 char_position = glm::vec2(0, 0);
 	glm::vec2 camera_position = glm::vec2(0, 0);
+	glm::vec2 camera_vector_from_player = glm::vec2(0, 0);
 
 	Renderer renderer;
 
@@ -37,6 +38,5 @@ struct PlayMode : Mode {
 		{SDLK_r, Button()}
 	};
 
-	glm::vec2 camera_position = glm::vec2(0, 0);
-	glm::vec2 camera_vector_from_player = glm::vec2(0, 0);
+	
 };
