@@ -651,12 +651,20 @@ void Renderer::draw(const glm::uvec2 &drawable_size) {
 		}
 
 		// draw player
+		glm::uvec2 tex;
+		if (char_color == BulletColor::Blue) {
+			tex = { 0, 16};
+		} else if (char_color == BulletColor::Red) {
+			tex = {16, 16};
+		} else {
+			throw std::runtime_error("Color not supported for player");
+		}
 		draw_rect(
 			small_verts,
 			atlas_size,
 			player_position,
 			char_rotation - 1.571f,
-			glm::uvec2(0, 16),
+			tex,
 			glm::uvec2(16, 16),
 			glm::u8vec4(255, 255, 255, 255)
 		);
@@ -783,6 +791,10 @@ void Renderer::update_char_position(const glm::vec2 &position, float rotation) {
 	char_rotation = rotation;
 }
 
+void Renderer::update_char_color(BulletColor color) {
+	char_color = color;
+}
+
 Renderer::Enemy Renderer::new_enemy(const glm::vec2 &position, float rotation, EnemyType type, BulletColor color) {
 	enemies.push_front(Renderer::Enemy_ {
 		position,
@@ -797,16 +809,20 @@ Renderer::Enemy Renderer::new_enemy(const glm::vec2 &position, float rotation, E
 void Renderer::update_enemy_position(Enemy e, const glm::vec2 &position) {
 	e->position = position;
 }
+
 void Renderer::update_enemy_rotation(Enemy e, float rotation) {
 	e->rotation = rotation;
 }
+
 void Renderer::update_enemy_color(Enemy e, BulletColor color) {
 	e->color = color;
 }
+
 void Renderer::invuln_enemy(Enemy e) {
 	static constexpr float INVULN_TIME = 0.2f;
 	e->invuln_time = INVULN_TIME;
 }
+
 void Renderer::destroy_enemy(Enemy e) {
 	enemies.erase(e);
 }
