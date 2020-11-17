@@ -8,6 +8,12 @@
 #include <deque>
 #include <unordered_map>
 
+struct bullet_wrapper {
+    Renderer::Bullet b;
+    glm::vec2 direction;
+};
+
+
 struct PlayMode : Mode {
 	PlayMode();
 	virtual ~PlayMode();
@@ -29,6 +35,7 @@ struct PlayMode : Mode {
 	// Additional functions
 	void update_force_vector(glm::vec2 &force_vector);
 	void reset_downs();
+	void shoot_bullet();
 
 	// Tracking positions and velocities
 	glm::vec2 force_vector = glm::vec2(0, 0);
@@ -39,6 +46,12 @@ struct PlayMode : Mode {
 	glm::vec2 mouse_vector_from_player = glm::vec2(0, 0);
 
 	Renderer renderer;
+
+	std::deque<bullet_wrapper> bullets;
+    std::deque<Renderer::Enemy> enemies;
+ 
+    float max_bullet_time = 3.0f;
+  	Renderer::BulletColor player_color = Renderer::Blue; 
 
 	// Tracking inputs
 	struct Button {

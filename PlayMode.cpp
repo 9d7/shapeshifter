@@ -69,6 +69,16 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 
 		return true;
 	}
+	else if (evt.type == SDL_MOUSEBUTTONDOWN) {
+        if (evt.button.button == SDL_BUTTON_LEFT) { //lmb for blue
+            player_color = Renderer::Blue;
+        } else if (evt.button.button == SDL_BUTTON_RIGHT) { //rmb for red
+            player_color = Renderer::Red;
+        }
+        shoot_bullet();
+        return true;
+    }
+
 
 	return false;
 }
@@ -105,6 +115,23 @@ void PlayMode::update(float elapsed) {
 		renderer.update_char_position(player_position, glm::atan(mouse_vector_from_player.y, mouse_vector_from_player.x)); // Mouse position based rotation
 	} else {
 		renderer.update_char_position(player_position, 0);
+	}
+
+	//delete while iterating taken from
+	//https://stackoverflow.com/questions/596162/can-you-remove-elements-from-a-stdlist-while-iterating-through-it
+    std::deque<bullet_wrapper>::iterator i = bullets.begin();
+    while (i != bullets.end()) {
+        i->b->elapsed += elapsed;
+        // also check collision
+        if (i->b->elapsed > max_bullet_time) {
+            renderer.destroy_bullet(i->b);
+            bullets.erase(i++);  // alternatively, i = items.erase(i);
+            if (bullets.size() == 0) break;
+        } else {
+            i->b->position += i->direction * elapsed * 200.0f;
+            renderer.update_bullet_position(i->b, i->b->position);
+            ++i;
+        }
 	}
 
 
@@ -166,4 +193,15 @@ void PlayMode::reset_downs()
 		button.second.downs = 0;
 	}
 	return;
+}
+
+void PlayMode::shoot_bullet() {
+    glm::vec2 shoot_at = glm::vec2(mouse_position.x - Renderer::ScreenWidth/2 + camera_position.x, mouse_position.y - Renderer::ScreenHeight/2 + camera_position.y);
+    Renderer::Bullet b = renderer.new_bullet(player_position, player_color);
+    bullet_wrapper new_bullet;
+    b->elapsed = 0.0f;
+    new_bullet.b = b;
+    new_bullet.direction = glm::vec2(shoot_at.x - player_position.x, shoot_at.y - player_position.y);
+    new_bullet.direction = glm::normalize(new_bullet.direction);
+    bullets.push_back(new_bullet);
 }
