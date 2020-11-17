@@ -30,7 +30,7 @@ public:
 private:
 
 	// random
-	std::mt19937 mt                            = std::mt19937(time(NULL));
+	std::mt19937 mt                            = std::mt19937((unsigned int)time(NULL));
 	std::uniform_real_distribution<float> real = std::uniform_real_distribution<float>(0.0f, 1.0f);
 
 	// list

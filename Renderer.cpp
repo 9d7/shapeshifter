@@ -263,15 +263,15 @@ Renderer::Renderer() {
 		for (size_t i = 0; i < sizes.size(); i++) {
 
 			glVertexAttribPointer(
-				i,
-				sizes[i],
+				(GLuint)i,
+				(GLint)sizes[i],
 				GL_FLOAT,
 				GL_FALSE,
 				total_size * sizeof(float),
 				(GLbyte *)0 + offset * sizeof(float)
 			);
 			glEnableVertexAttribArray(i);
-			offset += sizes[i];
+			offset += (GLuint)sizes[i];
 
 		}
 
