@@ -334,7 +334,9 @@ Renderer::Renderer() {
 
 Renderer::~Renderer() {}
 
-
+void Renderer::update_cursor_position(const glm::vec2 &position) {
+	cursor_position = position;
+}
 
 void Renderer::draw(const glm::uvec2 &drawable_size) {
 
@@ -610,7 +612,7 @@ void Renderer::draw(const glm::uvec2 &drawable_size) {
 		draw_rect(
 			small_verts,
 			atlas_size,
-			char_position,
+			player_position,
 			char_rotation - 1.571f,
 			glm::uvec2(32, 8),
 			glm::uvec2(16, 16),
@@ -669,18 +671,13 @@ void Renderer::draw(const glm::uvec2 &drawable_size) {
 		SDL_GetMouseState(&x, &y);
 		y = drawable_size.y - y;
 
-		glm::vec2 mouse_pos;
-		// map(x, (drawable_size.x - actual_drawable_size.x) / 2.0f, (drawable_size.x + actual_drawable_size.x) / 2.0f, 0, ScreenWidth)
-		mouse_pos.x = ((float)x - (drawable_size.x - actual_drawable_size.x) / 2.0f) * (float)ScreenWidth / actual_drawable_size.x;
-		mouse_pos.y = ((float)y - (drawable_size.y - actual_drawable_size.y) / 2.0f) * (float)ScreenHeight / actual_drawable_size.y;
-
 		small_verts.clear();
 
 		// draw mouse
 		draw_rect(
 			small_verts,
 			atlas_size,
-			mouse_pos,
+			cursor_position,
 			0.0f,
 			glm::uvec2(56, 0),
 			glm::uvec2(8, 8),
@@ -742,7 +739,7 @@ void Renderer::update_camera_position(const glm::vec2 &position) {
 }
 
 void Renderer::update_char_position(const glm::vec2 &position, float rotation) {
-	char_position = position;
+	player_position = position;
 	char_rotation = rotation;
 }
 

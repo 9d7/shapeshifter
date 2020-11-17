@@ -15,6 +15,7 @@
 #include "glm/geometric.hpp"
 
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 #include <random>
 
@@ -45,56 +46,65 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 		}
 	}
 	else if (evt.type == SDL_MOUSEMOTION) {
+		SDL_MouseMotionEvent mme = evt.motion;
+		glm::vec2 screen_pos {(float)mme.x, (float)(window_size.y - mme.y)};
 
+		// get real drawable size
+		size_t actual_window_scale = std::min(
+			window_size.x * Renderer::ScreenHeight,
+			window_size.y * Renderer::ScreenWidth
+		);
+		glm::uvec2 actual_window_size = glm::uvec2(
+			actual_window_scale / Renderer::ScreenHeight,
+			actual_window_scale / Renderer::ScreenWidth
+		);
+
+		// map(x, (drawable_size.x - actual_drawable_size.x) / 2.0f, (drawable_size.x + actual_drawable_size.x) / 2.0f, 0, ScreenWidth)
+		mouse_position.x = (screen_pos.x - (window_size.x - actual_window_size.x) / 2.0f) * (float)Renderer::ScreenWidth  / actual_window_size.x;
+		mouse_position.y = (screen_pos.y - (window_size.y - actual_window_size.y) / 2.0f) * (float)Renderer::ScreenHeight / actual_window_size.y;
+
+		mouse_vector_from_player = mouse_position + camera_position - player_position - PIXEL_SCREEN_CENTER;
+
+		renderer.update_cursor_position(mouse_position);
+
+		return true;
 	}
 
 	return false;
 }
 
 void PlayMode::update(float elapsed) {
+	
+	// Do actions
+	
+	// Comment out the following line to allow for linear acceleration and exponential velocity
+	force_vector = glm::vec2(0, 0);
+	update_force_vector(force_vector);
 
-	// move_force is in pixels/s^2 (it's actually acceleration, don't tell anybody)
-	// max_velocity is in pixels/s
-	static constexpr float MOVE_FORCE = 400.0f;
-	static constexpr float MAX_VELOCITY = 200.0f;
-	static constexpr float FRICTION = 0.95f;
-
-	glm::vec2 force_vector = glm::vec2(0, 0);
-	int num_keys;
-	const uint8_t *keys = SDL_GetKeyboardState(&num_keys);
-
-	if (keys[SDL_SCANCODE_W] || keys[SDL_SCANCODE_UP]) {
-		force_vector.y += 1.0f;
-	}
-	if (keys[SDL_SCANCODE_A] || keys[SDL_SCANCODE_LEFT]) {
-		force_vector.x -= 1.0f;
-	}
-	if (keys[SDL_SCANCODE_S] || keys[SDL_SCANCODE_DOWN]) {
-		force_vector.y -= 1.0f;
-	}
-	if (keys[SDL_SCANCODE_D] || keys[SDL_SCANCODE_RIGHT]) {
-		force_vector.x += 1.0f;
-	}
-
-	// apply force
-	if (glm::length(force_vector) > 0) {
-		force_vector = glm::normalize(force_vector) * MOVE_FORCE;
-	}
-	char_velocity += force_vector * elapsed;
+	// Clear downs after all key presses are accounted for
+	//reset_downs();
+	
+	player_velocity += force_vector * elapsed;
 
 	// velocity cap
-	if (glm::length(char_velocity) > MAX_VELOCITY) {
-		char_velocity = glm::normalize(char_velocity) * MAX_VELOCITY;
+	if (glm::length(player_velocity) > MAX_VELOCITY) {
+		player_velocity = glm::normalize(player_velocity) * MAX_VELOCITY;
 	}
 
 	//update position
-	char_position += char_velocity * elapsed;
-	char_velocity *= FRICTION;
+	player_position += player_velocity * elapsed;
+	player_velocity *= FRICTION;
+	mouse_vector_from_player = mouse_position + camera_position - player_position - PIXEL_SCREEN_CENTER;
 
-	if (glm::length(char_velocity) > 0) {
-		renderer.update_char_position(char_position, glm::atan(char_velocity.y, char_velocity.x));
+
+	//std::cout << "player: " << glm::to_string(player_position) << " | mouse: " << glm::to_string(mouse_position) << " | camera: " << glm::to_string(camera_position) << " \nattempt: " << glm::to_string(mouse_vector_from_player) << "\n";
+
+	// Update player rotation
+	if (glm::length(player_velocity) > 0) {
+		//renderer.update_char_position(player_position, glm::atan(player_velocity.y, player_velocity.x)); // Velocity based rotation
+		renderer.update_char_position(player_position, glm::atan(mouse_vector_from_player.y, mouse_vector_from_player.x)); // Mouse position based rotation
 	} else {
-		renderer.update_char_position(char_position, 0);
+		renderer.update_char_position(player_position, 0);
 	}
 
 
@@ -104,20 +114,20 @@ void PlayMode::update(float elapsed) {
 			Renderer::ScreenHeight
 	) * 1.0f / 3.0f;
 
-	glm::vec2 space_from_camera_center = camera_position - char_position;
+	glm::vec2 space_from_camera_center = camera_position - player_position;
 
 	if (space_from_camera_center.x > MARGIN.x) {
-		camera_position.x = MARGIN.x + char_position.x;
+		camera_position.x = MARGIN.x + player_position.x;
 	}
 	if (-space_from_camera_center.x > MARGIN.x) {
-		camera_position.x = char_position.x - MARGIN.x;
+		camera_position.x = player_position.x - MARGIN.x;
 	}
 
 	if (space_from_camera_center.y > MARGIN.y) {
-		camera_position.y = MARGIN.y + char_position.y;
+		camera_position.y = MARGIN.y + player_position.y;
 	}
 	if (-space_from_camera_center.y > MARGIN.y) {
-		camera_position.y = char_position.y - MARGIN.y;
+		camera_position.y = player_position.y - MARGIN.y;
 	}
 
 	renderer.update_camera_position(camera_position);
@@ -127,4 +137,33 @@ void PlayMode::update(float elapsed) {
 void PlayMode::draw(glm::uvec2 const &drawable_size) {
 	renderer.draw(drawable_size);
 	GL_ERRORS();
+}
+
+void PlayMode::update_force_vector(glm::vec2& force_vector)
+{
+	if (buttons[SDLK_w].pressed) {
+		force_vector.y += 1.0f;
+	}
+	if (buttons[SDLK_a].pressed) {
+		force_vector.x -= 1.0f;
+	}
+	if (buttons[SDLK_s].pressed) {
+		force_vector.y -= 1.0f;
+	}
+	if (buttons[SDLK_d].pressed) {
+		force_vector.x += 1.0f;
+	}
+
+	// apply force
+	if (glm::length(force_vector) > 0) {
+		force_vector = glm::normalize(force_vector) * MOVE_FORCE;
+	}
+}
+
+void PlayMode::reset_downs()
+{
+	for (std::pair<SDL_KeyCode, Button> button : buttons) {
+		button.second.downs = 0;
+	}
+	return;
 }
