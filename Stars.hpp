@@ -51,22 +51,22 @@ private:
 	std::array<Star, NUM_INSTANCES> stars;
 
 	// animations
-	const glm::uvec2 SPRITE_PIP      { 0, 24};
-	const glm::uvec2 SPRITE_TWINKLE1 { 8, 24};
-	const glm::uvec2 SPRITE_TWINKLE2 {16, 24};
-	const glm::uvec2 SPRITE_TWINKLE3 {24, 24};
+	const glm::uvec2 SPRITE_PIP      { 0,  0};
+	const glm::uvec2 SPRITE_TWINKLE1 { 8,  0};
+	const glm::uvec2 SPRITE_TWINKLE2 {16,  0};
+	const glm::uvec2 SPRITE_TWINKLE3 {24,  0};
 
-	const glm::uvec2 SPRITE_EXPAND   { 0, 16};
-	const glm::uvec2 SPRITE_BURST1   { 8, 16};
-	const glm::uvec2 SPRITE_BURST2   {16, 16};
-	const glm::uvec2 SPRITE_BURST3   {24, 16};
+	const glm::uvec2 SPRITE_EXPAND   {32,  0};
+	const glm::uvec2 SPRITE_BURST1   {40,  0};
+	const glm::uvec2 SPRITE_BURST2   {48,  0};
+	const glm::uvec2 SPRITE_BURST3   {56,  0};
 
 	const glm::uvec2 SPRITE_SHOOT1   { 0,  8};
 	const glm::uvec2 SPRITE_SHOOT2   { 8,  8};
 	const glm::uvec2 SPRITE_SHOOT3   {16,  8};
 	const glm::uvec2 SPRITE_SHOOT4   {24,  8};
 
-	const glm::uvec2 SPRITE_EMPTY    { 0,  0};
+	const glm::uvec2 SPRITE_EMPTY    {40,  8};
 
 	const std::vector<std::vector<std::pair<glm::uvec2, float>>> animations {
 		{

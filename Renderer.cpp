@@ -315,7 +315,7 @@ Renderer::Renderer() {
 	std::vector<glm::u8vec4> atlas_data;
 
 	load_png(
-		data_path("stars.png"),
+		data_path("sprites.png"),
 		&atlas_size,
 		&atlas_data,
 		OriginLocation::LowerLeftOrigin
@@ -578,14 +578,14 @@ void Renderer::draw(const glm::uvec2 &drawable_size) {
 			glm::uvec2 frame1;
 
 			if (b.color == BulletColor::Blue) {
-				frame0 = {8, 0};
-				frame1 = {32, 0};
+				frame0 = {48, 16};
+				frame1 = {48, 24};
 			} else if (b.color == BulletColor::Red) {
-				frame0 = {16, 0};
-				frame1 = {40, 0};
+				frame0 = {40, 16};
+				frame1 = {40, 24};
 			} else if (b.color == BulletColor::Purple) {
-				frame0 = {24, 0};
-				frame1 = {48, 0};
+				frame0 = {56, 16};
+				frame1 = {56, 24};
 			} else {
 				throw std::runtime_error("Undefined BulletColor");
 			}
@@ -614,7 +614,7 @@ void Renderer::draw(const glm::uvec2 &drawable_size) {
 			atlas_size,
 			char_position,
 			char_rotation - 1.571f,
-			glm::uvec2(32, 8),
+			glm::uvec2(0, 16),
 			glm::uvec2(16, 16),
 			glm::u8vec4(255, 255, 255, 255)
 		);
@@ -679,12 +679,10 @@ void Renderer::draw(const glm::uvec2 &drawable_size) {
 			atlas_size,
 			cursor_position,
 			0.0f,
-			glm::uvec2(56, 0),
+			glm::uvec2(32, 8),
 			glm::uvec2(8, 8),
 			glm::u8vec4(255, 255, 255, 255)
 		);
-
-
 
 		glBindBuffer(GL_ARRAY_BUFFER, tiny_vbo);
 		glBufferData(
