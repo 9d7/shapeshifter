@@ -11,8 +11,13 @@
 struct bullet_wrapper {
     Renderer::Bullet b;
     glm::vec2 direction;
+	float speed;
 };
 
+struct enemy_wrapper {
+	Renderer::Enemy e;
+	float bullet_timer;
+};
 
 struct PlayMode : Mode {
 	PlayMode();
@@ -36,6 +41,11 @@ struct PlayMode : Mode {
 	void update_force_vector(glm::vec2 &force_vector);
 	void reset_downs();
 	void shoot_bullet();
+	void shoot_enemy_bullet(Renderer::Enemy &e, float speed);
+
+	void move_soldier(enemy_wrapper &ewrap, float elapsed);
+	void move_hunter(enemy_wrapper &ewrap, float elapsed);
+	void generate_enemy();
 
 	// Tracking positions and velocities
 	glm::vec2 force_vector = glm::vec2(0, 0);
@@ -47,11 +57,12 @@ struct PlayMode : Mode {
 
 	Renderer renderer;
 
-	std::deque<bullet_wrapper> bullets;
-    std::deque<Renderer::Enemy> enemies;
+	std::deque<bullet_wrapper> player_bullets;
+	std::deque<bullet_wrapper> enemy_bullets;
+    std::deque<enemy_wrapper> enemies;
  
-    float max_bullet_time = 3.0f;
-  	Renderer::BulletColor player_color = Renderer::Blue; 
+    float max_bullet_time = 5.0f;
+  	Renderer::BulletColor player_color = Renderer::Red; 
 
 	// Tracking inputs
 	struct Button {
