@@ -10,7 +10,6 @@
 
 
 
-
 struct PlayMode : Mode {
 	PlayMode();
 	virtual ~PlayMode();
@@ -24,6 +23,12 @@ struct PlayMode : Mode {
 	struct bullet_wrapper {
 		Renderer::Bullet b;
 		glm::vec2 direction;
+		float speed;
+	};
+
+	struct enemy_wrapper {
+		Renderer::Enemy e;
+		float bullet_timer;
 	};
 
 	//functions called by main loop:
@@ -36,9 +41,15 @@ struct PlayMode : Mode {
 	void reset_downs();
 	void dev_mode_update();
 	void shoot_bullet();
-	void enemy_shoot_bullet(Renderer::Enemy);
+
 	void check_collisions();
 	void update_bullets(std::deque<bullet_wrapper> &bullets, float elapsed);
+	void shoot_enemy_bullet(Renderer::Enemy &e, float speed);
+
+	void move_soldier(enemy_wrapper &ewrap, float elapsed);
+	void move_hunter(enemy_wrapper &ewrap, float elapsed);
+	void generate_enemy();
+
 
 	// Tracking positions and velocities
 	glm::vec2 force_vector = glm::vec2(0, 0);
@@ -51,10 +62,11 @@ struct PlayMode : Mode {
 	Renderer renderer;
 
 	std::deque<bullet_wrapper> enemy_bullets, player_bullets;
-    std::deque<Renderer::Enemy> enemies;
+    std::deque<enemy_wrapper> enemies;
+
  
-    float max_bullet_time = 3.0f;
-  	Renderer::BulletColor player_color = Renderer::Blue; 
+    float max_bullet_time = 5.0f;
+  	Renderer::BulletColor player_color = Renderer::Red; 
 
 	bool dead = false;
 

@@ -25,6 +25,16 @@ Load < Renderer > renderer_(LoadTagDefault, []() -> Renderer const * {
 
 PlayMode::PlayMode() : renderer(*renderer_) {
 	SDL_ShowCursor(SDL_DISABLE);
+	Renderer::Enemy e = renderer.new_enemy(glm::vec2(0, 15), 0, Renderer::EnemyType::Hunter, Renderer::BulletColor::Blue);
+    enemy_wrapper ewrap;
+	ewrap.e = e;
+	enemies.push_back(ewrap);
+	Renderer::Enemy e2 = renderer.new_enemy(glm::vec2(0, -15), 0, Renderer::EnemyType::Soldier, Renderer::BulletColor::Red);
+	//enemies.push_back(e2);
+	enemy_wrapper ewrap2;
+	ewrap2.bullet_timer = 2.0f;
+	ewrap2.e = e2;
+	enemies.push_back(ewrap2);
 }
 
 PlayMode::~PlayMode() {
@@ -128,6 +138,16 @@ void PlayMode::update(float elapsed) {
 	update_bullets(player_bullets, elapsed);
 	check_collisions();
 	
+	if (enemies.size() < 10) generate_enemy();
+
+	for (size_t i = 0; i < enemies.size(); i++) {
+		enemies[i].bullet_timer -= elapsed;
+		if (enemies[i].e->type == Renderer::EnemyType::Soldier) {
+			move_soldier(enemies[i], elapsed);
+		} else if (enemies[i].e->type == Renderer::EnemyType::Hunter) {
+			move_hunter(enemies[i], elapsed);
+		}
+	}
 
 	// update camera to be out of dead space
 	static const glm::vec2 MARGIN = glm::vec2(
@@ -230,6 +250,7 @@ void PlayMode::shoot_bullet() {
     bullet_wrapper new_bullet;
     b->elapsed = 0.0f;
     new_bullet.b = b;
+	new_bullet.speed = 200;
     new_bullet.direction = glm::vec2(shoot_at.x - player_position.x, shoot_at.y - player_position.y);
     new_bullet.direction = glm::normalize(new_bullet.direction);
     player_bullets.push_back(new_bullet);
@@ -276,9 +297,91 @@ void PlayMode::update_bullets(std::deque<bullet_wrapper> &bullets, float elapsed
 			if (bullets.size() == 0) break;
 		}
 		else {
-			i->b->position += i->direction * elapsed * 200.0f; // TODO replace this with bullet speed
+			i->b->position += i->direction * elapsed * i->speed; // TODO replace this with bullet speed
 			renderer.update_bullet_position(i->b, i->b->position);
 			++i;
 		}
+	}
+
+}
+
+void PlayMode::move_soldier(enemy_wrapper &ewrap, float elapsed) {
+	float xdiff = ewrap.e->position.x - player_position.x;
+	float ydiff = ewrap.e->position.y - player_position.y;
+	float dist = sqrt(xdiff*xdiff + ydiff*ydiff);
+	glm::vec2 move_enemy = glm::normalize(player_position - ewrap.e->position);
+	move_enemy = move_enemy * 50.0f * elapsed;
+	if (dist > 100.0f) {
+		ewrap.e->position = ewrap.e->position + move_enemy;
+		renderer.update_enemy_position(ewrap.e, ewrap.e->position);
+	} else if (dist < 50.0f) {
+		ewrap.e->position = ewrap.e->position - move_enemy;
+		renderer.update_enemy_position(ewrap.e, ewrap.e->position);
+	} else if (ewrap.bullet_timer < 0.0f) {
+		shoot_enemy_bullet(ewrap.e, 100.0f);
+		ewrap.bullet_timer = 2.0f;
+	}
+}
+
+void PlayMode::move_hunter(enemy_wrapper &ewrap, float elapsed) {
+	glm::vec2 move_enemy = glm::normalize(player_position - ewrap.e->position);
+	move_enemy = move_enemy * 70.0f * elapsed;
+	ewrap.e->position = ewrap.e->position + move_enemy;
+	renderer.update_enemy_position(ewrap.e, ewrap.e->position);
+}
+
+void PlayMode::shoot_enemy_bullet(Renderer::Enemy &e, float speed) {
+    Renderer::Bullet b = renderer.new_bullet(e->position, e->color);
+    bullet_wrapper new_bullet;
+    b->elapsed = 0.0f;
+    new_bullet.b = b;
+	new_bullet.speed = 50.0f;
+    new_bullet.direction = player_position - e->position;
+    new_bullet.direction = glm::normalize(new_bullet.direction);
+    enemy_bullets.push_back(new_bullet);
+
+}
+
+void PlayMode::generate_enemy() {
+	int r = rand() % 4;
+	float minx, maxx, miny, maxy;
+	if (r == 0) {
+		minx = camera_position.x + renderer.ScreenWidth / 2;
+		maxx = minx + 50.0f;
+		miny = camera_position.y - renderer.ScreenHeight / 2;
+		maxy = camera_position.y + renderer.ScreenHeight / 2;
+	} else if (r == 1) {
+		minx = camera_position.x - renderer.ScreenWidth / 2 - 50.0f;
+		maxx = minx + 50.0f;
+		miny = camera_position.y - renderer.ScreenHeight / 2;
+		maxy = camera_position.y + renderer.ScreenHeight / 2;
+	} else if (r == 2) {
+		minx = camera_position.x - renderer.ScreenWidth / 2 - 50.0f;
+		maxx = camera_position.x + renderer.ScreenWidth / 2 + 50.0f;
+		miny = camera_position.y + renderer.ScreenHeight / 2;
+		maxy = miny + 50.0f;
+	} else {
+		minx = camera_position.x - renderer.ScreenWidth / 2 - 50.0f;
+		maxx = camera_position.x + renderer.ScreenWidth / 2 + 50.0f;
+		miny = camera_position.y - renderer.ScreenHeight / 2 - 50.0f;
+		maxy = miny + 50.0f;
+	}
+	float x = minx + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(maxx-minx)));
+	float y = miny + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(maxy-miny)));
+	int type = rand() % 2;
+	int col = rand() % 2;
+	Renderer::BulletColor c;
+	if (col == 0) c = Renderer::BulletColor::Blue;
+	if (col == 1) c = Renderer::BulletColor::Red;
+	if (type == 0) {
+		Renderer::Enemy e = renderer.new_enemy(glm::vec2(x, y), 0, Renderer::EnemyType::Hunter, c);
+		enemy_wrapper ewrap;
+		ewrap.e = e;
+		enemies.push_back(ewrap);
+	} else if (type == 1) {
+		Renderer::Enemy e = renderer.new_enemy(glm::vec2(x, y), 0, Renderer::EnemyType::Soldier, c);
+		enemy_wrapper ewrap;
+		ewrap.e = e;
+		enemies.push_back(ewrap);
 	}
 }
