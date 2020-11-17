@@ -1,9 +1,11 @@
 #include "Renderer.hpp"
 #include "GL.hpp"
 #include "Load.hpp"
+#include "Stars.hpp"
 #include "data_path.hpp"
 #include "gl_compile_program.hpp"
 #include "gl_errors.hpp"
+#include <array>
 #include <cstdio>
 #include <glm/glm.hpp>
 #include "glm/ext/matrix_clip_space.hpp"
@@ -12,6 +14,7 @@
 #include "load_save_png.hpp"
 #include <algorithm>
 #include <iterator>
+#include <string>
 #include <vector>
 #include <fstream>
 
@@ -48,6 +51,7 @@ Load < GLuint > texture_program(LoadTagDefault, []() -> GLuint *{
 struct BackgroundProgram {
 	GLuint program;
 	GLint Time_float;
+	GLint Camera_ivec2;
 };
 
 // program that simply draws the background.
@@ -72,7 +76,8 @@ Load < BackgroundProgram > background_program(LoadTagDefault, []() -> Background
 
 	return new BackgroundProgram {
 		program,
-		glGetUniformLocation(program, "Time")
+		glGetUniformLocation(program, "Time"),
+		glGetUniformLocation(program, "Camera")
 	};
 
 });
@@ -115,6 +120,68 @@ Load < SpriteSmallProgram > sprite_small_program(LoadTagDefault, []() -> SpriteS
 
 });
 
+struct StarProgram {
+	GLuint program;
+	std::array<GLint, NUM_INSTANCES> TexCoords_vec2;
+	std::array<GLint, NUM_INSTANCES> Colors_vec4;
+	std::array<GLint, NUM_INSTANCES> Positions_ivec2;
+	std::array<GLint, NUM_INSTANCES> Parallax_float;
+	GLint Camera_ivec2;
+	GLint ScreenToClip_mat4;
+	GLint AtlasSize_uvec2;
+};
+
+Load < StarProgram > star_program(LoadTagDefault, []() -> StarProgram *{
+
+	std::ifstream vfs(data_path("shaders/star_vertex.glsl"));
+	std::string vertex_shader(
+		(std::istreambuf_iterator<char>(vfs)),
+		(std::istreambuf_iterator<char>())
+	);
+
+	std::ifstream ffs(data_path("shaders/star_fragment.glsl"));
+	std::string fragment_shader(
+		(std::istreambuf_iterator<char>(ffs)),
+		(std::istreambuf_iterator<char>())
+	);
+
+	GLuint program = gl_compile_program(
+		vertex_shader,
+		fragment_shader
+	);
+
+	GLuint TEX_sampler2D = glGetUniformLocation(program, "TEX");
+
+	//set TEX to always refer to texture binding zero:
+	glUseProgram(program); //bind program -- glUniform* calls refer to this program now
+	glUniform1i(TEX_sampler2D, 0); //set TEX to sample from GL_TEXTURE0
+	glUseProgram(0); //unbind program -- glUniform* calls refer to ??? now
+
+	std::array<GLint, NUM_INSTANCES> TexCoords_vec2;
+	std::array<GLint, NUM_INSTANCES> Colors_vec4;
+	std::array<GLint, NUM_INSTANCES> Positions_ivec2;
+	std::array<GLint, NUM_INSTANCES> Parallax_float;
+
+	for (size_t i = 0; i < NUM_INSTANCES; i++) {
+		TexCoords_vec2[i]  = glGetUniformLocation(program, ("TexCoords[" + std::to_string(i) + "]").c_str());
+		Colors_vec4[i]     = glGetUniformLocation(program, ("Colors["    + std::to_string(i) + "]").c_str());
+		Positions_ivec2[i] = glGetUniformLocation(program, ("Positions[" + std::to_string(i) + "]").c_str());
+		Parallax_float[i]  = glGetUniformLocation(program, ("Parallax["  + std::to_string(i) + "]").c_str());
+	}
+
+	return new StarProgram {
+		program,
+		TexCoords_vec2,
+		Colors_vec4,
+		Positions_ivec2,
+		Parallax_float,
+		glGetUniformLocation(program, "Camera"),
+		glGetUniformLocation(program, "ScreenToClip"),
+		glGetUniformLocation(program, "AtlasSize")
+	};
+
+});
+
 float quad_verts[] = {
 	-1.0f,  1.0f,  0.0f,  1.0f,
 	-1.0f, -1.0f,  0.0f,  0.0f,
@@ -122,6 +189,15 @@ float quad_verts[] = {
 	-1.0f,  1.0f,  0.0f,  1.0f,
 	 1.0f, -1.0f,  1.0f,  0.0f,
 	 1.0f,  1.0f,  1.0f,  1.0f
+};
+
+float star_verts[] = {
+	0.0f, 8.0f,
+	0.0f, 0.0f,
+	8.0f, 0.0f,
+	0.0f, 8.0f,
+	8.0f, 0.0f,
+	8.0f, 8.0f
 };
 
 Renderer::Renderer() {
@@ -221,6 +297,17 @@ Renderer::Renderer() {
 
 	make_vb(&tiny_vbo, &tiny_vao, {2, 2, 4}, 8);
 
+	make_vb(&star_vbo, &star_vao, {2}, 2);
+
+	glBindBuffer(GL_ARRAY_BUFFER, star_vbo);
+	glBufferData(
+		GL_ARRAY_BUFFER,
+		sizeof(star_verts),
+		star_verts,
+		GL_STATIC_DRAW
+	);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 
 	// make texture atlas
 	std::vector<glm::u8vec4> atlas_data;
@@ -245,65 +332,71 @@ Renderer::Renderer() {
 
 Renderer::~Renderer() {}
 
+void Renderer::draw_rect(
+	std::vector<Renderer::Vertex> &verts,
+	const glm::uvec2 &atlas_size,
+	const glm::ivec2 &location,
+	const glm::uvec2 &tex,
+	const glm::uvec2 &size,
+	const glm::u8vec4 &color
+	) {
+
+	glm::vec2 p_min = glm::vec2(location);
+	glm::vec2 p_max = glm::vec2(location + glm::ivec2(size));
+
+	glm::vec2 t_min = glm::vec2(tex) / glm::vec2(atlas_size);
+	glm::vec2 t_max = glm::vec2(tex + size) / glm::vec2(atlas_size);
+
+	glm::vec4 c = glm::vec4(color) / 255.0f;
+
+	verts.push_back(Vertex {
+		glm::vec2(p_min.x, p_max.y),
+		glm::vec2(t_min.x, t_max.y),
+		c
+	});
+
+	verts.push_back(Vertex {
+		glm::vec2(p_min.x, p_min.y),
+		glm::vec2(t_min.x, t_min.y),
+		c
+	});
+
+	verts.push_back(Vertex {
+		glm::vec2(p_max.x, p_min.y),
+		glm::vec2(t_max.x, t_min.y),
+		c
+	});
+
+	verts.push_back(Vertex {
+		glm::vec2(p_min.x, p_max.y),
+		glm::vec2(t_min.x, t_max.y),
+		c
+	});
+
+	verts.push_back(Vertex {
+		glm::vec2(p_max.x, p_min.y),
+		glm::vec2(t_max.x, t_min.y),
+		c
+	});
+
+	verts.push_back(Vertex {
+		glm::vec2(p_max.x, p_max.y),
+		glm::vec2(t_max.x, t_max.y),
+		c
+	});
+
+}
+
+
 void Renderer::draw(const glm::uvec2 &drawable_size) {
 
 	small_verts.clear();
 
-	auto draw_rect = [this](
-		glm::ivec2  location,
-		glm::uvec2  tex,
-		glm::uvec2  size,
-		glm::u8vec4 color
-	) {
-
-		glm::vec2 p_min = glm::vec2(location);
-		glm::vec2 p_max = glm::vec2(location + glm::ivec2(size));
-
-		glm::vec2 t_min = glm::vec2(tex) / glm::vec2(atlas_size);
-		glm::vec2 t_max = glm::vec2(tex + size) / glm::vec2(atlas_size);
-
-		glm::vec4 c = glm::vec4(color) / 255.0f;
-
-		this->small_verts.push_back(Vertex {
-			glm::vec2(p_min.x, p_max.y),
-			glm::vec2(t_min.x, t_max.y),
-			c
-		});
-
-		this->small_verts.push_back(Vertex {
-			glm::vec2(p_min.x, p_min.y),
-			glm::vec2(t_min.x, t_min.y),
-			c
-		});
-
-		this->small_verts.push_back(Vertex {
-			glm::vec2(p_max.x, p_min.y),
-			glm::vec2(t_max.x, t_min.y),
-			c
-		});
-
-		this->small_verts.push_back(Vertex {
-			glm::vec2(p_min.x, p_max.y),
-			glm::vec2(t_min.x, t_max.y),
-			c
-		});
-
-		this->small_verts.push_back(Vertex {
-			glm::vec2(p_max.x, p_min.y),
-			glm::vec2(t_max.x, t_min.y),
-			c
-		});
-
-		this->small_verts.push_back(Vertex {
-			glm::vec2(p_max.x, p_max.y),
-			glm::vec2(t_max.x, t_max.y),
-			c
-		});
-
-	};
 
 	draw_rect(
-		glm::ivec2(char_position - camera_position + glm::vec2(ScreenWidth, ScreenHeight) / 2.0f),
+		small_verts,
+		atlas_size,
+		glm::ivec2(char_position + glm::vec2(ScreenWidth, ScreenHeight) / 2.0f),
 		glm::uvec2(0, 16),
 		glm::uvec2(8, 8),
 		glm::u8vec4(0, 255, 255, 255)
@@ -318,11 +411,47 @@ void Renderer::draw(const glm::uvec2 &drawable_size) {
 	// draw background
 	glDisable(GL_DEPTH_TEST);
 	glUseProgram(background_program->program);
+
 	glUniform1f(background_program->Time_float, total_elapsed);
+	glUniform2i(background_program->Camera_ivec2, (int)camera_position.x, (int)camera_position.y);
 	glBindVertexArray(quad_vao);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
 	glUseProgram(0);
+
+	// draw stars
+	glDisable(GL_DEPTH_TEST);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
+	GL_ERRORS();
+
+	glUseProgram(star_program->program);
+
+	glUniform2i(star_program->Camera_ivec2, (int)camera_position.x, (int)camera_position.y);
+	glUniformMatrix4fv(
+		star_program->ScreenToClip_mat4,
+		1,
+		GL_FALSE,
+		glm::value_ptr(glm::ortho(0.0f, (float)ScreenWidth, 0.0f, (float)ScreenHeight))
+	);
+	glUniform2ui(star_program->AtlasSize_uvec2, atlas_size.x, atlas_size.y);
+
+	stars.draw(
+		star_program->TexCoords_vec2,
+		star_program->Colors_vec4,
+		star_program->Positions_ivec2,
+		star_program->Parallax_float
+	);
+
+	glBindVertexArray(star_vao);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, atlas_tex);
+	glDrawArraysInstanced(GL_TRIANGLES, 0, 6, NUM_INSTANCES);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindVertexArray(0);
+	glUseProgram(0);
+	GL_ERRORS();
 
 	// draw tiny textures
 	glDisable(GL_DEPTH_TEST);
@@ -344,12 +473,20 @@ void Renderer::draw(const glm::uvec2 &drawable_size) {
 		sprite_small_program->ScreenToClip_mat4,
 		1,
 		GL_FALSE,
-		glm::value_ptr(glm::ortho(
-			0.0f,
-			(float)ScreenWidth,
-			0.0f,
-			(float)ScreenHeight
-		))
+		glm::value_ptr(
+			glm::ortho(
+				0.0f,
+				(float)ScreenWidth,
+				0.0f,
+				(float)ScreenHeight
+			) *
+			glm::mat4(
+				glm::vec4(1.0f, 0.0f, 0.0f, 0.0f),
+				glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),
+				glm::vec4(0.0f, 0.0f, 1.0f, 0.0f),
+				glm::vec4((float)(-(int)(camera_position.x)), (float)(-(int)(camera_position.y)), 0.0f, 1.0f)
+			)
+		)
 	);
 
 	glBindVertexArray(tiny_vao);

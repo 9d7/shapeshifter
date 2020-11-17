@@ -2,6 +2,7 @@
 
 #include <glm/glm.hpp>
 #include "GL.hpp"
+#include "Stars.hpp"
 #include "glm/fwd.hpp"
 #include <vector>
 
@@ -24,6 +25,13 @@ public:
 		ScreenHeight = 240
 	};
 
+	struct Vertex{
+		glm::vec2 position;
+		glm::vec2 tex_coord;
+		glm::vec4 color;
+	};
+	static_assert(sizeof(Vertex) == sizeof(float) * 8, "Vertex is not packed");
+
 	// character controls
 
 	// position: [(0, 0), (320, 240)], rotation: [0, 2*pi]
@@ -33,7 +41,19 @@ public:
 	// position: [(0, 0), (320, 240)]
 	void update_camera_position(const glm::vec2 &position);
 
+	// other rendering helper functions
+	static void draw_rect(
+		std::vector<Vertex> &verts,
+		const glm::uvec2  &atlas_size,
+		const glm::ivec2  &location,
+		const glm::uvec2  &tex,
+		const glm::uvec2  &size,
+		const glm::u8vec4 &color
+	);
+
 private:
+
+	Stars stars;
 
 	glm::vec2 char_position = glm::vec2(0, 0);
 	glm::vec2 camera_position = glm::vec2(0, 0);
@@ -56,16 +76,13 @@ private:
 	GLuint quad_vbo;
 	GLuint quad_vao;
 
+	// for stars
+	GLuint star_vbo;
+	GLuint star_vao;
+
 	// texture atlas
 	GLuint atlas_tex;
 	glm::uvec2 atlas_size;
-
-	struct Vertex{
-		glm::vec2 position;
-		glm::vec2 tex_coord;
-		glm::vec4 color;
-	};
-	static_assert(sizeof(Vertex) == sizeof(float) * 8, "Vertex is not packed");
 
 	std::vector<Vertex> small_verts;
 
