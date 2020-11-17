@@ -1,4 +1,4 @@
-# (TODO: your game's title)
+# (Shapeshifter)
 
 Author: (TODO: your name)
 
@@ -11,13 +11,11 @@ Screen Shot:
 ![Screen Shot](screenshot.png)
 
 How To Play:
-
-(TODO: describe the controls and (if needed) goals/strategy.)
-
-Sources: (TODO: list a source URL for any assets you did not create yourself. Make sure you have a license for the asset.)
-
-This game was built with [NEST](NEST.md).
-
+wasd or arrow keys to move
+use mouse to aim
+use left mouse button to shoot blue bullets and turn blue
+use right mouse button to shoot red bullets and turn red
+Blue entities can only hurt red entities, and red entities can only hurt blue entities
 
 DEV MODE:
 P - enable/disable dev mode
