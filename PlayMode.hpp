@@ -24,13 +24,10 @@ struct PlayMode : Mode {
 	virtual ~PlayMode();
 
 	// Constants
-
-	// move_force is in pixels/s^2 (it's actually acceleration, don't tell anybody)
-	// max_velocity is in pixels/s
-	static constexpr float MOVE_FORCE = 600.0f;
-	static constexpr float MAX_VELOCITY = 400.0f;
+	static constexpr float MOVE_FORCE = 600.0f; // move_force is in pixels/s^2 (it's actually acceleration, don't tell anybody)
+	static constexpr float MAX_VELOCITY = 400.0f; // max_velocity is in pixels/s
 	static constexpr float FRICTION = 0.95f;
-	static constexpr glm::vec2 PIXEL_SCREEN_CENTER = glm::vec2(160, 120);
+	static constexpr glm::vec2 PIXEL_SCREEN_CENTER = glm::vec2(160, 120); // The center of the pixel screen
 
 	//functions called by main loop:
 	virtual bool handle_event(SDL_Event const &, glm::uvec2 const &window_size) override;
@@ -40,6 +37,7 @@ struct PlayMode : Mode {
 	// Additional functions
 	void update_force_vector(glm::vec2 &force_vector);
 	void reset_downs();
+	void dev_mode_update();
 	void shoot_bullet();
 	void shoot_enemy_bullet(Renderer::Enemy &e, float speed);
 
@@ -75,8 +73,24 @@ struct PlayMode : Mode {
 		{SDLK_a, Button()},
 		{SDLK_s, Button()},
 		{SDLK_d, Button()},
-		{SDLK_r, Button()}
+		{SDLK_r, Button()},
+		{SDLK_j, Button()},
+		{SDLK_k, Button()},
+		{SDLK_v, Button()},
+		{SDLK_m, Button()},
+		{SDLK_p, Button()},
+		{SDLK_l, Button()},
+		{SDLK_h, Button()},
+		{SDLK_o, Button()},
+
 	};
+
+	// Dev mode
+	bool dev_mode = false;
+	float dev_velocity_multiplier = 1.0f;
+	bool dev_velocity_rotation_mode = false;
+	bool dev_position_debug = false;
+	bool dev_show_dev_values = true;
 
 
 };

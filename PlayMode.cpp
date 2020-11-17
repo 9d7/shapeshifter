@@ -52,6 +52,7 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 	else if (evt.type == SDL_KEYUP) {
 		if (buttons.find(key) != buttons.end()) {
 			buttons[key].pressed = false;
+			if (key == SDLK_p) dev_mode = !dev_mode;
 			return true;
 		}
 	}
@@ -95,10 +96,7 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 }
 
 void PlayMode::update(float elapsed) {
-
 	// Do actions
-
-	// Comment out the following line to allow for linear acceleration and exponential velocity
 	force_vector = glm::vec2(0, 0);
 	update_force_vector(force_vector);
 
@@ -108,8 +106,8 @@ void PlayMode::update(float elapsed) {
 	player_velocity += force_vector * elapsed;
 
 	// velocity cap
-	if (glm::length(player_velocity) > MAX_VELOCITY) {
-		player_velocity = glm::normalize(player_velocity) * MAX_VELOCITY;
+	if (glm::length(player_velocity) > MAX_VELOCITY * dev_velocity_multiplier) {
+		player_velocity = glm::normalize(player_velocity) * MAX_VELOCITY * dev_velocity_multiplier;
 	}
 
 	//update position
@@ -117,16 +115,24 @@ void PlayMode::update(float elapsed) {
 	player_velocity *= FRICTION;
 	mouse_vector_from_player = mouse_position + camera_position - player_position - PIXEL_SCREEN_CENTER;
 
-
-	//std::cout << "player: " << glm::to_string(player_position) << " | mouse: " << glm::to_string(mouse_position) << " | camera: " << glm::to_string(camera_position) << " \nattempt: " << glm::to_string(mouse_vector_from_player) << "\n";
+	// Dev mode
+	if (dev_mode) {
+		dev_mode_update();
+	}
 
 	// Update player rotation
-	if (glm::length(player_velocity) > 0) {
-		//renderer.update_char_position(player_position, glm::atan(player_velocity.y, player_velocity.x)); // Velocity based rotation
-		renderer.update_char_position(player_position, glm::atan(mouse_vector_from_player.y, mouse_vector_from_player.x)); // Mouse position based rotation
-	} else {
-		renderer.update_char_position(player_position, 0);
+	if (dev_velocity_rotation_mode) { // Velocity based rotation
+		if (glm::length(player_velocity) > 0) {
+			renderer.update_char_position(player_position, glm::atan(player_velocity.y, player_velocity.x));
+		}
+		else {
+			renderer.update_char_position(player_position, 0);
+		}
 	}
+	else { // Mouse position based rotation
+		renderer.update_char_position(player_position, glm::atan(mouse_vector_from_player.y, mouse_vector_from_player.x)); 
+	}
+	
 
 	if (enemies.size() < 10) generate_enemy();
 
@@ -188,8 +194,7 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 	GL_ERRORS();
 }
 
-void PlayMode::update_force_vector(glm::vec2& force_vector)
-{
+void PlayMode::update_force_vector(glm::vec2& force_vector) {
 	if (buttons[SDLK_w].pressed) {
 		force_vector.y += 1.0f;
 	}
@@ -205,16 +210,52 @@ void PlayMode::update_force_vector(glm::vec2& force_vector)
 
 	// apply force
 	if (glm::length(force_vector) > 0) {
-		force_vector = glm::normalize(force_vector) * MOVE_FORCE;
+		force_vector = glm::normalize(force_vector) * MOVE_FORCE * dev_velocity_multiplier;
 	}
 }
 
-void PlayMode::reset_downs()
-{
-	for (std::pair<const SDL_KeyCode, Button> &button : buttons) {
+// Currently unneeded as we're sticking with linear velocity
+void PlayMode::reset_downs() {
+	for (std::pair<SDL_KeyCode, Button> button : buttons) {
 		button.second.downs = 0;
 	}
 	return;
+}
+
+void PlayMode::dev_mode_update() {
+	if (buttons[SDLK_r].pressed) {
+		player_position = glm::vec2(0, 0);
+		camera_position = glm::vec2(0, 0);
+	}
+	if (buttons[SDLK_j].pressed && dev_velocity_multiplier > .01f) {
+		dev_velocity_multiplier -= .01f;
+	}
+	if (buttons[SDLK_k].pressed) {
+		dev_velocity_multiplier += .01f;
+	}
+	if (buttons[SDLK_v].pressed) {
+		dev_velocity_rotation_mode = true;
+	}
+	if (buttons[SDLK_m].pressed) {
+		dev_velocity_rotation_mode = false;
+	}
+	if (buttons[SDLK_l].pressed) {
+		dev_position_debug = true;
+	}
+	if (buttons[SDLK_h].pressed) {
+		dev_show_dev_values = true;
+	}
+	if (buttons[SDLK_o].pressed) {
+		dev_position_debug = false;
+		dev_show_dev_values = false;
+	}
+
+	if (dev_position_debug) {
+		std::cout << "player: " << glm::to_string(player_position) << " | mouse: " << glm::to_string(mouse_position) << " | camera: " << glm::to_string(camera_position) << " | mouse from player: " << glm::to_string(mouse_vector_from_player) << "\n";
+	}
+	if (dev_show_dev_values) {
+		std::cout << "Velocity multiplier: " << dev_velocity_multiplier << " | Rotation mode: " << dev_velocity_rotation_mode << "\n";
+	}
 }
 
 void PlayMode::shoot_bullet() {
