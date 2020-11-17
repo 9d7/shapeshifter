@@ -15,6 +15,7 @@
 #include "load_save_png.hpp"
 #include <algorithm>
 #include <iterator>
+#include <stdexcept>
 #include <string>
 #include <vector>
 #include <fstream>
@@ -561,6 +562,43 @@ void Renderer::draw(const glm::uvec2 &drawable_size) {
 		glEnable(GL_BLEND);
 
 		small_verts.clear();
+
+		for (Bullet_ &b : bullets) {
+			glm::uvec2 frame0;
+			glm::uvec2 frame1;
+
+			if (b.color == BulletColor::Blue) {
+				frame0 = {8, 0};
+				frame1 = {32, 0};
+			} else if (b.color == BulletColor::Red) {
+				frame0 = {16, 0};
+				frame1 = {40, 0};
+			} else if (b.color == BulletColor::Purple) {
+				frame0 = {24, 0};
+				frame1 = {48, 0};
+			} else {
+				throw std::runtime_error("Undefined BulletColor");
+			}
+
+			static constexpr float ANIM_SPEED = 0.2f;
+			glm::uvec2 frame = frame0;
+			if (glm::mod(b.elapsed, ANIM_SPEED) > (ANIM_SPEED / 2.0f)) {
+				frame = frame1;
+			}
+
+			draw_rect(
+				small_verts,
+				atlas_size,
+				b.position,
+				0.0f,
+				frame,
+				glm::uvec2(8, 8),
+				glm::u8vec4(255, 255, 255, 255)
+			);
+
+		}
+
+		// draw player
 		draw_rect(
 			small_verts,
 			atlas_size,
@@ -629,6 +667,8 @@ void Renderer::draw(const glm::uvec2 &drawable_size) {
 		mouse_pos.y = ((float)y - (drawable_size.y - actual_drawable_size.y) / 2.0f) * (float)ScreenHeight / actual_drawable_size.y;
 
 		small_verts.clear();
+
+		// draw mouse
 		draw_rect(
 			small_verts,
 			atlas_size,
@@ -638,6 +678,8 @@ void Renderer::draw(const glm::uvec2 &drawable_size) {
 			glm::uvec2(8, 8),
 			glm::u8vec4(255, 255, 255, 255)
 		);
+
+
 
 		glBindBuffer(GL_ARRAY_BUFFER, tiny_vbo);
 		glBufferData(
@@ -681,6 +723,10 @@ void Renderer::draw(const glm::uvec2 &drawable_size) {
 void Renderer::update(float elapsed) {
 	total_elapsed += elapsed;
 	stars.update(elapsed);
+
+	for (Bullet_ &b : bullets) {
+		b.elapsed += elapsed;
+	}
 }
 
 void Renderer::update_camera_position(const glm::vec2 &position) {
@@ -716,6 +762,14 @@ Renderer::Bullet Renderer::new_bullet(const glm::vec2 &position, BulletColor col
 	return bullets.begin();
 }
 
-void Renderer::update_bullet_position(Bullet b, const glm::vec2 &position) {}
-void Renderer::update_bullet_color(Bullet b, BulletColor color) {}
-void Renderer::destroy_bullet(Bullet b) {}
+void Renderer::update_bullet_position(Bullet b, const glm::vec2 &position) {
+	b->position = position;
+}
+
+void Renderer::update_bullet_color(Bullet b, BulletColor color) {
+	b->color = color;
+}
+
+void Renderer::destroy_bullet(Bullet b) {
+	bullets.erase(b);
+}

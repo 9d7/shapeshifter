@@ -50,8 +50,9 @@ public:
 	};
 
 	struct Bullet_ {
-		glm::vec2 position;
+		glm::vec2   position;
 		BulletColor color;
+		float       elapsed;
 	};
 
 	typedef std::list<Bullet_>::iterator Bullet;
