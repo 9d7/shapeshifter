@@ -22,4 +22,6 @@ struct PlayMode : Mode {
 
 	Renderer renderer;
 
+	glm::vec2 mouse_position = glm::vec2(0, 0);
+
 };

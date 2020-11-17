@@ -30,6 +30,30 @@ PlayMode::~PlayMode() {
 }
 
 bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size) {
+
+	if (evt.type == SDL_MOUSEMOTION) {
+		SDL_MouseMotionEvent mme = evt.motion;
+		glm::vec2 screen_pos {(float)mme.x, (float)(window_size.y - mme.y)};
+
+		// get real drawable size
+		size_t actual_window_scale = std::min(
+			window_size.x * Renderer::ScreenHeight,
+			window_size.y * Renderer::ScreenWidth
+		);
+		glm::uvec2 actual_window_size = glm::uvec2(
+			actual_window_scale / Renderer::ScreenHeight,
+			actual_window_scale / Renderer::ScreenWidth
+		);
+
+		// map(x, (drawable_size.x - actual_drawable_size.x) / 2.0f, (drawable_size.x + actual_drawable_size.x) / 2.0f, 0, ScreenWidth)
+		mouse_position.x = (screen_pos.x - (window_size.x - actual_window_size.x) / 2.0f) * (float)Renderer::ScreenWidth  / actual_window_size.x;
+		mouse_position.y = (screen_pos.y - (window_size.y - actual_window_size.y) / 2.0f) * (float)Renderer::ScreenHeight / actual_window_size.y;
+
+		renderer.update_cursor_position(mouse_position);
+
+		return true;
+	}
+
 	return false;
 }
 

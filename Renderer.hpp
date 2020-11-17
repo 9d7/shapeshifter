@@ -42,6 +42,9 @@ public:
 	// position: [(0, 0), (320, 240)]
 	void update_camera_position(const glm::vec2 &position);
 
+	// cursor
+	void update_cursor_position(const glm::vec2 &position);
+
 	// bullets
 	enum BulletColor {
 		Red,
@@ -62,6 +65,7 @@ public:
 	void update_bullet_color(Bullet b, BulletColor color);
 	void destroy_bullet(Bullet b);
 
+	// enemies
 	enum EnemyType {
 		Regular,
 		Soldier,
@@ -94,6 +98,7 @@ private:
 
 	glm::vec2 char_position = glm::vec2(0, 0);
 	glm::vec2 camera_position = glm::vec2(0, 0);
+	glm::vec2 cursor_position = glm::vec2(-8, -8);
 	float     char_rotation = 0.0f;
 
 	float total_elapsed = 0.0f;
