@@ -5,9 +5,14 @@
 
 Stars::Stars() {
 	for (Star &s : stars) {
-		s.color = glm::vec4(1.0f, 1.0f, 0.0f, 0.5f);
-		s.tex_coords = glm::ivec2(0.0f, 16.0f);
+
+		s.animation_index = (size_t)glm::floor(real(mt) * animations.size());
+		s.elapsed = real(mt) * 30.0f; // phase offset
+		s.frame_index = 0;
+		s.speed_modifier = 0.95f + real(mt) * 0.1f;
+
 		s.parallax = real(mt) * 0.75f + 0.25f;
+		s.color = glm::vec4(1.0f, real(mt) * 0.25f + 0.75f, real(mt) * 0.75f, s.parallax - 0.15f);
 		s.pos = glm::vec2(
 			real(mt) * (float)Renderer::ScreenWidth * 2.0f,
 			real(mt) * (float)Renderer::ScreenHeight * 2.0f
@@ -18,6 +23,19 @@ Stars::Stars() {
 Stars::~Stars() {}
 
 void Stars::update(float elapsed) {
+
+	for (Star &s : stars) {
+		s.elapsed += elapsed * s.speed_modifier;
+
+		while (s.elapsed >= animations[s.animation_index][s.frame_index].second) {
+			s.elapsed -= animations[s.animation_index][s.frame_index].second;
+			s.frame_index++;
+			s.frame_index %= animations[s.animation_index].size();
+		}
+
+		s.tex_coords = animations[s.animation_index][s.frame_index].first;
+	}
+
 
 }
 

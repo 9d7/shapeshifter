@@ -57,10 +57,10 @@ float hatch_interpolate(float amt, ivec2 coord) {
 
 void main() {
 
-	const float PARALLAX_SPEED = 1.0f;
+	const float PARALLAX_SPEED = 0.75f;
 	ivec2 pixel_location = ivec2(gl_FragCoord.xy) + ivec2(Camera * PARALLAX_SPEED);
 
-	float n = (noise_scaled_sum(1.0f * vec3(pixel_location / RESOLUTION, Time / 128.0f))) * 1.5;
+	float n = (noise_scaled_sum(1.0f * vec3(pixel_location / RESOLUTION, Time / 64.0f))) * 1.5;
 
 	const vec3 color1 = vec3(7.0, 4.0, 20.0) / 255.0;
 	const vec3 color2 = vec3(40.0, 9.0, 80.0) / 255.0;

@@ -537,6 +537,7 @@ void Renderer::draw(const glm::uvec2 &drawable_size) {
 
 void Renderer::update(float elapsed) {
 	total_elapsed += elapsed;
+	stars.update(elapsed);
 }
 
 void Renderer::update_camera_position(const glm::vec2 &position) {

@@ -35,6 +35,13 @@ private:
 
 	// list
 	struct Star {
+		size_t     animation_index;
+		size_t     frame_index;
+		float      elapsed;
+		// slightly modify speed of different patterns so they
+		// don't overlap
+		float      speed_modifier;
+
 		glm::ivec2  tex_coords;
 		glm::vec4  color;
 		glm::ivec2 pos;
@@ -61,7 +68,7 @@ private:
 
 	const glm::uvec2 SPRITE_EMPTY    { 0,  0};
 
-	const std::vector<std::list<std::pair<glm::uvec2, float>>> animations {
+	const std::vector<std::vector<std::pair<glm::uvec2, float>>> animations {
 		{
 			{SPRITE_PIP, 120.0f}
 		}, {
@@ -71,6 +78,24 @@ private:
 			{SPRITE_TWINKLE3, 0.5f},
 			{SPRITE_TWINKLE2, 0.5f},
 			{SPRITE_TWINKLE1, 0.5f},
+		}, {
+			{SPRITE_PIP, 0.5f},
+			{SPRITE_TWINKLE1, 0.5f},
+			{SPRITE_EXPAND, 0.5f},
+			{SPRITE_TWINKLE1, 0.5f}
+		}, {
+			{SPRITE_EMPTY, 10.0f},
+			{SPRITE_PIP, 0.25f},
+			{SPRITE_TWINKLE1, 0.25f},
+			{SPRITE_BURST1, 0.25f},
+			{SPRITE_BURST2, 0.25f},
+			{SPRITE_BURST3, 0.25f}
+		}, {
+			{SPRITE_EMPTY, 30.0f},
+			{SPRITE_SHOOT1, 0.10f},
+			{SPRITE_SHOOT2, 0.10f},
+			{SPRITE_SHOOT3, 0.10f},
+			{SPRITE_SHOOT4, 0.10f}
 		}
 	};
 };
