@@ -8,16 +8,7 @@
 #include <deque>
 #include <unordered_map>
 
-struct bullet_wrapper {
-    Renderer::Bullet b;
-    glm::vec2 direction;
-	float speed;
-};
 
-struct enemy_wrapper {
-	Renderer::Enemy e;
-	float bullet_timer;
-};
 
 struct PlayMode : Mode {
 	PlayMode();
@@ -29,6 +20,17 @@ struct PlayMode : Mode {
 	static constexpr float FRICTION = 0.95f;
 	static constexpr glm::vec2 PIXEL_SCREEN_CENTER = glm::vec2(160, 120); // The center of the pixel screen
 
+	struct bullet_wrapper {
+		Renderer::Bullet b;
+		glm::vec2 direction;
+		float speed;
+	};
+
+	struct enemy_wrapper {
+		Renderer::Enemy e;
+		float bullet_timer;
+	};
+
 	//functions called by main loop:
 	virtual bool handle_event(SDL_Event const &, glm::uvec2 const &window_size) override;
 	virtual void update(float elapsed) override;
@@ -39,11 +41,15 @@ struct PlayMode : Mode {
 	void reset_downs();
 	void dev_mode_update();
 	void shoot_bullet();
+
+	void check_collisions();
+	void update_bullets(std::deque<bullet_wrapper> &bullets, float elapsed);
 	void shoot_enemy_bullet(Renderer::Enemy &e, float speed);
 
 	void move_soldier(enemy_wrapper &ewrap, float elapsed);
 	void move_hunter(enemy_wrapper &ewrap, float elapsed);
 	void generate_enemy();
+
 
 	// Tracking positions and velocities
 	glm::vec2 force_vector = glm::vec2(0, 0);
@@ -55,12 +61,14 @@ struct PlayMode : Mode {
 
 	Renderer renderer;
 
-	std::deque<bullet_wrapper> player_bullets;
-	std::deque<bullet_wrapper> enemy_bullets;
+	std::deque<bullet_wrapper> enemy_bullets, player_bullets;
     std::deque<enemy_wrapper> enemies;
+
  
     float max_bullet_time = 5.0f;
   	Renderer::BulletColor player_color = Renderer::Red; 
+
+	bool dead = false;
 
 	// Tracking inputs
 	struct Button {

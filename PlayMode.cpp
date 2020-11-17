@@ -83,6 +83,7 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 	else if (evt.type == SDL_MOUSEBUTTONDOWN) {
         if (evt.button.button == SDL_BUTTON_LEFT) { //lmb for blue
             player_color = Renderer::Blue;
+			
         } else if (evt.button.button == SDL_BUTTON_RIGHT) { //rmb for red
             player_color = Renderer::Red;
         }
@@ -134,6 +135,9 @@ void PlayMode::update(float elapsed) {
 	}
 	
 
+	update_bullets(player_bullets, elapsed);
+	check_collisions();
+	
 	if (enemies.size() < 10) generate_enemy();
 
 	for (size_t i = 0; i < enemies.size(); i++) {
@@ -144,24 +148,6 @@ void PlayMode::update(float elapsed) {
 			move_hunter(enemies[i], elapsed);
 		}
 	}
-
-	//delete while iterating taken from
-	//https://stackoverflow.com/questions/596162/can-you-remove-elements-from-a-stdlist-while-iterating-through-it
-    std::deque<bullet_wrapper>::iterator i = player_bullets.begin();
-    while (i != player_bullets.end()) {
-        i->b->elapsed += elapsed;
-        // also check collision
-        if (i->b->elapsed > max_bullet_time) {
-            renderer.destroy_bullet(i->b);
-            player_bullets.erase(i++);  // alternatively, i = items.erase(i);
-            if (player_bullets.size() == 0) break;
-        } else {
-            i->b->position += i->direction * elapsed * i->speed;
-            renderer.update_bullet_position(i->b, i->b->position);
-            ++i;
-        }
-	}
-
 
 	// update camera to be out of dead space
 	static const glm::vec2 MARGIN = glm::vec2(
@@ -214,13 +200,13 @@ void PlayMode::update_force_vector(glm::vec2& force_vector) {
 	}
 }
 
-// Currently unneeded as we're sticking with linear velocity
-void PlayMode::reset_downs() {
-	for (std::pair<SDL_KeyCode, Button> button : buttons) {
-		button.second.downs = 0;
-	}
-	return;
-}
+//// Currently unneeded as we're sticking with linear velocity
+//void PlayMode::reset_downs() {
+//	for (std::pair<SDL_KeyCode, Button> &button : buttons) {
+//		button.second.downs = 0;
+//	}
+//	return;
+//}
 
 void PlayMode::dev_mode_update() {
 	if (buttons[SDLK_r].pressed) {
@@ -270,6 +256,49 @@ void PlayMode::shoot_bullet() {
     player_bullets.push_back(new_bullet);
 }
 
+
+
+void PlayMode::check_collisions() {
+	// Just checks player bullets and enemie bodys for now
+	for (bullet_wrapper bullet : enemy_bullets) {
+		glm::vec2 distance_vector = bullet.b->position - player_position;
+		float dist = glm::length(distance_vector);
+		if (dist < 10.0f) {
+			dead = true;
+		}
+	}
+	for (bullet_wrapper bullet : player_bullets) {
+		for (enemy_wrapper enemy : enemies) {
+			glm::vec2 distance_vector = bullet.b->position - enemy.e->position;
+			float dist = glm::length(distance_vector);
+			if (dist < 10.0f) {
+				renderer.destroy_enemy(enemy.e);
+			}
+		}
+	}
+}
+
+void PlayMode::update_bullets(std::deque<bullet_wrapper> &bullets, float elapsed) {
+	//delete while iterating taken from
+	//https://stackoverflow.com/questions/596162/can-you-remove-elements-from-a-stdlist-while-iterating-through-it
+	std::deque<bullet_wrapper>::iterator i = bullets.begin();
+	while (i != bullets.end()) {
+		i->b->elapsed += elapsed;
+		// also check collision
+		if (i->b->elapsed > max_bullet_time) {
+			renderer.destroy_bullet(i->b);
+			bullets.erase(i++);  // alternatively, i = items.erase(i);
+			if (bullets.size() == 0) break;
+		}
+		else {
+			i->b->position += i->direction * elapsed * i->speed; // TODO replace this with bullet speed
+			renderer.update_bullet_position(i->b, i->b->position);
+			++i;
+		}
+	}
+
+}
+
 void PlayMode::move_soldier(enemy_wrapper &ewrap, float elapsed) {
 	float xdiff = ewrap.e->position.x - player_position.x;
 	float ydiff = ewrap.e->position.y - player_position.y;
@@ -304,6 +333,7 @@ void PlayMode::shoot_enemy_bullet(Renderer::Enemy &e, float speed) {
     new_bullet.direction = player_position - e->position;
     new_bullet.direction = glm::normalize(new_bullet.direction);
     enemy_bullets.push_back(new_bullet);
+
 }
 
 void PlayMode::generate_enemy() {
