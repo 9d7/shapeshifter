@@ -200,13 +200,13 @@ void PlayMode::update_force_vector(glm::vec2& force_vector) {
 	}
 }
 
-// Currently unneeded as we're sticking with linear velocity
-void PlayMode::reset_downs() {
-	for (std::pair<SDL_KeyCode, Button> &button : buttons) {
-		button.second.downs = 0;
-	}
-	return;
-}
+//// Currently unneeded as we're sticking with linear velocity
+//void PlayMode::reset_downs() {
+//	for (std::pair<SDL_KeyCode, Button> &button : buttons) {
+//		button.second.downs = 0;
+//	}
+//	return;
+//}
 
 void PlayMode::dev_mode_update() {
 	if (buttons[SDLK_r].pressed) {
@@ -268,18 +268,12 @@ void PlayMode::check_collisions() {
 		}
 	}
 	for (bullet_wrapper bullet : player_bullets) {
-		for (Renderer::Enemy enemy : enemies) {
-			glm::vec2 distance_vector = bullet.b->position - enemy->position;
+		for (enemy_wrapper enemy : enemies) {
+			glm::vec2 distance_vector = bullet.b->position - enemy.e->position;
 			float dist = glm::length(distance_vector);
 			if (dist < 10.0f) {
-				renderer.destroy_enemy(enemy);
-				
+				renderer.destroy_enemy(enemy.e);
 			}
-		}
-	}
-	for (auto bull_it = player_bullets.begin(); bull_it != player_bullets.end(); ++bull_it) {
-		for (auto enem_it = enemies.begin(); enem_it != enemies.end(); ++enem_it) {
-			glm::vec2 distance_vector = enem_it
 		}
 	}
 }
