@@ -25,16 +25,16 @@ Load < Renderer > renderer_(LoadTagDefault, []() -> Renderer const * {
 
 PlayMode::PlayMode() : renderer(*renderer_) {
 	SDL_ShowCursor(SDL_DISABLE);
-	Renderer::Enemy e = renderer.new_enemy(glm::vec2(0, 15), 0, Renderer::EnemyType::Hunter, Renderer::BulletColor::Blue);
-    enemy_wrapper ewrap;
-	ewrap.e = e;
-	enemies.push_back(ewrap);
-	Renderer::Enemy e2 = renderer.new_enemy(glm::vec2(0, -15), 0, Renderer::EnemyType::Soldier, Renderer::BulletColor::Red);
-	//enemies.push_back(e2);
-	enemy_wrapper ewrap2;
-	ewrap2.bullet_timer = 2.0f;
-	ewrap2.e = e2;
-	enemies.push_back(ewrap2);
+	////Renderer::Enemy e = renderer.new_enemy(glm::vec2(0, 15), 0, Renderer::EnemyType::Hunter, Renderer::BulletColor::Blue);
+ //   enemy_wrapper ewrap;
+	//ewrap.e = e;
+	//enemies.push_back(ewrap);
+	//Renderer::Enemy e2 = renderer.new_enemy(glm::vec2(0, -15), 0, Renderer::EnemyType::Soldier, Renderer::BulletColor::Red);
+	////enemies.push_back(e2);
+	//enemy_wrapper ewrap2;
+	//ewrap2.bullet_timer = 2.0f;
+	//ewrap2.e = e2;
+	//enemies.push_back(ewrap2);
 }
 
 PlayMode::~PlayMode() {
@@ -292,6 +292,7 @@ void PlayMode::check_collisions() {
 			dead = true;
 			renderer.destroy_bullet(bull_it->b);
 			enemy_bullets.erase(bull_it);
+			return;
 		}
 	}
 	for (auto bull_it = player_bullets.begin(); bull_it != player_bullets.end(); ++bull_it) {
