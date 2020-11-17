@@ -73,11 +73,16 @@ void PlayMode::update(float elapsed) {
 	char_position += char_velocity * elapsed;
 	char_velocity *= FRICTION;
 
-	renderer.update_char_position(char_position, 0);
+	if (glm::length(char_velocity) > 0) {
+		renderer.update_char_position(char_position, glm::atan(char_velocity.y, char_velocity.x));
+	} else {
+		renderer.update_char_position(char_position, 0);
+	}
+
 
 	// update camera to be out of dead space
 	static const glm::vec2 MARGIN = glm::vec2(
-			Renderer::ScreenWidth, 
+			Renderer::ScreenWidth,
 			Renderer::ScreenHeight
 	) * 1.0f / 3.0f;
 

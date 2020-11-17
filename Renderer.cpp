@@ -350,22 +350,30 @@ void Renderer::draw(const glm::uvec2 &drawable_size) {
 		const glm::u8vec4 &color
 	) {
 
-		glm::vec2 p_min = glm::vec2(-0.5f, -0.5f);
-		glm::vec2 p_max = glm::vec2( 0.5f,  0.5f);
+		glm::vec2 p0 = glm::vec2(-0.5f, -0.5f);
+		glm::vec2 p1 = glm::vec2(-0.5f,  0.5f);
+		glm::vec2 p2 = glm::vec2( 0.5f,  0.5f);
+		glm::vec2 p3 = glm::vec2( 0.5f, -0.5f);
 
 		glm::mat2 rot = glm::mat2x2(
 			glm::vec2(glm::cos(rotation), glm::sin(rotation)),
 			glm::vec2(-glm::sin(rotation), glm::cos(rotation))
 		);
 
-		p_min *= glm::vec2(size);
-		p_max *= glm::vec2(size);
+		p0 *= size;
+		p1 *= size;
+		p2 *= size;
+		p3 *= size;
 
-		p_min = rot * p_min;
-		p_max = rot * p_max;
+		p0 = rot * p0;
+		p1 = rot * p1;
+		p2 = rot * p2;
+		p3 = rot * p3;
 
-		p_min += glm::vec2(location);
-		p_max += glm::vec2(location);
+		p0 += glm::vec2(location);
+		p1 += glm::vec2(location);
+		p2 += glm::vec2(location);
+		p3 += glm::vec2(location);
 
 		glm::vec2 t_min = glm::vec2(tex) / glm::vec2(atlas_size);
 		glm::vec2 t_max = glm::vec2(tex + size) / glm::vec2(atlas_size);
@@ -373,37 +381,37 @@ void Renderer::draw(const glm::uvec2 &drawable_size) {
 		glm::vec4 c = glm::vec4(color) / 255.0f;
 
 		verts.push_back(Vertex {
-			glm::vec2(p_min.x, p_max.y),
+			p1,
 			glm::vec2(t_min.x, t_max.y),
 			c
 		});
 
 		verts.push_back(Vertex {
-			glm::vec2(p_min.x, p_min.y),
+			p0,
 			glm::vec2(t_min.x, t_min.y),
 			c
 		});
 
 		verts.push_back(Vertex {
-			glm::vec2(p_max.x, p_min.y),
+			p3,
 			glm::vec2(t_max.x, t_min.y),
 			c
 		});
 
 		verts.push_back(Vertex {
-			glm::vec2(p_min.x, p_max.y),
+			p1,
 			glm::vec2(t_min.x, t_max.y),
 			c
 		});
 
 		verts.push_back(Vertex {
-			glm::vec2(p_max.x, p_min.y),
+			p3,
 			glm::vec2(t_max.x, t_min.y),
 			c
 		});
 
 		verts.push_back(Vertex {
-			glm::vec2(p_max.x, p_max.y),
+			p2,
 			glm::vec2(t_max.x, t_max.y),
 			c
 		});
@@ -603,9 +611,9 @@ void Renderer::draw(const glm::uvec2 &drawable_size) {
 			small_verts,
 			atlas_size,
 			char_position,
-			0.0f,
-			glm::uvec2(8, 0),
-			glm::uvec2(8, 8),
+			char_rotation - 1.571f,
+			glm::uvec2(32, 8),
+			glm::uvec2(16, 16),
 			glm::u8vec4(255, 255, 255, 255)
 		);
 
