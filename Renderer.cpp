@@ -267,10 +267,10 @@ Renderer::Renderer() {
 				(GLint)sizes[i],
 				GL_FLOAT,
 				GL_FALSE,
-				total_size * sizeof(float),
+				(GLuint)(total_size * sizeof(float)),
 				(GLbyte *)0 + offset * sizeof(float)
 			);
-			glEnableVertexAttribArray(i);
+			glEnableVertexAttribArray((GLuint)i);
 			offset += (GLuint)sizes[i];
 
 		}
@@ -492,7 +492,7 @@ void Renderer::draw(const glm::uvec2 &drawable_size) {
 	glBindVertexArray(tiny_vao);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, atlas_tex);
-	glDrawArrays(GL_TRIANGLES, 0, small_verts.size());
+	glDrawArrays(GL_TRIANGLES, 0, (GLsizei)small_verts.size());
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glBindVertexArray(0);
