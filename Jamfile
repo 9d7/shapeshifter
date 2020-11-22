@@ -101,12 +101,12 @@ if $(OS) = NT { #Windows
 
 #Store the names of various .cpp files to build into variables:
 GAME_NAMES =
-	Stars
-	Renderer
+	Framebuffer
+	View
+	Model
+	Controller
 	PlayMode
 	main
-	LitColorTextureProgram
-	#ColorTextureProgram #not used right now, but you might want it
 	Sound
 	load_wav
 	load_opus
@@ -114,12 +114,6 @@ GAME_NAMES =
 
 COMMON_NAMES =
 	data_path
-	PathFont
-	PathFont-font
-	DrawLines
-	ColorProgram
-	Scene
-	Mesh
 	load_save_png
 	gl_compile_program
 	Mode
@@ -127,27 +121,10 @@ COMMON_NAMES =
 	Load
 	;
 
-SHOW_MESHES_NAMES =
-	show-meshes
-	ShowMeshesProgram
-	ShowMeshesMode
-	;
-
-
-SHOW_SCENE_NAMES =
-	show-scene
-	ShowSceneProgram
-	ShowSceneMode
-	;
-
-
-
 LOCATE_TARGET = objs ; #put objects in 'objs' directory
 Objects 
 	$(GAME_NAMES:S=.cpp)
 	$(COMMON_NAMES:S=.cpp)
-	$(SHOW_MESHES_NAMES:S=.cpp)
-	$(SHOW_SCENE_NAMES:S=.cpp)
 	;
 
 #------------------------
