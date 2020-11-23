@@ -5,6 +5,7 @@ uniform float Time = 0;
 
 uniform sampler2D TEX;
 out vec4 fragColor;
+
 /*****************************************************************************/
 //	Simplex 3D Noise
 //	by Ian McEwan, Ashima Arts

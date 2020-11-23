@@ -3,6 +3,7 @@
 #include "data_path.hpp"
 #include <cstdio>
 #include <memory>
+#include "yaml-cpp/yaml.h"
 
 View::View() {
 

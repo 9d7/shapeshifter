@@ -1,0 +1,34 @@
+# Language Structure
+# Comments start with #
+# Numeric values can be represented in one of three ways:
+# - as a constant: 20
+# - as a random range: 15..20
+# - as a random choice: 15, 20, 25
+
+# bullets (may expand in the future)
+# time: the time before the previous bullet to shoot this bullet.
+# velocity: the velocity of the bullet, as a multiple of the global bullet velocity
+# angle: the ange of the bullet's trajectory, offset from the vector from the attacker to the player
+# color: <0.5: enemy color, >0.5: not enemy color. done like this so randomness can be used
+# number: amount of bullets of this type
+# sequence: if shooting multiple bullets, whether to start them all at the same time (parallel) or one after the other (serial)
+# dispatch: whether to shoot this at the same time as the last bullet (with) or after the last bullet is shot (after)
+
+# default bullet:
+# time: 0
+# velocity: 1
+# angle: 0
+# color: 0
+# number: 1
+# sequence: parallel
+# dispatch: after
+
+soldier:
+	health: 2
+	attacks:
+		-
+			chance: 1
+			bullets:
+			-
+				velocity: 0.95..1.05
+				angle:    -0.05..0.05
