@@ -12,7 +12,7 @@ public:
 		const std::string &fragment_shader_path,
 		GLuint            empty_vao
 	);
-	~Framebuffer();
+	virtual ~Framebuffer();
 
 	virtual void   realloc(const glm::uvec2 &drawable_size);
 	virtual GLuint draw(GLuint old_tex);
