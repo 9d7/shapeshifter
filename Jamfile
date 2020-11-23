@@ -16,14 +16,14 @@ if $(OS) = NT { #Windows
 		/I"$(NEST_LIBS)/freetype/include"
 
 		/experimental:external # VS compilation, allow marking "external"
-		/external:I"libs/windows/yaml-cpp/include"
+		/external:I"winlibs/yaml-cpp/include"
 		/external:W0 # disable warnings on external libraries
 
 		#disable a few warnings:
 		/wd4146 #-1U is still unsigned
 		/wd4297 #unforunately SDLmain is nothrow
 	;
-	LINKFLAGS = /nologo /SUBSYSTEM:CONSOLE /DEBUG:FASTLINK
+	LINKFLAGS = /nologo /SUBSYSTEM:CONSOLE /DEBUG:FASTLINK /NODEFAULTLIB:LIBCMT /LTCG
 		/LIBPATH:"$(NEST_LIBS)/SDL2/lib"
 		/LIBPATH:"$(NEST_LIBS)/libpng/lib"
 		/LIBPATH:"$(NEST_LIBS)/zlib/lib"
@@ -32,7 +32,7 @@ if $(OS) = NT { #Windows
 		/LIBPATH:"$(NEST_LIBS)/libogg/lib"
 		/LIBPATH:"$(NEST_LIBS)/harfbuzz/lib"
 		/LIBPATH:"$(NEST_LIBS)/freetype/lib"
-		/LIBPATH:"libs/yaml-cpp/lib"
+		/LIBPATH:"winlibs/yaml-cpp/lib"
 	;
 	LINKLIBS =
 		SDL2main.lib SDL2.lib OpenGL32.lib Shell32.lib
