@@ -66,6 +66,13 @@ jobs:
           cd ..
           wget https://github.com/15-466/nest-libs/releases/download/${NEST_LIBS_VERSION}/nest-libs-linux-${NEST_LIBS_VERSION}.tar.gz -Onest-libs.tar.gz
           tar xfz nest-libs.tar.gz
+      - name: Build Libraries
+        shell: bash
+        run: |
+          cd yaml-cpp
+          mkdir build && cd build
+          cmake ..
+          make yaml-cpp
       - name: Build Code
         shell: bash
         run: |
@@ -110,6 +117,13 @@ jobs:
           cd ..
           wget https://github.com/15-466/nest-libs/releases/download/${NEST_LIBS_VERSION}/nest-libs-macos-${NEST_LIBS_VERSION}.tar.gz -Onest-libs.tar.gz
           tar xfz nest-libs.tar.gz
+      - name: Build Libraries
+        shell: bash
+        run: |
+          cd yaml-cpp
+          mkdir build && cd build
+          cmake ..
+          make yaml-cpp
       - name: Build Code
         shell: bash
         run: |
