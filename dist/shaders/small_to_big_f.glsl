@@ -13,7 +13,7 @@ void main() {
 	// First, nearest neighbor scale TEX to an integer multiple size
 	// that is larger than ViewportSize.
 	// Then, bilinearly sample that larger texture.
-	float scale = ceil(ViewportSize.x / TextureSize.x);
+	float scale = ceil(float(ViewportSize.x) / float(TextureSize.x));
 	vec2 scaled_texture_size = TextureSize * scale;
 
 	vec2 loc = gl_FragCoord.xy - ViewportOffset;

@@ -28,7 +28,6 @@ class View {
 			ScreenHeight = 240
 		};
 
-
 	private:
 
 		class BackgroundFramebuffer : public Framebuffer {
@@ -129,7 +128,6 @@ class View {
 		GLuint program                      = 0;
 		GLint  program_ViewportOffset_uvec2 = 0;
 		GLint  program_ViewportSize_uvec2   = 0;
-		GLint  program_TextureSize_uvec2    = 0;
 
 		GLuint empty_vao = 0;
 		std::unique_ptr<BackgroundFramebuffer> background_framebuffer;

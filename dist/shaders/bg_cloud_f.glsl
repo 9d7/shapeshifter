@@ -93,14 +93,22 @@ void main() {
 	}
 	noise *= 1.5f;
 	noise = clamp(noise, 0.0, 1.0);
-	noise = pow(noise, 1.5);
+	noise = pow(noise, 0.8);
 
-	const vec3 color1 = vec3(7.0, 4.0, 20.0) / 255.0;
-	const vec3 color2 = vec3(40.0, 9.0, 80.0) / 255.0;
+	const vec3 color1 = vec3( 4.0,  8.0,  45.0) / 255.0;
+	const vec3 color2 = vec3(36.0, 22.0,  73.0) / 255.0;
+	const vec3 color3 = vec3(76.0, 40.0, 119.0) / 255.0;
 
 	vec2 bn_size = vec2(textureSize(TEX, 0));
 	float bn = texelFetch(TEX, ivec2(mod(gl_FragCoord.xy, bn_size)), 0).r;
-	fragColor = vec4(mix(color1, color2, step(bn + 0.05, noise)), 1.0);
+
+	noise *= 2.0;
+	vec3 out_color = mix(color1, color2, step(bn + 0.05, noise));
+	if (noise > 0.85) {
+		noise -= 0.85;
+		out_color = mix(color2, color3, step(bn + 0.05, noise));
+	}
+	fragColor = vec4(out_color, 1.0);
 
 
 }

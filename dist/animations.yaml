@@ -1,0 +1,11 @@
+blue_bullet:
+	- [0.5, bullet_blue1]
+	- [0.5, bullet_blue2]
+
+red_bullet:
+	- [0.5, bullet_red1]
+	- [0.5, bullet_red2]
+
+purple_bullet:
+	- [0.5, bullet_purple1]
+	- [0.5, bullet_purple2]

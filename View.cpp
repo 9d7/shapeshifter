@@ -3,7 +3,6 @@
 #include "data_path.hpp"
 #include <cstdio>
 #include <memory>
-#include "yaml-cpp/yaml.h"
 
 View::View() {
 
@@ -19,10 +18,13 @@ View::View() {
 	// get uniform locations
 	program_ViewportOffset_uvec2 = glGetUniformLocation(program, "ViewportOffset");
 	program_ViewportSize_uvec2 = glGetUniformLocation(program, "ViewportSize");
-	program_TextureSize_uvec2 = glGetUniformLocation(program, "TextureSize");
+	GLint program_TextureSize_uvec2 = glGetUniformLocation(program, "TextureSize");
 
-
+	glUseProgram(program);
+	glUniform2ui(program_TextureSize_uvec2, ScreenWidth, ScreenHeight);
+	glUseProgram(0);
 }
+
 View::~View() {}
 
 void View::draw(const glm::uvec2 &drawable_size) {
@@ -70,7 +72,6 @@ void View::draw(const glm::uvec2 &drawable_size) {
 
 	glUniform2ui(program_ViewportOffset_uvec2, viewport_offset.x, viewport_offset.y);
 	glUniform2ui(program_ViewportSize_uvec2, viewport_size.x, viewport_size.y);
-	glUniform2ui(program_TextureSize_uvec2, ScreenWidth, ScreenHeight);
 
 	glBindVertexArray(empty_vao);
 	glActiveTexture(GL_TEXTURE0);
