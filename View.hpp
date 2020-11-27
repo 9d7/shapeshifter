@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 #include "Framebuffer.hpp"
 #include "GL.hpp"
+#include "SpriteManager.hpp"
 #include "data_path.hpp"
 #include "gl_compile_program.hpp"
 #include "gl_errors.hpp"
@@ -27,6 +28,8 @@ class View {
 			ScreenWidth  = 320,
 			ScreenHeight = 240
 		};
+
+		SpriteManager sprites {};
 
 	private:
 
@@ -125,13 +128,44 @@ class View {
 				GLuint star_program = 0;
 		};
 
-		GLuint program                      = 0;
-		GLint  program_ViewportOffset_uvec2 = 0;
-		GLint  program_ViewportSize_uvec2   = 0;
+		class SpriteFramebuffer : public Framebuffer {
+			public:
+
+				SpriteFramebuffer(GLuint empty_vao, GLuint sprite_tex_)
+				: Framebuffer(
+					data_path("shaders/fullscreen_quad_v.glsl"),
+					data_path("shaders/small_to_big_f.glsl"),
+					empty_vao
+				), sprite_tex(sprite_tex_) {
+
+					small_to_big_ViewportSize_uvec2 =
+						glGetUniformLocation(program, "ViewportSize");
+
+					GLint small_to_big_TextureSize_uvec2 =
+						glGetUniformLocation(program, "TextureSize");
+
+					glUseProgram(program);
+					glUniform2ui(small_to_big_TextureSize_uvec2, ScreenWidth, ScreenHeight);
+					glUseProgram(0);
+
+				}
+
+				GLuint small_to_big_ViewportSize_uvec2   = 0;
+			protected:
+				GLuint sprite_tex;
+
+
+		};
 
 		GLuint empty_vao = 0;
+
+		GLuint blit_program = 0;
+		GLint blit_program_ViewportOffset_uvec2 = -1;
+
+		std::unique_ptr<SpriteFramebuffer>     sprite_framebuffer;
 		std::unique_ptr<BackgroundFramebuffer> background_framebuffer;
 
 		float total_time = 0.0f;
+
 
 };

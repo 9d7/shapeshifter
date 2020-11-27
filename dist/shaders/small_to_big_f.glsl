@@ -1,6 +1,5 @@
 #version 330
 
-uniform uvec2 ViewportOffset;
 uniform uvec2 ViewportSize;
 uniform uvec2 TextureSize;
 
@@ -16,7 +15,7 @@ void main() {
 	float scale = ceil(float(ViewportSize.x) / float(TextureSize.x));
 	vec2 scaled_texture_size = TextureSize * scale;
 
-	vec2 loc = gl_FragCoord.xy - ViewportOffset;
+	vec2 loc = gl_FragCoord.xy;
 	loc *= scaled_texture_size / ViewportSize;
 
 	vec2 frac = fract(loc);
