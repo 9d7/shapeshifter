@@ -33,7 +33,7 @@ std::shared_ptr<Sprite> SpriteManager::acquire(size_t z) {
 		[this](Sprite *s){ zombie_count++; printf("Sprite killed\n"); delete s; fix_zombies(); }
 	);
 
-	sprites.emplace(z, std::weak_ptr(sprite));
+	sprites.emplace(z, sprite);
 	printf("Sprite spawned\n");
 
 	fix_zombies();
