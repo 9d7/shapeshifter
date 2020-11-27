@@ -28,19 +28,7 @@ PlayMode::PlayMode() {
 PlayMode::~PlayMode() {}
 
 bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size) {
-
-	static std::list<std::shared_ptr<Sprite>> sprites;
-
-	if (evt.type == SDL_KEYDOWN) {
-		if (evt.key.keysym.sym == SDLK_p) {
-			sprites.push_back(view->sprites.acquire(0));
-		} else if (evt.key.keysym.sym == SDLK_o) {
-			sprites.pop_front();
-		}
-	}
-
 	return controller->handle_event(evt, window_size);
-
 }
 
 void PlayMode::update(float elapsed) {
