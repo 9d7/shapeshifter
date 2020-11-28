@@ -148,11 +148,124 @@ class View {
 					glUniform2ui(small_to_big_TextureSize_uvec2, ScreenWidth, ScreenHeight);
 					glUseProgram(0);
 
+					// sprite program
+					sprite_program = compile_shader_from_path(
+						data_path("shaders/sprites_v.glsl"),
+						data_path("shaders/sprites_f.glsl")
+					);
+
+					glGenVertexArrays(1, &sprite_vao);
+					glGenBuffers(1, &sprite_vbo);
+
+					glBindVertexArray(sprite_vao);
+					glBindBuffer(GL_ARRAY_BUFFER, sprite_vbo);
+
+					GLuint Position_vec2 = glGetAttribLocation(sprite_program, "Position");
+					glVertexAttribPointer(
+						Position_vec2,
+						2,
+						GL_FLOAT,
+						GL_FALSE,
+						sizeof(SpriteManager::Vertex),
+						(GLbyte *)0
+					);
+					glEnableVertexAttribArray(Position_vec2);
+
+					GLuint Rotation_float = glGetAttribLocation(sprite_program, "Rotation");
+					glVertexAttribPointer(
+						Rotation_float,
+						1,
+						GL_FLOAT,
+						GL_FALSE,
+						sizeof(SpriteManager::Vertex),
+						(GLbyte *)0 + 4*2
+					);
+					glEnableVertexAttribArray(Rotation_float);
+
+					GLuint Size_uvec2 = glGetAttribLocation(sprite_program, "Size");
+					glVertexAttribPointer(
+						Size_uvec2,
+						2,
+						GL_UNSIGNED_INT,
+						GL_FALSE,
+						sizeof(SpriteManager::Vertex),
+						(GLbyte *)0 + 4*2 + 4*1
+					);
+					glEnableVertexAttribArray(Size_uvec2);
+
+					GLuint Texture_uvec2 = glGetAttribLocation(sprite_program, "Texture");
+					glVertexAttribPointer(
+						Texture_uvec2,
+						2,
+						GL_UNSIGNED_INT,
+						GL_FALSE,
+						sizeof(SpriteManager::Vertex),
+						(GLbyte *)0 + 4*2 + 4*1 + 4*2
+					);
+					glEnableVertexAttribArray(Position_vec2);
+
+					GLuint VertexID_uint = glGetAttribLocation(sprite_program, "VertexID");
+					glVertexAttribPointer(
+						VertexID_uint,
+						1,
+						GL_UNSIGNED_INT,
+						GL_FALSE,
+						sizeof(SpriteManager::Vertex),
+						(GLbyte *)0 + 4*2 + 4*1 + 4*2 + 4*2
+					);
+					glEnableVertexAttribArray(VertexID_uint);
+
+					glBindVertexArray(0);
+					glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+					GL_ERRORS();
 				}
 
 				GLuint small_to_big_ViewportSize_uvec2   = 0;
+
+				GLuint draw(GLuint old_tex, std::vector<SpriteManager::Vertex> &verts) {
+
+					Framebuffer::draw(old_tex);
+
+					glDisable(GL_DEPTH_TEST);
+					glDisable(GL_STENCIL_TEST);
+					glEnable(GL_BLEND);
+
+					glBindBuffer(GL_ARRAY_BUFFER, sprite_vbo);
+					glBufferData(
+						GL_ARRAY_BUFFER,
+						verts.size() * sizeof(SpriteManager::Vertex),
+						verts.data(),
+						GL_DYNAMIC_DRAW
+					);
+					glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+					glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+					glUseProgram(sprite_program);
+					glBindVertexArray(sprite_vao);
+					glActiveTexture(GL_TEXTURE0);
+					glBindTexture(GL_TEXTURE_2D, sprite_tex);
+
+					glDrawArrays(GL_TRIANGLE_STRIP, 0, verts.size());
+
+					glBindTexture(GL_TEXTURE_2D, 0);
+					glBindVertexArray(0);
+					glUseProgram(0);
+					glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+					GL_ERRORS();
+					return tex;
+				}
+
+
 			protected:
+				// hide old draw function
+				GLuint draw(GLuint old_tex) {return 0;}
+
 				GLuint sprite_tex;
+				GLuint sprite_program;
+				GLuint sprite_vao;
+				GLuint sprite_vbo;
 
 
 		};
@@ -160,7 +273,9 @@ class View {
 		GLuint empty_vao = 0;
 
 		GLuint blit_program = 0;
-		GLint blit_program_ViewportOffset_uvec2 = -1;
+		GLint  blit_program_ViewportOffset_uvec2 = -1;
+
+		GLuint sprite_tex;
 
 		std::unique_ptr<SpriteFramebuffer>     sprite_framebuffer;
 		std::unique_ptr<BackgroundFramebuffer> background_framebuffer;

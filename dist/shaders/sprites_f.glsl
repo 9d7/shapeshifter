@@ -2,8 +2,8 @@
 
 uniform sampler2D TEX;
 
-in uvec2 size;
-in uvec2 texCoords;
+flat in uvec2 size;
+flat in uvec2 texCoords;
 in vec2  uv;
 
 out vec4 fragColor;

@@ -19,6 +19,42 @@ View::View() {
 	blit_program_ViewportOffset_uvec2 =
 		glGetUniformLocation(blit_program, "ViewportOffset");
 
+
+	glGenTextures(1, &sprite_tex);
+	glBindTexture(GL_TEXTURE_2D, sprite_tex);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	// generate the texture
+	std::vector<glm::u8vec4> image_pixels;
+	glm::uvec2 image_size;
+	load_png(data_path("sprites.png"), &image_size, &image_pixels, LowerLeftOrigin);
+
+	std::vector<uint8_t> pixels;
+	pixels.reserve(image_size.x * image_size.y);
+
+	for (size_t i = 0; i < image_size.x * image_size.y; i++) {
+		pixels[i] = image_pixels[i].r;
+	}
+
+	glTexImage2D(
+		GL_TEXTURE_2D,
+		0,
+		GL_R8,
+		image_size.x,
+		image_size.y,
+		0,
+		GL_RED,
+		GL_UNSIGNED_BYTE,
+		pixels.data()
+	);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+	GL_ERRORS();
+
 }
 
 View::~View() {}
@@ -52,7 +88,9 @@ void View::draw(const glm::uvec2 &drawable_size) {
 	glUseProgram(sprite_framebuffer->program);
 	glUniform2ui(sprite_framebuffer->small_to_big_ViewportSize_uvec2, viewport_size.x, viewport_size.y);
 
-	GLuint sprite_tex = sprite_framebuffer->draw(bg_tex);
+	std::vector<SpriteManager::Vertex> sprite_verts;
+	sprites.draw(sprite_verts);
+	GLuint sprite_tex = sprite_framebuffer->draw(bg_tex, sprite_verts);
 
 	glViewport(
 		viewport_offset.x,
