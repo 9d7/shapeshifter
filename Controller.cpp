@@ -74,13 +74,25 @@ bool Controller::handle_event(
 	};
 
 	if (evt.type == SDL_MOUSEMOTION) {
-
 		model->set_mouse_position(fix_mouse(evt.motion.x, evt.motion.y));
 	}
 
 	if (evt.type == SDL_MOUSEBUTTONDOWN) {
+
 		model->set_mouse_position(fix_mouse(evt.button.x, evt.button.y));
-		model->player_shoot(Bullet::Color::Blue);
+
+		if (evt.button.button == SDL_BUTTON_LEFT) {
+
+			model->player_color(Bullet::Color::Blue);
+			model->player_shoot(Bullet::Color::Blue);
+
+		} else if (evt.button.button == SDL_BUTTON_RIGHT) {
+
+			model->player_color(Bullet::Color::Red);
+			model->player_shoot(Bullet::Color::Red);
+
+		}
+
 	}
 
 	return false;

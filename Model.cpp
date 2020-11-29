@@ -13,8 +13,10 @@ Model::Model(std::shared_ptr<View> view_) : view(view_) {
 	// it might be a good idea to store the animations and then just run Animation::find_*
 	// in the constructor for the class
 	// - Eric
+	player_red = Animation::find_static("player_red");
+	player_blue = Animation::find_static("player_blue");
 
-	player_sprite = view->sprites->from_anim(Animation::find_static("player_blue"), false);
+	player_sprite = view->sprites->from_anim(player_blue, false);
 	bullets = std::make_shared<BulletManager>();
 }
 
@@ -62,6 +64,7 @@ void Model::update(float elapsed) {
 	if (-space_from_camera_center.y > MARGIN.y) {
 		camera_position.y = player_position.y - MARGIN.y;
 	}
+	set_mouse_position(mouse_ui_position);
 	view->update_camera(camera_position);
 
 	update_view();
@@ -98,4 +101,10 @@ void Model::player_shoot(Bullet::Color color) {
 void Model::set_mouse_position(const glm::vec2 &position) {
 	mouse_ui_position = position;
 	mouse_world_position = position - glm::vec2(View::ScreenWidth, View::ScreenHeight) / 2.0f + camera_position;
+}
+
+void Model::player_color(Bullet::Color color) {
+	player_col = color;
+	Animation::Animation anim = player_col == Bullet::Color::Blue ? player_blue : player_red;
+	player_sprite->override_animation(anim, false);
 }

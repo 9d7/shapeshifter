@@ -32,7 +32,7 @@ class SpriteManager {
 
 	protected:
 
-		std::multimap<size_t, std::weak_ptr<Sprite>> sprites;
+		std::multimap<int, std::weak_ptr<Sprite>, std::greater<int>> sprites;
 
 };
 
