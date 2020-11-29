@@ -23,10 +23,14 @@ class View {
 			ScreenHeight = 240
 		};
 
+		// use this to get new sprites, as well as Animation::find_* functions
 		SpriteManager sprites {};
+
+		void update_camera(const glm::vec2 &pos);
 
 	private:
 
+		glm::vec2 camera_position {0.0f, 0.0f};
 
 		GLuint empty_vao = 0;
 

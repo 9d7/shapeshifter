@@ -83,6 +83,9 @@ void View::draw(const glm::uvec2 &drawable_size) {
 	glUseProgram(sprite_framebuffer->program);
 	glUniform2ui(sprite_framebuffer->small_to_big_ViewportSize_uvec2, viewport_size.x, viewport_size.y);
 
+	glUseProgram(sprite_framebuffer->sprite_program);
+	glUniform2f(sprite_framebuffer->sprite_Camera_vec2, camera_position.x, camera_position.y);
+
 	std::vector<SpriteManager::Vertex> sprite_verts;
 	sprites.draw(sprite_verts);
 	GLuint sprite_tex = sprite_framebuffer->draw(bg_tex, sprite_verts);
@@ -129,4 +132,8 @@ void View::draw(const glm::uvec2 &drawable_size) {
 void View::update(float elapsed) {
 	total_time += elapsed;
 	sprites.update(elapsed);
+}
+
+void View::update_camera(const glm::vec2 &pos) {
+	camera_position = pos;
 }

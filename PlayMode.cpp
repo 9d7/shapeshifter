@@ -1,6 +1,8 @@
 #include "PlayMode.hpp"
+#include "Animation.hpp"
 #include "Load.hpp"
 #include "Sprite.hpp"
+#include <cstdlib>
 #include <memory>
 
 /*
@@ -20,8 +22,8 @@ PlayMode::PlayMode() {
 
 	// using shared ptrs to handle deallocation
 	view = std::make_shared<View>();
-	model = std::make_shared<Model>(std::weak_ptr<View>(view));
-	controller = std::make_shared<Controller>(std::weak_ptr<Model>(model));
+	model = std::make_shared<Model>(view);
+	controller = std::make_shared<Controller>(model);
 
 }
 

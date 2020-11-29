@@ -25,6 +25,9 @@ SpriteFramebuffer::SpriteFramebuffer(GLuint empty_vao, GLuint sprite_tex_)
 		data_path("shaders/sprites_f.glsl")
 	);
 
+	sprite_Camera_vec2 =
+		glGetUniformLocation(sprite_program, "Camera");
+
 	glUseProgram(sprite_program);
 	glUniform2f(glGetUniformLocation(sprite_program, "ScreenSize"), View::ScreenWidth, View::ScreenHeight);
 	glUseProgram(0);

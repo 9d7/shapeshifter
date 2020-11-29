@@ -14,14 +14,15 @@ class SpriteFramebuffer : public Framebuffer {
 		GLuint draw(GLuint old_tex, std::vector<SpriteManager::Vertex> &verts);
 
 		GLuint small_to_big_ViewportSize_uvec2   = 0;
+		GLuint sprite_Camera_vec2                = 0;
 
+		GLuint sprite_program;
 
 	protected:
 		// hide old draw function
 		GLuint draw(GLuint old_tex) {return 0;}
 
 		GLuint sprite_tex;
-		GLuint sprite_program;
 		GLuint sprite_vao;
 		GLuint sprite_vbo;
 
