@@ -111,6 +111,8 @@ if $(OS) = NT { #Windows
 
 #Store the names of various .cpp files to build into variables:
 GAME_NAMES =
+	BackgroundFramebuffer
+	SpriteFramebuffer
 	Animation
 	Sprite
 	SpriteManager
