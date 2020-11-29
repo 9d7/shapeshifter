@@ -128,4 +128,5 @@ void View::draw(const glm::uvec2 &drawable_size) {
 
 void View::update(float elapsed) {
 	total_time += elapsed;
+	sprites.update(elapsed);
 }

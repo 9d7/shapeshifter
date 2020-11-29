@@ -5,6 +5,7 @@
 #include <map>
 #include <memory>
 #include <unordered_map>
+#include "Animation.hpp"
 #include "GL.hpp"
 #include "Sprite.hpp"
 
@@ -16,6 +17,7 @@ class SpriteManager {
 
 		// z here is the z-index: it cannot be changed.
 		std::shared_ptr<Sprite> acquire(size_t z);
+		std::shared_ptr<Sprite> from_anim(Animation::Animation anim, bool loop);
 
 		struct Vertex {
 			glm::vec2  position;
@@ -25,6 +27,7 @@ class SpriteManager {
 		};
 		static_assert(sizeof(Vertex) == 4*2 + 4 + 4*2 + 4*2, "Vertex wrong size");
 
+		void update(float elapsed);
 		void draw(std::vector<Vertex> &verts);
 
 	protected:

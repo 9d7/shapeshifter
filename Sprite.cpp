@@ -36,8 +36,8 @@ void Sprite::update(float elapsed_) {
 
 		// move frames forward
 		while (current_frame < d->size() && elapsed >= (*d)[current_frame].first) {
-			current_frame++;
 			elapsed -= (*d)[current_frame].first;
+			current_frame++;
 		}
 
 		// either loop or go to next animation
