@@ -14,7 +14,6 @@ std::shared_ptr<Sprite> SpriteManager::acquire(size_t z) {
 	);
 
 	sprites.emplace(z, sprite);
-	printf("Sprite spawned\n");
 
 	return sprite;
 
@@ -25,13 +24,13 @@ std::shared_ptr<Sprite> SpriteManager::from_anim(Animation::Animation anim, bool
 	if (anim.index() == 0) { // static
 		// if static, get z value straight from struct
 		std::shared_ptr<Sprite> s = acquire(std::get<0>(anim).lock()->z);
-		s->override_animation(anim, false, nullptr);
+		s->override_animation(anim, false);
 		return s;
 
 	} else {
 
 		std::shared_ptr<Sprite> s = acquire(std::get<1>(anim).lock()->front().second.lock()->z);
-		s->override_animation(anim, loop, nullptr);
+		s->override_animation(anim, loop);
 		return s;
 
 	}
@@ -40,7 +39,7 @@ std::shared_ptr<Sprite> SpriteManager::from_anim(Animation::Animation anim, bool
 
 void SpriteManager::update(float elapsed) {
 	for (auto s = sprites.begin(); s != sprites.end();) {
-		
+
 		if (s->second.expired()) {
 			s = sprites.erase(s);
 			continue;

@@ -8,12 +8,14 @@ Sprite::~Sprite() {};
 void Sprite::set_position(const glm::vec2 &pos_) { pos = pos_; }
 void Sprite::set_rotation(float rot_) { rot = rot_; }
 
-void Sprite::queue_animation(Animation::Animation anim, bool loop, std::function<void ()> *on_finish) {
+void Sprite::queue_animation(Animation::Animation anim, bool loop, std::function<void ()> on_finish) {
 	animations.emplace_back(anim, loop, on_finish);
 }
 
-void Sprite::override_animation(Animation::Animation anim, bool loop, std::function<void ()> *on_finish) {
+void Sprite::override_animation(Animation::Animation anim, bool loop, std::function<void ()> on_finish) {
 	animations.clear();
+	current_frame = 0;
+	elapsed = 0.0f;
 	queue_animation(anim, loop, on_finish);
 }
 
@@ -47,9 +49,7 @@ void Sprite::update(float elapsed_) {
 			if (!std::get<1>(animations.front())) { // don't loop
 
 				auto func = std::get<2>(animations.front());
-				if (func != nullptr) {
-					(*func)();
-				};
+				func();
 
 				animations.pop_front();
 

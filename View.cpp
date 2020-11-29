@@ -1,5 +1,6 @@
 #include "View.hpp"
 #include "GL.hpp"
+#include "SpriteManager.hpp"
 #include "data_path.hpp"
 #include "glm/fwd.hpp"
 #include "load_save_png.hpp"
@@ -7,6 +8,8 @@
 #include <memory>
 
 View::View() {
+
+	sprites = std::make_shared<SpriteManager>();
 
 	glGenVertexArrays(1, &empty_vao);
 
@@ -87,7 +90,7 @@ void View::draw(const glm::uvec2 &drawable_size) {
 	glUniform2f(sprite_framebuffer->sprite_Camera_vec2, camera_position.x, camera_position.y);
 
 	std::vector<SpriteManager::Vertex> sprite_verts;
-	sprites.draw(sprite_verts);
+	sprites->draw(sprite_verts);
 	GLuint sprite_tex = sprite_framebuffer->draw(bg_tex, sprite_verts);
 
 	glViewport(
@@ -131,7 +134,7 @@ void View::draw(const glm::uvec2 &drawable_size) {
 
 void View::update(float elapsed) {
 	total_time += elapsed;
-	sprites.update(elapsed);
+	sprites->update(elapsed);
 }
 
 void View::update_camera(const glm::vec2 &pos) {

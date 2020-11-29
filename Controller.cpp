@@ -1,5 +1,6 @@
 #include "Controller.hpp"
 #include "Model.hpp"
+#include "SDL_events.h"
 #include "SDL_scancode.h"
 #include "glm/geometric.hpp"
 #include <glm/glm.hpp>
@@ -26,7 +27,7 @@ void Controller::update(float elapsed) {
 	if (player_force != glm::vec2(0.0f, 0.0f)) {
 		player_force = glm::normalize(player_force);
 	}
-	model->control_player(player_force);
+	model->player_move(player_force);
 }
 
 bool Controller::handle_event(
@@ -48,6 +49,38 @@ bool Controller::handle_event(
 
 	if (evt.type == SDL_KEYUP) {
 		pressed.erase(evt.key.keysym.scancode);
+		return true;
+	}
+
+	auto fix_mouse = [window_size](int x, int y){
+
+		glm::vec2 screen_pos(x, window_size.y - y);
+
+		// get real drawable size
+		size_t actual_window_scale = std::min(
+			window_size.x * View::ScreenHeight,
+			window_size.y * View::ScreenWidth
+		);
+		glm::uvec2 actual_window_size = glm::uvec2(
+			actual_window_scale / View::ScreenHeight,
+			actual_window_scale / View::ScreenWidth
+		);
+
+		// map(x, (drawable_size.x - actual_drawable_size.x) / 2.0f, (drawable_size.x + actual_drawable_size.x) / 2.0f, 0, ScreenWidth)
+		glm::vec2 mouse_position;
+		mouse_position.x = (screen_pos.x - (window_size.x - actual_window_size.x) / 2.0f) * (float)View::ScreenWidth  / actual_window_size.x;
+		mouse_position.y = (screen_pos.y - (window_size.y - actual_window_size.y) / 2.0f) * (float)View::ScreenHeight / actual_window_size.y;
+		return mouse_position;
+	};
+
+	if (evt.type == SDL_MOUSEMOTION) {
+
+		model->set_mouse_position(fix_mouse(evt.motion.x, evt.motion.y));
+	}
+
+	if (evt.type == SDL_MOUSEBUTTONDOWN) {
+		model->set_mouse_position(fix_mouse(evt.button.x, evt.button.y));
+		model->player_shoot(Bullet::Color::Blue);
 	}
 
 	return false;
