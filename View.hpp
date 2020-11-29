@@ -241,7 +241,7 @@ class View {
 					glActiveTexture(GL_TEXTURE0);
 					glBindTexture(GL_TEXTURE_2D, sprite_tex);
 
-					glDrawArrays(GL_TRIANGLE_STRIP, 0, verts.size());
+					glDrawArrays(GL_TRIANGLE_STRIP, 0, (GLsizei)verts.size());
 
 					glBindTexture(GL_TEXTURE_2D, 0);
 					glBindVertexArray(0);

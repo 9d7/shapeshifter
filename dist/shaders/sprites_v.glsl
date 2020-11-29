@@ -20,11 +20,11 @@ void main() {
 	uv = vec2(vert & 1, (vert & 2) / 2);
 
 	mat2 rot = mat2(
-		cos(Rotation), -sin(Rotation),
-		sin(Rotation),  cos(Rotation)
+		 cos(Rotation), sin(Rotation),
+		-sin(Rotation), cos(Rotation)
 	);
 
-	gl_Position = vec4((Size * 2 * (rot * (uv - vec2(0.5, 0.5))) + Position) / ScreenSize, 0.0, 1.0);
+	gl_Position = vec4((Size * (rot * (uv - vec2(0.5, 0.5))) + Position) / (ScreenSize / 2), 0.0, 1.0);
 
 	size = Size;
 	texCoords = TexCoords;
