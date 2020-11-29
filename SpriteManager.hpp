@@ -20,20 +20,14 @@ class SpriteManager {
 		struct Vertex {
 			glm::vec2  position;
 			float      rotation;
-			glm::uvec2 size;
-			glm::uvec2 texture;
-			uint32_t   vertex;
+			glm::vec2  size;
+			glm::vec2  texture;
 		};
-		static_assert(sizeof(Vertex) == 4*2 + 4 + 4*2 + 4*2 + 4, "Vertex wrong size");
+		static_assert(sizeof(Vertex) == 4*2 + 4 + 4*2 + 4*2, "Vertex wrong size");
 
 		void draw(std::vector<Vertex> &verts);
 
 	protected:
-		// main idea: when a sprite dies, do nothing--only worry about
-		// cleaning up the multimap once a significant portion of the
-		// map is filled with "zombie sprites"
-		size_t zombie_count;
-		void fix_zombies();
 
 		std::multimap<size_t, std::weak_ptr<Sprite>> sprites;
 

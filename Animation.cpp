@@ -37,24 +37,27 @@ namespace {
 		for (auto it = dynamic_yaml.begin(); it != dynamic_yaml.end(); it++) {
 			std::string key = it->first.as<std::string>();
 
+			printf("%s\n", key.c_str());
 			std::shared_ptr<Animation::Dynamic> anim = std::make_shared<Animation::Dynamic>();
 
 			YAML::Node frames = it->second;
 			for (auto f_it = frames.begin(); f_it != frames.end(); f_it++) {
 
 				const auto &sprite = static_animations.find(
-					f_it->second.as<std::string>()
+					(*f_it)[1].as<std::string>()
 				);
 				if (sprite == static_animations.cend()) {
 					throw std::runtime_error("Could not find sprite in animation");
 				}
 
 				anim->emplace_back(
-					f_it->first.as<float>(),
+					(*f_it)[0].as<float>(),
 					sprite->second
 				);
 
 			}
+
+			dynamic_animations.emplace(key, anim);
 		}
 
 	}

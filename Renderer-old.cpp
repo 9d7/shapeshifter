@@ -845,4 +845,4 @@ void Renderer::update_bullet_color(Bullet b, BulletColor color) {
 
 void Renderer::destroy_bullet(Bullet b) {
 	bullets.erase(b);
-}
+

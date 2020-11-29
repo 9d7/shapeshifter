@@ -95,6 +95,7 @@ class View {
 
 					glDisable(GL_DEPTH_TEST);
 					glDisable(GL_STENCIL_TEST);
+					glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 					glEnable(GL_BLEND);
 
 					glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -154,6 +155,10 @@ class View {
 						data_path("shaders/sprites_f.glsl")
 					);
 
+					glUseProgram(sprite_program);
+					glUniform2f(glGetUniformLocation(sprite_program, "ScreenSize"), ScreenWidth, ScreenHeight);
+					glUseProgram(0);
+
 					glGenVertexArrays(1, &sprite_vao);
 					glGenBuffers(1, &sprite_vbo);
 
@@ -182,39 +187,29 @@ class View {
 					);
 					glEnableVertexAttribArray(Rotation_float);
 
-					GLuint Size_uvec2 = glGetAttribLocation(sprite_program, "Size");
+					GLuint Size_vec2 = glGetAttribLocation(sprite_program, "Size");
 					glVertexAttribPointer(
-						Size_uvec2,
+						Size_vec2,
 						2,
-						GL_UNSIGNED_INT,
+						GL_FLOAT,
 						GL_FALSE,
 						sizeof(SpriteManager::Vertex),
 						(GLbyte *)0 + 4*2 + 4*1
 					);
-					glEnableVertexAttribArray(Size_uvec2);
+					glEnableVertexAttribArray(Size_vec2);
 
-					GLuint Texture_uvec2 = glGetAttribLocation(sprite_program, "Texture");
+					GLuint TexCoords_vec2 = 3;
 					glVertexAttribPointer(
-						Texture_uvec2,
+						TexCoords_vec2,
 						2,
-						GL_UNSIGNED_INT,
+						GL_FLOAT,
 						GL_FALSE,
 						sizeof(SpriteManager::Vertex),
 						(GLbyte *)0 + 4*2 + 4*1 + 4*2
 					);
-					glEnableVertexAttribArray(Position_vec2);
+					glEnableVertexAttribArray(TexCoords_vec2);
 
-					GLuint VertexID_uint = glGetAttribLocation(sprite_program, "VertexID");
-					glVertexAttribPointer(
-						VertexID_uint,
-						1,
-						GL_UNSIGNED_INT,
-						GL_FALSE,
-						sizeof(SpriteManager::Vertex),
-						(GLbyte *)0 + 4*2 + 4*1 + 4*2 + 4*2
-					);
-					glEnableVertexAttribArray(VertexID_uint);
-
+					GL_ERRORS();
 					glBindVertexArray(0);
 					glBindBuffer(GL_ARRAY_BUFFER, 0);
 

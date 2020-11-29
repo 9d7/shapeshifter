@@ -1,6 +1,8 @@
 #include "View.hpp"
 #include "GL.hpp"
 #include "data_path.hpp"
+#include "glm/fwd.hpp"
+#include "load_save_png.hpp"
 #include <cstdio>
 #include <memory>
 
@@ -9,7 +11,6 @@ View::View() {
 	glGenVertexArrays(1, &empty_vao);
 
 	background_framebuffer = std::make_unique<BackgroundFramebuffer>(empty_vao);
-	sprite_framebuffer = std::make_unique<SpriteFramebuffer>(empty_vao, 0);
 
 	blit_program = Framebuffer::compile_shader_from_path(
 		data_path("shaders/fullscreen_quad_v.glsl"),
@@ -33,28 +34,22 @@ View::View() {
 	glm::uvec2 image_size;
 	load_png(data_path("sprites.png"), &image_size, &image_pixels, LowerLeftOrigin);
 
-	std::vector<uint8_t> pixels;
-	pixels.reserve(image_size.x * image_size.y);
-
-	for (size_t i = 0; i < image_size.x * image_size.y; i++) {
-		pixels[i] = image_pixels[i].r;
-	}
-
 	glTexImage2D(
 		GL_TEXTURE_2D,
 		0,
-		GL_R8,
+		GL_RGBA,
 		image_size.x,
 		image_size.y,
 		0,
-		GL_RED,
+		GL_RGBA,
 		GL_UNSIGNED_BYTE,
-		pixels.data()
+		image_pixels.data()
 	);
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 	GL_ERRORS();
 
+	sprite_framebuffer = std::make_unique<SpriteFramebuffer>(empty_vao, sprite_tex);
 }
 
 View::~View() {}
