@@ -14,21 +14,30 @@
 # sequence: if shooting multiple bullets, whether to start them all at the same time (parallel) or one after the other (serial)
 # dispatch: whether to shoot this at the same time as the last bullet (with) or after the last bullet is shot (after)
 
-# default bullet:
-# time: 0
-# velocity: 1
-# angle: 0
-# color: 0
-# number: 1
-# sequence: parallel
-# dispatch: after
+default:
+  enemy:
+    health: 1
+
+  bullet:
+    time: 0
+    velocity: 1
+    angle: 0
+    color: 0
+    number: 1
+    sequence: parallel
+    dispatch: after
+
+  attack:
+    chance: 1
+    aim: each
 
 soldier:
-	health: 2
-	attacks:
-		-
-			chance: 1
-			bullets:
-			-
-				velocity: 0.95..1.05
-				angle:    -0.05..0.05
+  health: 2
+  attacks:
+    -
+      chance: 1
+      aim:    each
+      bullets:
+        -
+          velocity: 0.95..1.05
+          angle:    -0.05..0.05

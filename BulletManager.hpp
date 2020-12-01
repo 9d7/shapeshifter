@@ -8,7 +8,7 @@
 #include "Sprite.hpp"
 #include "SpriteManager.hpp"
 
-class BulletManager : std::enable_shared_from_this<BulletManager> {
+class BulletManager {
 
 	public:
 
