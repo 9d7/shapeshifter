@@ -12,39 +12,17 @@
 
 namespace {
 
-	typedef std::vector<float>      Choice;
-	typedef std::pair<float, float> Range;
-	typedef std::variant<Choice, Range, float> Numeric;
+	typedef std::variant<std::string, EnemyData::Numeric> ValueType;
+	typedef std::unordered_map<std::string, ValueType>    ValueStore;
+	typedef std::unordered_map<std::string, ValueStore>   EnemyMap;
 
-	typedef std::variant<std::string, Numeric> ValueType;
-
-	typedef std::unordered_map<std::string, ValueType> ValueStore;
-
-	std::unordered_map<std::string, ValueStore> enemies;
+	EnemyMap enemies;
 
 	typedef std::pair<ValueStore, std::vector<ValueStore>> Attack;
 	typedef std::map<float, Attack> AttackList;
 	std::unordered_map<std::string, AttackList> attacks;
 
 	auto rng = std::bind(std::uniform_real_distribution<float>(0.0f, 1.0f), std::mt19937());
-
-	float parse_numeric(Numeric n) {
-
-		if (std::holds_alternative<Range>(n)) {
-
-			Range r = std::get<Range>(n);
-			return rng() * std::abs(r.second - r.first) + std::min(r.first, r.second);
-
-		} else if (std::holds_alternative<Choice>(n)) {
-
-			Choice c = std::get<Choice>(n);
-			return c[(int)std::floor(rng() * c.size())];
-
-		} else {
-			return std::get<float>(n);
-		}
-
-	}
 
 	void load_enemies() {
 
@@ -65,10 +43,10 @@ namespace {
 			if (std::regex_match(in, sm, range_regex)) { // range
 
 				printf("Matched '%s' as range\n", in.c_str());
-				return Range(
+				return EnemyData::Numeric(EnemyData::Numeric::Range(
 					std::atof(sm[1].str().c_str()),
 					std::atof(sm[2].str().c_str())
-				);
+				));
 			}
 
 			if (std::regex_match(in, choice_regex)) { // choice
@@ -78,17 +56,17 @@ namespace {
 				std::regex_iterator<std::string::iterator> rit ( i.begin(), i.end(), float_regex );
 				std::regex_iterator<std::string::iterator> rend;
 
-				Choice ret;
+				EnemyData::Numeric::Choice ret;
 				while (rit != rend) {
 					ret.push_back(std::atof(rit->str().c_str()));
 					rit++;
 				}
-				return ret;
+				return EnemyData::Numeric(ret);
 			}
 
 			if (std::regex_match(in, sm, full_float_regex)) { // float
 				printf("Matched '%s' as float\n", in.c_str());
-				return std::atof(sm[1].str().c_str());
+				return EnemyData::Numeric(std::atof(sm[1].str().c_str()));
 			}
 
 			// none matched -- assume a string
@@ -203,28 +181,20 @@ namespace {
 	}
 }
 
-float EnemyData::num(const std::string &enemy_name, const std::string &key) {
+std::mt19937 EnemyData::Numeric::mt (std::chrono::system_clock::now().time_since_epoch().count());
+std::uniform_real_distribution<float> EnemyData::Numeric::dist (0.0f, 1.0f);
+
+EnemyData::Numeric &EnemyData::num(const std::string &enemy_name, const std::string &key) {
 
 	if (enemies.size() == 0) { load_enemies(); }
 
-	ValueType v = enemies[enemy_name][key];
-	if (std::holds_alternative<std::string>(v)) {
-		throw std::runtime_error("num lookup called on string type");
-	}
+	return std::get<Numeric>(enemies[enemy_name][key]);
 
-	Numeric n = std::get<Numeric>(v);
-
-	return parse_numeric(n);
 }
 
-std::string EnemyData::str(const std::string &enemy_name, const std::string &key) {
+const std::string &EnemyData::str(const std::string &enemy_name, const std::string &key) {
 
 	if (enemies.size() == 0) { load_enemies(); }
 
-	ValueType v = enemies[enemy_name][key];
-	if (std::holds_alternative<Numeric>(v)) {
-		throw std::runtime_error("string lookup called on num type");
-	}
-
-	return std::get<std::string>(v);
+	return std::get<std::string>(enemies[enemy_name][key]);
 }

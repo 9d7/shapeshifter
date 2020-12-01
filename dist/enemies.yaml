@@ -4,6 +4,8 @@
 # - as a constant: 20
 # - as a random range: 15..20
 # - as a random choice: 15, 20, 25
+# These are allowed for *every* numeric value EXCEPT attack chance, since
+# attack chance is handled as a special case.
 
 # bullets (may expand in the future)
 # time: the time before the previous bullet to shoot this bullet.

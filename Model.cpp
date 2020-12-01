@@ -20,7 +20,7 @@ Model::Model(std::shared_ptr<View> view_) : view(view_) {
 	player_sprite = view->sprites->from_anim(player_blue, false);
 	bullets = std::make_shared<BulletManager>();
 
-	EnemyData::num("soldier", "health");
+	printf("%f\n", EnemyData::num("soldier", "health")());
 }
 
 void Model::update(float elapsed) {
