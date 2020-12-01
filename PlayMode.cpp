@@ -292,6 +292,7 @@ void PlayMode::check_collisions() {
 			dead = true;
 			renderer.destroy_bullet(bull_it->b);
 			enemy_bullets.erase(bull_it);
+			//score = 0;
 			return;
 		}
 	}
@@ -306,6 +307,7 @@ void PlayMode::check_collisions() {
 				renderer.destroy_bullet(bull_it->b);
 				enemies.erase(enem_it);
 				player_bullets.erase(bull_it);
+				//score++;
 				return;
 			}
 		}

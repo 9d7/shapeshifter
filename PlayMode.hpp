@@ -69,7 +69,7 @@ struct PlayMode : Mode {
   	Renderer::BulletColor player_color = Renderer::Red; 
 
 	bool dead = false;
-
+	int score = 0;
 	// Tracking inputs
 	struct Button {
 		uint8_t downs = 0;
@@ -94,7 +94,7 @@ struct PlayMode : Mode {
 	};
 
 	// Dev mode
-	bool dev_mode = false;
+	bool dev_mode = true;
 	float dev_velocity_multiplier = 1.0f;
 	bool dev_velocity_rotation_mode = false;
 	bool dev_position_debug = false;
@@ -102,3 +102,4 @@ struct PlayMode : Mode {
 
 
 };
+a
