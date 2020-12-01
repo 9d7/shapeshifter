@@ -7,7 +7,7 @@
 #include <chrono>
 #include <stdexcept>
 
-std::mt19937 Enemy::mt (std::chrono::system_clock::now().time_since_epoch().count());
+std::mt19937 Enemy::mt ((float)std::chrono::system_clock::now().time_since_epoch().count());
 std::uniform_real_distribution<float> Enemy::dist (0.0f, 1.0f);
 
 Enemy::Enemy (

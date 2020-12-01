@@ -1,4 +1,8 @@
 #include "Numeric.hpp"
+#include <chrono>
+
+std::mt19937 Numeric::mt ((float)std::chrono::system_clock::now().time_since_epoch().count());
+std::uniform_real_distribution<float> Numeric::dist (0.0f, 1.0f);
 
 float Numeric::operator()() const {
 

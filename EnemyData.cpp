@@ -175,8 +175,6 @@ namespace {
 	}
 }
 
-std::mt19937 Numeric::mt (std::chrono::system_clock::now().time_since_epoch().count());
-std::uniform_real_distribution<float> Numeric::dist (0.0f, 1.0f);
 
 Numeric &EnemyData::num(const std::string &enemy_name, const std::string &key) {
 
