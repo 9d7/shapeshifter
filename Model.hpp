@@ -3,6 +3,7 @@
 #include <memory>
 #include "Animation.hpp"
 #include "BulletManager.hpp"
+#include "Enemy.hpp"
 #include "Sprite.hpp"
 #include "View.hpp"
 
@@ -28,6 +29,8 @@ class Model {
 		void set_mouse_position(const glm::vec2 &position);
 
 	protected:
+
+		std::shared_ptr<Enemy> enemy;
 
 		std::shared_ptr<View> view;
 		std::shared_ptr<BulletManager> bullets;

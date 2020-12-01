@@ -1,7 +1,9 @@
 #include "Enemy.hpp"
 #include "Animation.hpp"
 #include "BulletManager.hpp"
+#include "Model.hpp"
 #include "glm/geometric.hpp"
+#include "glm/trigonometric.hpp"
 #include <chrono>
 #include <stdexcept>
 
@@ -16,6 +18,7 @@ Enemy::Enemy (
 
 	spr = spr_mgr->from_anim(Animation::find_static("soldier_blue"), false);
 	spr->set_position(pos);
+	spr->set_rotation(0.0f);
 
 }
 
@@ -32,6 +35,7 @@ void Enemy::update(float elapsed, std::shared_ptr<BulletManager> bm) {
 		glm::vec2 enemy_to_player = saved_player_pos - pos;
 		if (glm::length(enemy_to_player) > 0) {
 			enemy_to_player = glm::normalize(enemy_to_player);
+			spr->set_rotation(glm::atan(enemy_to_player.y, enemy_to_player.x));
 		}
 
 		glm::mat2 rot (
@@ -39,11 +43,15 @@ void Enemy::update(float elapsed, std::shared_ptr<BulletManager> bm) {
 			-glm::sin(angle), glm::cos(angle)
 		);
 
-		enemy_to_player = rot * velocity * enemy_to_player;
+		enemy_to_player = rot * velocity * enemy_to_player * Model::BULLET_SPEED;
 
 		// spawn bullet
 		bm->acquire(spr_mgr, color, pos, enemy_to_player);
 
+		firing_pattern.pop_front();
+	}
+	if (firing_pattern.size() == 0) {
+		firing_timer = 0.0f;
 	}
 
 }

@@ -20,10 +20,23 @@ Model::Model(std::shared_ptr<View> view_) : view(view_) {
 	player_sprite = view->sprites->from_anim(player_blue, false);
 	bullets = std::make_shared<BulletManager>();
 
-	printf("%f\n", EnemyData::num("soldier", "health")());
+	enemy = std::make_shared<Enemy>(
+		EnemyData::get_attack_list("soldier"),
+		glm::vec2(0.0f, 0.0f),
+		view->sprites
+	);
+
+	EnemyData::str("soldier", "movement style"); // -> "hunter"
+
+
 }
 
 void Model::update(float elapsed) {
+
+	enemy->update(elapsed, bullets);
+	if (!enemy->is_firing()) {
+		enemy->fire(player_position);
+	}
 
 	bullets->update(elapsed);
 	for (BulletManager::iterator b_it = bullets->begin(); b_it != bullets->end();) {
@@ -96,7 +109,6 @@ void Model::player_shoot(Bullet::Color color) {
 		direction = glm::normalize(player_to_mouse);
 	}
 	direction *= BULLET_SPEED;
-	direction += player_velocity;
 
 	bullets->acquire(view->sprites, color, player_position, direction);
 }

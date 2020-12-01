@@ -1,8 +1,9 @@
 #pragma once
 
 #include "Bullet.hpp"
-#include "EnemyData.hpp"
+#include "Numeric.hpp"
 #include <list>
+
 class BulletSequencer {
 
 
@@ -16,11 +17,11 @@ class BulletSequencer {
 	public:
 
 		struct AbstractBulletInfo {
-			EnemyData::Numeric time;
-			EnemyData::Numeric velocity;
-			EnemyData::Numeric angle;
-			EnemyData::Numeric color;
-			EnemyData::Numeric number;
+			Numeric time;
+			Numeric velocity;
+			Numeric angle;
+			Numeric color;
+			Numeric number;
 			bool parallel;
 			bool with_previous;
 		};

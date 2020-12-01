@@ -1,5 +1,4 @@
 #include "EnemyData.hpp"
-#include "BulletSequencer.hpp"
 #include "data_path.hpp"
 #include <cstdlib>
 #include <stdexcept>
@@ -10,10 +9,11 @@
 #include <yaml-cpp/yaml.h>
 #include <regex>
 #include <random>
+#include "Numeric.hpp"
 
 namespace {
 
-	typedef std::variant<std::string, EnemyData::Numeric> ValueType;
+	typedef std::variant<std::string, Numeric> ValueType;
 	typedef std::unordered_map<std::string, ValueType>    ValueStore;
 	typedef std::unordered_map<std::string, ValueStore>   EnemyMap;
 
@@ -21,7 +21,6 @@ namespace {
 
 	typedef std::vector<ValueStore> Attack;
 	typedef std::map<float, BulletSequencer> AttackList;
-
 	std::unordered_map<std::string, AttackList> attacks;
 
 	void load_enemies() {
@@ -39,7 +38,7 @@ namespace {
 			std::smatch sm;
 			if (std::regex_match(in, sm, range_regex)) { // range
 
-				return EnemyData::Numeric(EnemyData::Numeric::Range(
+				return Numeric(Numeric::Range(
 					std::atof(sm[1].str().c_str()),
 					std::atof(sm[2].str().c_str())
 				));
@@ -51,16 +50,16 @@ namespace {
 				std::regex_iterator<std::string::iterator> rit ( i.begin(), i.end(), float_regex );
 				std::regex_iterator<std::string::iterator> rend;
 
-				EnemyData::Numeric::Choice ret;
+				Numeric::Choice ret;
 				while (rit != rend) {
 					ret.push_back(std::atof(rit->str().c_str()));
 					rit++;
 				}
-				return EnemyData::Numeric(ret);
+				return Numeric(ret);
 			}
 
 			if (std::regex_match(in, sm, full_float_regex)) { // float
-				return EnemyData::Numeric(std::atof(sm[1].str().c_str()));
+				return Numeric(std::atof(sm[1].str().c_str()));
 			}
 
 			// none matched -- assume a string
@@ -93,6 +92,7 @@ namespace {
 			for (auto it2 = value.begin(); it2 != value.end(); it2++) {
 
 				std::string key = it2->first.as<std::string>();
+				printf("%s\n", key.c_str());
 
 				if (key == "attacks") {
 
@@ -115,7 +115,6 @@ namespace {
 										bullet[it6->first.as<std::string>()] =
 											parse_arg(it6->second.as<std::string>());
 									}
-
 									// put in defaults if they don't exist
 									for (auto db : default_bullet) {
 										bullet.emplace(db);
@@ -128,6 +127,7 @@ namespace {
 
 								total += it4->second.as<float>();
 								found_chance = true;
+
 							} else {
 								std::runtime_error("unexpected attack thing");
 							}
@@ -140,13 +140,14 @@ namespace {
 
 						std::list<BulletSequencer::AbstractBulletInfo> bs_bullets;
 
+						printf("%zu\n", attack.size());
 						for (auto a : attack) {
 							bs_bullets.push_back(BulletSequencer::AbstractBulletInfo {
-								std::get<EnemyData::Numeric>(a["time"]),
-								std::get<EnemyData::Numeric>(a["velocity"]),
-								std::get<EnemyData::Numeric>(a["angle"]),
-								std::get<EnemyData::Numeric>(a["color"]),
-								std::get<EnemyData::Numeric>(a["number"]),
+								std::get<Numeric>(a["time"]),
+								std::get<Numeric>(a["velocity"]),
+								std::get<Numeric>(a["angle"]),
+								std::get<Numeric>(a["color"]),
+								std::get<Numeric>(a["number"]),
 								std::get<std::string>(a["sequence"]) == "parallel",
 								std::get<std::string>(a["dispatch"]) == "with",
 							});
@@ -156,7 +157,7 @@ namespace {
 
 					}
 
-					attacks[key] = attack_list;
+					attacks[name] = attack_list;
 
 				} else {
 					new_[key] = parse_arg(it2->second.as<std::string>());
@@ -174,10 +175,10 @@ namespace {
 	}
 }
 
-std::mt19937 EnemyData::Numeric::mt (std::chrono::system_clock::now().time_since_epoch().count());
-std::uniform_real_distribution<float> EnemyData::Numeric::dist (0.0f, 1.0f);
+std::mt19937 Numeric::mt (std::chrono::system_clock::now().time_since_epoch().count());
+std::uniform_real_distribution<float> Numeric::dist (0.0f, 1.0f);
 
-EnemyData::Numeric &EnemyData::num(const std::string &enemy_name, const std::string &key) {
+Numeric &EnemyData::num(const std::string &enemy_name, const std::string &key) {
 
 	if (enemies.size() == 0) { load_enemies(); }
 
@@ -190,4 +191,11 @@ const std::string &EnemyData::str(const std::string &enemy_name, const std::stri
 	if (enemies.size() == 0) { load_enemies(); }
 
 	return std::get<std::string>(enemies[enemy_name][key]);
+}
+
+const AttackList &EnemyData::get_attack_list(const std::string &enemy_name) {
+
+	if (enemies.size() == 0) { load_enemies(); }
+
+	return attacks[enemy_name];
 }

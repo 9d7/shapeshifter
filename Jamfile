@@ -111,7 +111,10 @@ if $(OS) = NT { #Windows
 
 #Store the names of various .cpp files to build into variables:
 GAME_NAMES =
+	Numeric
+	Enemy
 	EnemyData
+	BulletSequencer
 	BulletManager
 	Bullet
 	BackgroundFramebuffer

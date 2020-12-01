@@ -13,6 +13,7 @@
 #include <glm/glm.hpp>
 #include <random>
 #include <string>
+#include "EnemyData.hpp"
 
 class Enemy {
 	public:
@@ -26,7 +27,13 @@ class Enemy {
 		void update(float elapsed, std::shared_ptr<BulletManager> bw);
 
 
-		friend class EnemyManager;
+		Enemy (
+			const AttackList &attack_list_,
+			const glm::vec2  &pos_,
+			std::shared_ptr<SpriteManager> spr_mgr_
+		);
+
+		//friend class EnemyManager;
 
 	protected:
 
@@ -44,10 +51,5 @@ class Enemy {
 		std::list<BulletSequencer::ConcreteBulletInfo> firing_pattern;
 		float firing_timer = 0.0f;
 
-		Enemy (
-			const AttackList &attack_list_,
-			const glm::vec2  &pos_,
-			std::shared_ptr<SpriteManager> spr_mgr_
-		);
 
 };
