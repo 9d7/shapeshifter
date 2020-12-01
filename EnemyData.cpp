@@ -39,8 +39,8 @@ namespace {
 			if (std::regex_match(in, sm, range_regex)) { // range
 
 				return Numeric(Numeric::Range(
-					std::atof(sm[1].str().c_str()),
-					std::atof(sm[2].str().c_str())
+					(float)std::atof(sm[1].str().c_str()),
+					(float)std::atof(sm[2].str().c_str())
 				));
 			}
 
@@ -52,14 +52,14 @@ namespace {
 
 				Numeric::Choice ret;
 				while (rit != rend) {
-					ret.push_back(std::atof(rit->str().c_str()));
+					ret.push_back((float)std::atof(rit->str().c_str()));
 					rit++;
 				}
 				return Numeric(ret);
 			}
 
 			if (std::regex_match(in, sm, full_float_regex)) { // float
-				return Numeric(std::atof(sm[1].str().c_str()));
+				return Numeric((float)std::atof(sm[1].str().c_str()));
 			}
 
 			// none matched -- assume a string
