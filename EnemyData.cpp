@@ -1,4 +1,5 @@
 #include "EnemyData.hpp"
+#include "BulletSequencer.hpp"
 #include "data_path.hpp"
 #include <cstdlib>
 #include <stdexcept>
@@ -18,11 +19,10 @@ namespace {
 
 	EnemyMap enemies;
 
-	typedef std::pair<ValueStore, std::vector<ValueStore>> Attack;
-	typedef std::map<float, Attack> AttackList;
-	std::unordered_map<std::string, AttackList> attacks;
+	typedef std::vector<ValueStore> Attack;
+	typedef std::map<float, BulletSequencer> AttackList;
 
-	auto rng = std::bind(std::uniform_real_distribution<float>(0.0f, 1.0f), std::mt19937());
+	std::unordered_map<std::string, AttackList> attacks;
 
 	void load_enemies() {
 
@@ -30,10 +30,7 @@ namespace {
 
 		auto parse_arg = [](const std::string &in) -> ValueType {
 
-			// first--remove all spaces from string
-			// (-?\d+\.?\d*)\s*\.\.\s*(-?\d+\.?\d*) = 2.5..3.5
-			// (?:(?:-?\d+\.?\d*)\s*,\s*)+(?:-?\d+\.?\d*) = comma separated list, no captures
-			// (-?\d+\.?\d*) = float
+			// wow, regex is so pretty and readable. :)
 			static std::regex range_regex (R"(^\s*(-?\d*\.?\d+)\s*\.\.\s*(-?\d*\.?\d+)\s*$)");
 			static std::regex choice_regex (R"(^\s*((-?\d*\.?\d+)\s*,\s*)+(-?\d*\.?\d+)\s*$)");
 			static std::regex full_float_regex (R"(^\s*(-?\d*\.?\d+)\s*$)");
@@ -42,7 +39,6 @@ namespace {
 			std::smatch sm;
 			if (std::regex_match(in, sm, range_regex)) { // range
 
-				printf("Matched '%s' as range\n", in.c_str());
 				return EnemyData::Numeric(EnemyData::Numeric::Range(
 					std::atof(sm[1].str().c_str()),
 					std::atof(sm[2].str().c_str())
@@ -51,7 +47,6 @@ namespace {
 
 			if (std::regex_match(in, choice_regex)) { // choice
 
-				printf("Matched '%s' as choice\n", in.c_str());
 				std::string i = in;
 				std::regex_iterator<std::string::iterator> rit ( i.begin(), i.end(), float_regex );
 				std::regex_iterator<std::string::iterator> rend;
@@ -65,19 +60,16 @@ namespace {
 			}
 
 			if (std::regex_match(in, sm, full_float_regex)) { // float
-				printf("Matched '%s' as float\n", in.c_str());
 				return EnemyData::Numeric(std::atof(sm[1].str().c_str()));
 			}
 
 			// none matched -- assume a string
-			printf("Matched '%s' as string\n", in.c_str());
 			return in;
 		};
 
-		ValueStore default_attack;
 		ValueStore default_bullet;
 		ValueStore default_enemy;
-		float      default_attack_chance = 0.0f;
+		float      default_attack_chance = yaml["default"]["chance"].as<float>();
 
 		YAML::Node default_ = yaml["default"];
 		for (auto it = default_["enemy"].begin(); it != default_["enemy"].end(); it++) {
@@ -85,15 +77,6 @@ namespace {
 				parse_arg(it->second.as<std::string>());
 		}
 		enemies["default"] = default_enemy;
-
-		for (auto it = default_["attack"].begin(); it != default_["attack"].end(); it++) {
-			std::string name = it->first.as<std::string>();
-			if (name == "chance") {
-				default_attack_chance = it->second.as<float>();
-			} else {
-				default_attack[name] = parse_arg(it->second.as<std::string>());
-			}
-		}
 
 		for (auto it = default_["bullet"].begin(); it != default_["bullet"].end(); it++) {
 			default_bullet[it->first.as<std::string>()] =
@@ -138,7 +121,7 @@ namespace {
 										bullet.emplace(db);
 									}
 
-									attack.second.emplace_back(bullet);
+									attack.emplace_back(bullet);
 								}
 
 							} else if (attack_param == "chance") {
@@ -146,24 +129,34 @@ namespace {
 								total += it4->second.as<float>();
 								found_chance = true;
 							} else {
-
-								attack.first[attack_param] = parse_arg(it4->second.as<std::string>());
+								std::runtime_error("unexpected attack thing");
 							}
 
-						}
-
-						for (auto da : default_attack) {
-							attack.first.emplace(da);
 						}
 
 						if (!found_chance) {
 							total += default_attack_chance;
 						}
-						attack_list[total] = attack;
+
+						std::list<BulletSequencer::AbstractBulletInfo> bs_bullets;
+
+						for (auto a : attack) {
+							bs_bullets.push_back(BulletSequencer::AbstractBulletInfo {
+								std::get<EnemyData::Numeric>(a["time"]),
+								std::get<EnemyData::Numeric>(a["velocity"]),
+								std::get<EnemyData::Numeric>(a["angle"]),
+								std::get<EnemyData::Numeric>(a["color"]),
+								std::get<EnemyData::Numeric>(a["number"]),
+								std::get<std::string>(a["sequence"]) == "parallel",
+								std::get<std::string>(a["dispatch"]) == "with",
+							});
+						}
+
+						attack_list.emplace(total, BulletSequencer(bs_bullets));
 
 					}
 
-					attacks[name] = attack_list;
+					attacks[key] = attack_list;
 
 				} else {
 					new_[key] = parse_arg(it2->second.as<std::string>());

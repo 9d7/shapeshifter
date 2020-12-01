@@ -6,33 +6,48 @@
  * and allow you to loop through them based on type.
  */
 
+#include "BulletManager.hpp"
+#include "BulletSequencer.hpp"
+#include "Sprite.hpp"
+#include "SpriteManager.hpp"
 #include <glm/glm.hpp>
+#include <random>
 #include <string>
 
 class Enemy {
 	public:
 
+		~Enemy(){};
 
-		/* Note:
-		 * Ideally, you should never use get_type to give a certain enemy type
-		 * special behavior. Instead, a flag for that special behavior can
-		 * be added to the enemies.yaml file. That flag will be parsed,
-		 * and can be fetched with a "get_flag" function.
-		 */
+		typedef std::map<float, BulletSequencer> AttackList;
 
-		float              get_flag_numerical(const std::string &str) const;
-		const std::string &get_flag_string(const std::string &str) const;
-		glm::vec2          get_position();
+		void fire(const glm::vec2 &player_pos);
+		bool is_firing();
+		void update(float elapsed, std::shared_ptr<BulletManager> bw);
 
 
 		friend class EnemyManager;
 
 	protected:
 
-		glm::vec2 position;
-		void update(float elapsed);
+		static std::mt19937 mt;
+		static std::uniform_real_distribution<float> dist;
 
+		const AttackList &attack_list;
 
+		glm::vec2 pos;
+		glm::vec2 saved_player_pos {0.0f, 0.0f};
 
+		std::shared_ptr<SpriteManager> spr_mgr;
+		std::shared_ptr<Sprite> spr;
+
+		std::list<BulletSequencer::ConcreteBulletInfo> firing_pattern;
+		float firing_timer = 0.0f;
+
+		Enemy (
+			const AttackList &attack_list_,
+			const glm::vec2  &pos_,
+			std::shared_ptr<SpriteManager> spr_mgr_
+		);
 
 };

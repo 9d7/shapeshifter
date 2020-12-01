@@ -29,16 +29,13 @@ default:
     sequence: parallel
     dispatch: after
 
-  attack:
-    chance: 1
-    aim: each
+  chance: 1
 
 soldier:
   health: 2
   attacks:
     -
       chance: 1
-      aim:    each
       bullets:
         -
           velocity: 0.95..1.05

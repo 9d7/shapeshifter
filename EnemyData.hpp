@@ -16,6 +16,7 @@ namespace EnemyData {
 	// is fine? Like Animation::Animation, the str and num functions are designed
 	// to have their results cached.
 
+
 	class Numeric {
 		public:
 			typedef std::vector<float>      Choice;
