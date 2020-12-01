@@ -5,7 +5,7 @@
 
 if $(OS) = NT { #Windows
 	NEST_LIBS = ..\\nest-libs\\windows ;
-	C++FLAGS = /nologo /Z7 /c /EHsc /W3 /WX /MD
+	C++FLAGS = /nologo /Z7 /c /EHsc /W3 /WX /MD /std:c++17
 		/I"$(NEST_LIBS)/SDL2/include"
 		/I"$(NEST_LIBS)/glm/include"
 		/I"$(NEST_LIBS)/libpng/include"
@@ -14,11 +14,16 @@ if $(OS) = NT { #Windows
 		/I"$(NEST_LIBS)/libogg/include"
 		/I"$(NEST_LIBS)/harfbuzz/include"
 		/I"$(NEST_LIBS)/freetype/include"
+
+		/experimental:external # VS compilation, allow marking "external"
+		/external:I"winlibs/yaml-cpp/include"
+		/external:W0 # disable warnings on external libraries
+
 		#disable a few warnings:
 		/wd4146 #-1U is still unsigned
 		/wd4297 #unforunately SDLmain is nothrow
 	;
-	LINKFLAGS = /nologo /SUBSYSTEM:CONSOLE /DEBUG:FASTLINK
+	LINKFLAGS = /nologo /SUBSYSTEM:CONSOLE /DEBUG:FASTLINK /NODEFAULTLIB:LIBCMT /LTCG
 		/LIBPATH:"$(NEST_LIBS)/SDL2/lib"
 		/LIBPATH:"$(NEST_LIBS)/libpng/lib"
 		/LIBPATH:"$(NEST_LIBS)/zlib/lib"
@@ -27,10 +32,11 @@ if $(OS) = NT { #Windows
 		/LIBPATH:"$(NEST_LIBS)/libogg/lib"
 		/LIBPATH:"$(NEST_LIBS)/harfbuzz/lib"
 		/LIBPATH:"$(NEST_LIBS)/freetype/lib"
+		/LIBPATH:"winlibs/yaml-cpp/lib"
 	;
 	LINKLIBS =
 		SDL2main.lib SDL2.lib OpenGL32.lib Shell32.lib
-		libpng.lib zlib.lib opusfile.lib opus.lib libogg.lib harfbuzz.lib freetype.lib
+		libpng.lib zlib.lib opusfile.lib opus.lib libogg.lib harfbuzz.lib freetype.lib yaml-cpp.lib
 	;
 
 	File SDL2.dll : $(NEST_LIBS)\\SDL2\\dist\\SDL2.dll ;
@@ -50,6 +56,7 @@ if $(OS) = NT { #Windows
 		-I$(NEST_LIBS)/libogg/include                                               #libogg
 		-I$(NEST_LIBS)/freetype/include                                             #freetype
 		-I$(NEST_LIBS)/harfbuzz/include                                             #harfbuzz
+		-isystem yaml-cpp/include
 		;
 	LINK = clang++ ;
 	LINKFLAGS = -std=c++17 -g -Wall -Werror ;
@@ -62,6 +69,7 @@ if $(OS) = NT { #Windows
 		-L$(NEST_LIBS)/libogg/lib -logg                                             #libogg (for opusfile)
 		-L$(NEST_LIBS)/harfbuzz/lib -lharfbuzz                                      #harfbuzz
 		-L$(NEST_LIBS)/freetype/lib -lfreetype                                      #freetype
+		-Lyaml-cpp/build -lyaml-cpp
 		;
 	File README-SDL.txt : $(NEST_LIBS)/SDL2/dist/README-SDL.txt ;
 	MakeLocate README-SDL.txt : dist ;
@@ -78,6 +86,7 @@ if $(OS) = NT { #Windows
 		-I$(NEST_LIBS)/libogg/include                                               #libogg
 		-I$(NEST_LIBS)/freetype/include                                             #freetype
 		-I$(NEST_LIBS)/harfbuzz/include                                             #harfbuzz
+		-isystem yaml-cpp/include
 		;
 	LINK = g++ -no-pie ;
 	LINKFLAGS = -std=c++17 -g -Wall -Werror ;
@@ -90,6 +99,7 @@ if $(OS) = NT { #Windows
 		-L$(NEST_LIBS)/libogg/lib -logg                                                       #libogg (for opusfile)
 		-L$(NEST_LIBS)/harfbuzz/lib -lharfbuzz                                                #harfbuzz
 		-L$(NEST_LIBS)/freetype/lib -lfreetype                                                #freetype
+		-Lyaml-cpp/build -lyaml-cpp
 		;
 	#`PATH=$(KIT_LIBS)/SDL2/bin:$PATH sdl2-config --static-libs` -lGL #SDL2 (old way that allows system libs to also work)
 	File README-SDL.txt : $(NEST_LIBS)/SDL2/dist/README-SDL.txt ;
@@ -101,12 +111,23 @@ if $(OS) = NT { #Windows
 
 #Store the names of various .cpp files to build into variables:
 GAME_NAMES =
-	Stars
-	Renderer
+	Numeric
+	Enemy
+	EnemyData
+	BulletSequencer
+	BulletManager
+	Bullet
+	BackgroundFramebuffer
+	SpriteFramebuffer
+	Animation
+	Sprite
+	SpriteManager
+	Framebuffer
+	View
+	Model
+	Controller
 	PlayMode
 	main
-	LitColorTextureProgram
-	#ColorTextureProgram #not used right now, but you might want it
 	Sound
 	load_wav
 	load_opus
@@ -114,12 +135,6 @@ GAME_NAMES =
 
 COMMON_NAMES =
 	data_path
-	PathFont
-	PathFont-font
-	DrawLines
-	ColorProgram
-	Scene
-	Mesh
 	load_save_png
 	gl_compile_program
 	Mode
@@ -127,27 +142,10 @@ COMMON_NAMES =
 	Load
 	;
 
-SHOW_MESHES_NAMES =
-	show-meshes
-	ShowMeshesProgram
-	ShowMeshesMode
-	;
-
-
-SHOW_SCENE_NAMES =
-	show-scene
-	ShowSceneProgram
-	ShowSceneMode
-	;
-
-
-
 LOCATE_TARGET = objs ; #put objects in 'objs' directory
-Objects 
+Objects
 	$(GAME_NAMES:S=.cpp)
 	$(COMMON_NAMES:S=.cpp)
-	$(SHOW_MESHES_NAMES:S=.cpp)
-	$(SHOW_SCENE_NAMES:S=.cpp)
 	;
 
 #------------------------
@@ -160,8 +158,3 @@ Objects
 
 LOCATE_TARGET = dist ; #put main in 'dist' directory
 MainFromObjects game : $(GAME_NAMES:S=$(SUFOBJ)) $(COMMON_NAMES:S=$(SUFOBJ)) ;
-
-LOCATE_TARGET = scenes ; #put show-meshes and show-scene utilities in the 'scenes' directory:
-MainFromObjects show-meshes : $(SHOW_MESHES_NAMES:S=$(SUFOBJ)) $(COMMON_NAMES:S=$(SUFOBJ)) ;
-MainFromObjects show-scene : $(SHOW_SCENE_NAMES:S=$(SUFOBJ)) $(COMMON_NAMES:S=$(SUFOBJ)) ;
-
