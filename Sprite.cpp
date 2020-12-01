@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <variant>
 
-Sprite::Sprite(size_t z_) : z(z_) {}
+Sprite::Sprite(int z_) : z(z_) {}
 Sprite::~Sprite() {};
 
 void Sprite::set_position(const glm::vec2 &pos_) { pos = pos_; }

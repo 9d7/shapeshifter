@@ -7,7 +7,7 @@
 SpriteManager::SpriteManager() {}
 SpriteManager::~SpriteManager() {}
 
-std::shared_ptr<Sprite> SpriteManager::acquire(size_t z) {
+std::shared_ptr<Sprite> SpriteManager::acquire(int z) {
 
 	std::shared_ptr<Sprite> sprite(
 		new Sprite(z)

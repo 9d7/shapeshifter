@@ -27,9 +27,9 @@ class Sprite {
 
 	private:
 
-		Sprite(size_t z_);
+		Sprite(int z_);
 
-		const size_t z;
+		const int z;
 
 		glm::vec2    pos           {0, 0};
 		float        rot           = 0;
