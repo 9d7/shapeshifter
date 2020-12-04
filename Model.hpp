@@ -16,7 +16,6 @@ class Model {
 		static constexpr float BULLET_SPEED = Player::BULLET_SPEED; // TODO change this so different enemy types have the ability to set their own bullet speeds
 
 		Model(std::shared_ptr<View> view_);
-		void generate_player();
 
 		void update(float elapsed);
 

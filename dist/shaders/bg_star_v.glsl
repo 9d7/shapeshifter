@@ -1,6 +1,6 @@
 #version 330
 
-#define NUM_STARS 100U
+#define NUM_STARS 200U
 
 uniform vec2 Camera;
 uniform ivec2 ScreenSize;

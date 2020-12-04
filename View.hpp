@@ -8,6 +8,7 @@
 #include <memory>
 #include <vector>
 #include "Stars.hpp"
+#include "Ui.hpp"
 
 class View {
 
@@ -20,12 +21,18 @@ class View {
 		void update(float elapsed);
 
 		enum : size_t {
-			ScreenWidth  = 320,
+			ScreenWidth = 320,
 			ScreenHeight = 240
+		};
+
+		enum : size_t {
+			FieldWidth  = 320,
+			FieldHeight = 224
 		};
 
 		// use this to get new sprites, as well as Animation::find_* functions
 		std::shared_ptr<SpriteManager> sprites;
+		std::shared_ptr<Ui> ui;
 
 		void update_camera(const glm::vec2 &pos);
 

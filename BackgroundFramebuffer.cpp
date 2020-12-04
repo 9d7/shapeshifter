@@ -65,5 +65,5 @@ GLuint BackgroundFramebuffer::draw(GLuint old_tex) {
 }
 
 void BackgroundFramebuffer::realloc(const glm::uvec2 &drawable_size) {
-	Framebuffer::realloc(glm::uvec2(View::ScreenWidth + 1, View::ScreenHeight + 1));
+	Framebuffer::realloc(glm::uvec2(View::FieldWidth + 1, View::FieldHeight + 1));
 }

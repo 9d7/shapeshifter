@@ -2,6 +2,7 @@
 #include "View.hpp"
 #include "SpriteFramebuffer.hpp"
 #include "GL.hpp"
+#include "data_path.hpp"
 #include <chrono>
 
 SpriteFramebuffer::SpriteFramebuffer(GLuint empty_vao, GLuint sprite_tex_)
@@ -35,6 +36,7 @@ SpriteFramebuffer::SpriteFramebuffer(GLuint empty_vao, GLuint sprite_tex_)
 
 	GLint star_ScreenSize_ivec2 = glGetUniformLocation(star_program, "ScreenSize");
 	star_Camera_vec2 = glGetUniformLocation(star_program, "Camera");
+	star_ViewportSize_ivec2 = glGetUniformLocation(star_program, "ViewportSize");
 	GLint star_NumStars_uint = glGetUniformLocation(star_program, "NumStars");
 	star_TexCoords_vec2v =
 		glGetUniformLocation(star_program, "TexCoords");
@@ -42,6 +44,19 @@ SpriteFramebuffer::SpriteFramebuffer(GLuint empty_vao, GLuint sprite_tex_)
 
 	glUseProgram(star_program);
 	glUniform2i(star_ScreenSize_ivec2, View::ScreenWidth, View::ScreenHeight);
+	glUseProgram(0);
+
+	// screen edge program
+	screen_edge_program = compile_shader_from_path(
+		data_path("shaders/screen_edge_v.glsl"),
+		data_path("shaders/screen_edge_f.glsl")
+	);
+	GLint screen_edge_FieldSize_uvec2 = glGetUniformLocation(screen_edge_program, "FieldSize");
+	GLint screen_edge_ScreenSize_uvec2 = glGetUniformLocation(screen_edge_program, "ScreenSize");
+
+	glUseProgram(screen_edge_program);
+	glUniform2ui(screen_edge_FieldSize_uvec2, View::FieldWidth, View::FieldHeight);
+	glUniform2ui(screen_edge_ScreenSize_uvec2, View::ScreenWidth, View::ScreenHeight);
 	glUseProgram(0);
 
 	// sprite program
@@ -52,6 +67,9 @@ SpriteFramebuffer::SpriteFramebuffer(GLuint empty_vao, GLuint sprite_tex_)
 
 	sprite_Camera_vec2 =
 		glGetUniformLocation(sprite_program, "Camera");
+
+	sprite_ViewportSize_vec2 =
+		glGetUniformLocation(sprite_program, "ViewportSize");
 
 	glUseProgram(sprite_program);
 	glUniform2f(glGetUniformLocation(sprite_program, "ScreenSize"), View::ScreenWidth, View::ScreenHeight);
@@ -118,7 +136,12 @@ SpriteFramebuffer::SpriteFramebuffer(GLuint empty_vao, GLuint sprite_tex_)
 
 }
 
-GLuint SpriteFramebuffer::draw(GLuint old_tex, std::vector<SpriteManager::Vertex> &verts) {
+GLuint SpriteFramebuffer::draw(
+	GLuint old_tex,
+	std::vector<SpriteManager::Vertex> &sprite_verts,
+	std::vector<SpriteManager::Vertex> &ui_field_verts,
+	std::vector<SpriteManager::Vertex> &ui_border_verts
+) {
 
 	Framebuffer::draw(old_tex);
 
@@ -143,8 +166,8 @@ GLuint SpriteFramebuffer::draw(GLuint old_tex, std::vector<SpriteManager::Vertex
 	glBindBuffer(GL_ARRAY_BUFFER, sprite_vbo);
 	glBufferData(
 		GL_ARRAY_BUFFER,
-		verts.size() * sizeof(SpriteManager::Vertex),
-		verts.data(),
+		sprite_verts.size() * sizeof(SpriteManager::Vertex),
+		sprite_verts.data(),
 		GL_DYNAMIC_DRAW
 	);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -155,11 +178,56 @@ GLuint SpriteFramebuffer::draw(GLuint old_tex, std::vector<SpriteManager::Vertex
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, sprite_tex);
 
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, (GLsizei)verts.size());
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, (GLsizei)sprite_verts.size());
+
+	glBindBuffer(GL_ARRAY_BUFFER, sprite_vbo);
+	glBufferData(
+		GL_ARRAY_BUFFER,
+		ui_field_verts.size() * sizeof(SpriteManager::Vertex),
+		ui_field_verts.data(),
+		GL_DYNAMIC_DRAW
+	);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glUniform2f(sprite_Camera_vec2, ((float)View::ScreenWidth)/2.0f, ((float)View::ScreenHeight)/2.0f);
+
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, (GLsizei)ui_field_verts.size());
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glBindVertexArray(0);
 	glUseProgram(0);
+
+	// screen edge program
+	glUseProgram(screen_edge_program);
+	glBindVertexArray(empty_vao);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, sprite_tex);
+
+	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 2);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindVertexArray(0);
+	glUseProgram(0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, sprite_vbo);
+	glBufferData(
+		GL_ARRAY_BUFFER,
+		ui_border_verts.size() * sizeof(SpriteManager::Vertex),
+		ui_border_verts.data(),
+		GL_DYNAMIC_DRAW
+	);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glUseProgram(sprite_program);
+	glBindVertexArray(sprite_vao);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, sprite_tex);
+
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, (GLsizei)ui_border_verts.size());
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindVertexArray(0);
+	glUseProgram(0);
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	GL_ERRORS();

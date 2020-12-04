@@ -17,12 +17,18 @@ Model::Model(std::shared_ptr<View> view_) : view(view_) {
 	enemies = std::make_shared<EnemyManager>(view->sprites, bullets);
 
 	enemies->acquire("soldier", Bullet::Blue, glm::vec2(0, 0));
+
+	view->ui->set_health(10);
 }
 
 void Model::update(float elapsed) {
 
+
 	player->update(elapsed);
 	enemies->update(elapsed, player->get_position());
+	static size_t score = 0;
+	static size_t lives = 10;
+
 	bullets->update(elapsed);
 
 
@@ -42,7 +48,11 @@ void Model::update(float elapsed) {
 
 					if (glm::length(e.position() - b.get_position()) < radius + 4.0f) {
 						// kill enemy and bullet
-						e_it = enemies->erase(e_it);
+
+						// e_it = enemies->erase(e_it);
+						score += 100;
+						view->ui->set_score(score);
+
 						should_erase = true;
 						break;
 					} else {
@@ -50,8 +60,10 @@ void Model::update(float elapsed) {
 					}
 				}
 			} else {
-				if (glm::length(player->get_position() - b.get_position()) < 8.0f + 4.0f) {
-					printf("Player hit\n");
+				if (glm::length(player_position - b.get_position()) < 8.0f + 4.0f) {
+					if (lives > 0) lives--;
+					view->ui->set_health(lives);
+
 					should_erase = true;
 				}
 			}
@@ -69,8 +81,8 @@ void Model::update(float elapsed) {
 
 	// update camera to be out of dead space
 	static const glm::vec2 MARGIN = glm::vec2(
-			View::ScreenWidth,
-			View::ScreenHeight
+			View::FieldWidth,
+			View::FieldHeight
 	) * 1.0f / 4.0f;
 
 	glm::vec2 space_from_camera_center = ideal_camera_position - player->get_position();
@@ -118,14 +130,15 @@ void Model::player_move(glm::vec2 direction) {
 
 void Model::set_player_color(Bullet::Color color) {
 	player->set_color(color);
+	view->ui->set_health_color(color);
 }
 
 void Model::set_mouse_position(const glm::vec2 &position) {
 	mouse_ui_position = position;
-	mouse_world_position = position - glm::vec2(View::ScreenWidth, View::ScreenHeight) / 2.0f + camera_position;
+	mouse_world_position = position - glm::vec2(View::FieldWidth, View::FieldHeight) / 2.0f + camera_position;
+	view->ui->set_cursor(position);
 }
 
 float Model::get_bullet_speed() const {
 	return Player::BULLET_SPEED;
 }
-

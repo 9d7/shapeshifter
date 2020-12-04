@@ -1,6 +1,7 @@
 #include "View.hpp"
 #include "GL.hpp"
 #include "SpriteManager.hpp"
+#include "Ui.hpp"
 #include "data_path.hpp"
 #include "glm/fwd.hpp"
 #include "load_save_png.hpp"
@@ -10,6 +11,7 @@
 View::View() {
 
 	sprites = std::make_shared<SpriteManager>();
+	ui = std::make_shared<Ui>();
 
 	glGenVertexArrays(1, &empty_vao);
 
@@ -83,7 +85,7 @@ void View::draw(const glm::uvec2 &drawable_size) {
 	background_framebuffer->realloc(viewport_size);
 	sprite_framebuffer->realloc(viewport_size);
 
-	glViewport(0, 0, ScreenWidth + 1, ScreenHeight + 1);
+	glViewport(0, 0, FieldWidth + 1, FieldHeight + 1);
 
 	glUseProgram(background_framebuffer->program);
 	glUniform1f(background_framebuffer->Time_float, total_time);
@@ -116,14 +118,27 @@ void View::draw(const glm::uvec2 &drawable_size) {
 		sprite_framebuffer->num_stars,
 		(GLfloat *)(stars->star_tex_coords.data())
 	);
+	glUniform2i(
+		sprite_framebuffer->star_ViewportSize_ivec2,
+		(int)viewport_size.x,
+		(int)viewport_size.y
+	);
 	glUseProgram(0);
 
 	glUseProgram(sprite_framebuffer->sprite_program);
 	glUniform2f(sprite_framebuffer->sprite_Camera_vec2, camera_position.x, camera_position.y);
+	glUniform2f(sprite_framebuffer->sprite_ViewportSize_vec2, (float)drawable_size.x, (float)drawable_size.y);
 
 	std::vector<SpriteManager::Vertex> sprite_verts;
 	sprites->draw(sprite_verts);
-	GLuint sprite_tex = sprite_framebuffer->draw(bg_tex, sprite_verts);
+
+	std::vector<SpriteManager::Vertex> ui_field_verts;
+	std::vector<SpriteManager::Vertex> ui_border_verts;
+
+	ui->draw_field(ui_field_verts);
+	ui->draw_border(ui_border_verts);
+
+	GLuint sprite_tex = sprite_framebuffer->draw(bg_tex, sprite_verts, ui_field_verts, ui_border_verts);
 
 	glViewport(
 		viewport_offset.x,
@@ -171,5 +186,5 @@ void View::update(float elapsed) {
 }
 
 void View::update_camera(const glm::vec2 &pos) {
-	camera_position = pos;
+	camera_position = pos + glm::vec2(ScreenWidth - FieldWidth, ScreenHeight - FieldHeight) / 2.0f;
 }
