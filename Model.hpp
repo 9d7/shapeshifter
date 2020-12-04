@@ -13,7 +13,7 @@ class Model {
 	public:
 
 		static constexpr float MOVE_FORCE   = 1200.0f;  // Maybe as TODO below?
-		static constexpr float MAX_VELOCITY = 300.0f;   // TODO make a multiplier that we can adjust on the fly if we want powerups or slowing abilities
+		static constexpr float MAX_VELOCITY = 250.0f;   // TODO make a multiplier that we can adjust on the fly if we want powerups or slowing abilities
 		static constexpr float FRICTION     = 0.95f;    // Currently unused
 		static constexpr float FRICTION_FORCE = 500.0f; // Currently used for force based friction
 		static constexpr float BULLET_SPEED = 300.0f;   // Same TODO as above

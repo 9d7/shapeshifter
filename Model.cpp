@@ -65,25 +65,21 @@ void Model::update(float elapsed) {
 		}
 
 	}
-
-	float player_velocity_magnitude = glm::length(player_velocity); // just to save computation time, though likely unneeded tbh
-
-	
 	
 	player_velocity += player_force * elapsed;
-	printf("V: %f MAXV: %f ||| F: %f\n", glm::length(player_velocity), MAX_VELOCITY, glm::length(player_force)); // TODO remove
+	
 	player_force = glm::vec2(0.0f, 0.0f);
 
-	if (player_velocity_magnitude > MAX_VELOCITY) {
+	if (glm::length(player_velocity) > MAX_VELOCITY) {
 		player_velocity = glm::normalize(player_velocity) * MAX_VELOCITY;
 	}
-	
+	printf("V: %f MAXV: %f\n", glm::length(player_velocity), MAX_VELOCITY); // TODO remove
 	player_position += player_velocity * elapsed;
 
 	bool force_based_friction = true; // TODO delete this variable and the lazy friction method
-	if (player_velocity_magnitude > 0.0f && force_based_friction) { // Actual friction force
+	if (glm::length(player_velocity) > 0.0f && force_based_friction) { // friction force
 		player_friction = glm::normalize(player_velocity) * -1.0f * FRICTION_FORCE * elapsed;
-		if (player_velocity_magnitude < glm::length(player_friction)) player_velocity = glm::vec2(0.0f, 0.0f);
+		if (glm::length(player_velocity) < glm::length(player_friction)) player_velocity = glm::vec2(0.0f, 0.0f);
 		else player_velocity += player_friction;
 	}
 	else { // lazy friction
