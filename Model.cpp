@@ -10,10 +10,8 @@
 
 Model::Model(std::shared_ptr<View> view_) : view(view_) {
 
-	player_red = Animation::find_static("player_red");
-	player_blue = Animation::find_static("player_blue");
+	player = std::make_shared<Player>(view);
 
-	player_sprite = view->sprites->from_anim(player_blue, false);
 	bullets = std::make_shared<BulletManager>();
 
 	enemies = std::make_shared<EnemyManager>(view->sprites, bullets);
@@ -23,9 +21,11 @@ Model::Model(std::shared_ptr<View> view_) : view(view_) {
 
 void Model::update(float elapsed) {
 
-
-	enemies->update(elapsed, player_position);
+	player->update(elapsed);
+	enemies->update(elapsed, player->get_position());
 	bullets->update(elapsed);
+
+
 	for (BulletManager::iterator b_it = bullets->begin(); b_it != bullets->end();) {
 
 		bool should_erase = false;
@@ -50,7 +50,7 @@ void Model::update(float elapsed) {
 					}
 				}
 			} else {
-				if (glm::length(player_position - b.get_position()) < 8.0f + 4.0f) {
+				if (glm::length(player->get_position() - b.get_position()) < 8.0f + 4.0f) {
 					printf("Player hit\n");
 					should_erase = true;
 				}
@@ -66,26 +66,6 @@ void Model::update(float elapsed) {
 
 	}
 	
-	player_velocity += player_force * elapsed;
-	
-	player_force = glm::vec2(0.0f, 0.0f);
-
-	if (glm::length(player_velocity) > MAX_VELOCITY) {
-		player_velocity = glm::normalize(player_velocity) * MAX_VELOCITY;
-	}
-	printf("V: %f MAXV: %f\n", glm::length(player_velocity), MAX_VELOCITY); // TODO remove
-	player_position += player_velocity * elapsed;
-
-	bool force_based_friction = true; // TODO delete this variable and the lazy friction method
-	if (glm::length(player_velocity) > 0.0f && force_based_friction) { // friction force
-		player_friction = glm::normalize(player_velocity) * -1.0f * FRICTION_FORCE * elapsed;
-		if (glm::length(player_velocity) < glm::length(player_friction)) player_velocity = glm::vec2(0.0f, 0.0f);
-		else player_velocity += player_friction;
-	}
-	else { // lazy friction
-		// make friction timestep-independent
-		player_velocity *= glm::pow(FRICTION, 60 * elapsed);
-	}
 
 	// update camera to be out of dead space
 	static const glm::vec2 MARGIN = glm::vec2(
@@ -93,20 +73,20 @@ void Model::update(float elapsed) {
 			View::ScreenHeight
 	) * 1.0f / 4.0f;
 
-	glm::vec2 space_from_camera_center = ideal_camera_position - player_position;
+	glm::vec2 space_from_camera_center = ideal_camera_position - player->get_position();
 
 	if (space_from_camera_center.x > MARGIN.x) {
-		ideal_camera_position.x = MARGIN.x + player_position.x;
+		ideal_camera_position.x = MARGIN.x + player->get_position().x;
 	}
 	if (-space_from_camera_center.x > MARGIN.x) {
-		ideal_camera_position.x = player_position.x - MARGIN.x;
+		ideal_camera_position.x = player->get_position().x - MARGIN.x;
 	}
 
 	if (space_from_camera_center.y > MARGIN.y) {
-		ideal_camera_position.y = MARGIN.y + player_position.y;
+		ideal_camera_position.y = MARGIN.y + player->get_position().y;
 	}
 	if (-space_from_camera_center.y > MARGIN.y) {
-		ideal_camera_position.y = player_position.y - MARGIN.y;
+		ideal_camera_position.y = player->get_position().y - MARGIN.y;
 	}
 
 	camera_position += (ideal_camera_position - camera_position) * glm::pow(CAMERA_SMOOTHNESS, 60 * elapsed);
@@ -118,30 +98,26 @@ void Model::update(float elapsed) {
 
 void Model::update_view() {
 
-	player_sprite->set_position(player_position);
-	player_sprite->set_rotation(0.0f);
+	player->update_sprite();
 
-	glm::vec2 player_to_mouse = mouse_world_position - player_position;
+	glm::vec2 player_to_mouse = mouse_world_position - player->get_position();
 	if (player_to_mouse != glm::vec2(0.0f, 0.0f)) {
-		player_sprite->set_rotation(glm::atan(player_to_mouse.y, player_to_mouse.x));
-		//TODO set rotation to velocity and set turret to above^
+		player->set_rotation(glm::atan(player_to_mouse.y, player_to_mouse.x));
+		//TODO set rotation to velocity and set turret to above^ when multilayered sprites are in
 	}
 }
 
-void Model::player_move(const glm::vec2 &direction) {
-	player_force += direction * MOVE_FORCE;
+void Model::player_shoot() {
+	glm::vec2 shot_vector = player->shoot(mouse_world_position);
+	bullets->acquire(view->sprites, player->get_color(), player->get_position(), shot_vector, true);
 }
 
-void Model::player_shoot(Bullet::Color color) {
+void Model::player_move(glm::vec2 direction) {
+	player->move(direction);
+}
 
-	glm::vec2 direction (1.0f, 0.0f);
-	glm::vec2 player_to_mouse = mouse_world_position - player_position;
-	if (player_to_mouse != glm::vec2(0.0f, 0.0f)) {
-		direction = glm::normalize(player_to_mouse);
-	}
-	direction *= BULLET_SPEED;
-
-	bullets->acquire(view->sprites, color, player_position, direction, true);
+void Model::set_player_color(Bullet::Color color) {
+	player->set_color(color);
 }
 
 void Model::set_mouse_position(const glm::vec2 &position) {
@@ -149,8 +125,7 @@ void Model::set_mouse_position(const glm::vec2 &position) {
 	mouse_world_position = position - glm::vec2(View::ScreenWidth, View::ScreenHeight) / 2.0f + camera_position;
 }
 
-void Model::player_color(Bullet::Color color) {
-	player_col = color;
-	Animation::Animation anim = player_col == Bullet::Color::Blue ? player_blue : player_red;
-	player_sprite->override_animation(anim, false);
+float Model::get_bullet_speed() const {
+	return Player::BULLET_SPEED;
 }
+
