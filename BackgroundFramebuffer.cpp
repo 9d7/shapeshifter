@@ -15,6 +15,8 @@ BackgroundFramebuffer::BackgroundFramebuffer(GLuint empty_vao)
 
 
 	Time_float = glGetUniformLocation(program, "Time");
+	Camera_vec2 = glGetUniformLocation(program, "Camera");
+	Parallax_float = glGetUniformLocation(program, "Parallax");
 
 	// generate blue noise texture
 	glGenTextures(1, &blue_noise_tex);
@@ -63,5 +65,5 @@ GLuint BackgroundFramebuffer::draw(GLuint old_tex) {
 }
 
 void BackgroundFramebuffer::realloc(const glm::uvec2 &drawable_size) {
-	Framebuffer::realloc(glm::uvec2(View::ScreenWidth, View::ScreenHeight));
+	Framebuffer::realloc(glm::uvec2(View::ScreenWidth + 1, View::ScreenHeight + 1));
 }

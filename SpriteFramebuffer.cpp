@@ -11,8 +11,14 @@ SpriteFramebuffer::SpriteFramebuffer(GLuint empty_vao, GLuint sprite_tex_)
 		empty_vao
 	), sprite_tex(sprite_tex_) {
 
+	small_to_big_Camera_vec2 =
+		glGetUniformLocation(program, "Camera");
+
 	small_to_big_ViewportSize_uvec2 =
 		glGetUniformLocation(program, "ViewportSize");
+
+	small_to_big_Parallax_float =
+		glGetUniformLocation(program, "Parallax");
 
 	GLint small_to_big_TextureSize_uvec2 =
 		glGetUniformLocation(program, "TextureSize");
