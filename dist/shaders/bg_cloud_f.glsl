@@ -1,7 +1,9 @@
 #version 330
 
+uniform vec2 Camera;
 uniform uvec2 Resolution;
 uniform float Time = 0;
+uniform float Parallax;
 
 uniform sampler2D TEX;
 out vec4 fragColor;
@@ -83,7 +85,7 @@ float snoise(vec3 v){
 /*****************************************************************************/
 
 void main() {
-	vec2 pixel = gl_FragCoord.xy;
+	vec2 pixel = gl_FragCoord.xy + floor(Camera.xy * Parallax);
 	vec2 coord = pixel / 300.0;
 	float time = Time / 32.0;
 
@@ -100,7 +102,7 @@ void main() {
 	const vec3 color3 = vec3(76.0, 40.0, 119.0) / 255.0;
 
 	vec2 bn_size = vec2(textureSize(TEX, 0));
-	float bn = texelFetch(TEX, ivec2(mod(gl_FragCoord.xy, bn_size)), 0).r;
+	float bn = texelFetch(TEX, ivec2(mod(pixel, bn_size)), 0).r;
 
 	noise *= 2.0;
 	vec3 out_color = mix(color1, color2, step(bn + 0.05, noise));

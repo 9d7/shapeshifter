@@ -33,7 +33,13 @@ BulletManager::iterator BulletManager::erase(const_iterator position) {
 	return bullets.erase(position);
 }
 
-std::shared_ptr<Bullet> BulletManager::acquire(std::shared_ptr<SpriteManager> sprite_manager, Bullet::Color color, const glm::vec2 &position, const glm::vec2 &velocity) {
+std::shared_ptr<Bullet> BulletManager::acquire(
+	std::shared_ptr<SpriteManager> sprite_manager,
+	Bullet::Color color,
+	const glm::vec2 &position,
+	const glm::vec2 &velocity,
+	bool shot_by_player
+) {
 
 	Animation::Animation anim;
 	switch (color) {
@@ -48,7 +54,7 @@ std::shared_ptr<Bullet> BulletManager::acquire(std::shared_ptr<SpriteManager> sp
 	sprite->set_rotation(0.0f);
 
 
-	std::shared_ptr<Bullet> ret = std::make_shared<Bullet>(position, velocity, color, sprite);
+	std::shared_ptr<Bullet> ret = std::make_shared<Bullet>(position, velocity, color, sprite, shot_by_player);
 
 	bullets.emplace_back(ret);
 	return ret;

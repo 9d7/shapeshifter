@@ -15,6 +15,11 @@ View::View() {
 
 	background_framebuffer = std::make_unique<BackgroundFramebuffer>(empty_vao);
 
+	static constexpr float CLOUD_PARALLAX = 0.6f;
+	glUseProgram(background_framebuffer->program);
+	glUniform1f(background_framebuffer->Parallax_float, CLOUD_PARALLAX);
+	glUseProgram(0);
+
 	blit_program = Framebuffer::compile_shader_from_path(
 		data_path("shaders/fullscreen_quad_v.glsl"),
 		data_path("shaders/blit_f.glsl")
@@ -53,6 +58,11 @@ View::View() {
 	GL_ERRORS();
 
 	sprite_framebuffer = std::make_unique<SpriteFramebuffer>(empty_vao, sprite_tex);
+	stars = std::make_unique<Stars>(sprite_framebuffer->num_stars);
+
+	glUseProgram(sprite_framebuffer->program);
+	glUniform1f(sprite_framebuffer->small_to_big_Parallax_float, CLOUD_PARALLAX);
+	glUseProgram(0);
 }
 
 View::~View() {}
@@ -73,11 +83,15 @@ void View::draw(const glm::uvec2 &drawable_size) {
 	background_framebuffer->realloc(viewport_size);
 	sprite_framebuffer->realloc(viewport_size);
 
-	glViewport(0, 0, ScreenWidth, ScreenHeight);
+	glViewport(0, 0, ScreenWidth + 1, ScreenHeight + 1);
 
 	glUseProgram(background_framebuffer->program);
 	glUniform1f(background_framebuffer->Time_float, total_time);
-	glUseProgram(0);
+	glUniform2f(
+		background_framebuffer->Camera_vec2,
+		camera_position.x,
+		camera_position.y
+	);
 
 	GLuint bg_tex = background_framebuffer->draw(0);
 
@@ -85,6 +99,24 @@ void View::draw(const glm::uvec2 &drawable_size) {
 
 	glUseProgram(sprite_framebuffer->program);
 	glUniform2ui(sprite_framebuffer->small_to_big_ViewportSize_uvec2, viewport_size.x, viewport_size.y);
+	glUniform2f(
+		sprite_framebuffer->small_to_big_Camera_vec2,
+		camera_position.x,
+		camera_position.y
+	);
+
+	glUseProgram(sprite_framebuffer->star_program);
+	glUniform2f(
+		sprite_framebuffer->star_Camera_vec2,
+		camera_position.x,
+		camera_position.y
+	);
+	glUniform2fv(
+		sprite_framebuffer->star_TexCoords_vec2v,
+		sprite_framebuffer->num_stars,
+		(GLfloat *)(stars->star_tex_coords.data())
+	);
+	glUseProgram(0);
 
 	glUseProgram(sprite_framebuffer->sprite_program);
 	glUniform2f(sprite_framebuffer->sprite_Camera_vec2, camera_position.x, camera_position.y);
@@ -135,6 +167,7 @@ void View::draw(const glm::uvec2 &drawable_size) {
 void View::update(float elapsed) {
 	total_time += elapsed;
 	sprites->update(elapsed);
+	stars->update(elapsed);
 }
 
 void View::update_camera(const glm::vec2 &pos) {

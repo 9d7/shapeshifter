@@ -2,6 +2,8 @@
 
 uniform uvec2 ViewportSize;
 uniform uvec2 TextureSize;
+uniform vec2 Camera;
+uniform float Parallax;
 
 uniform sampler2D TEX;
 out vec4 fragColor;
@@ -18,6 +20,7 @@ void main() {
 	vec2 loc = gl_FragCoord.xy;
 	loc *= scaled_texture_size / ViewportSize;
 
+	loc += scale * fract(Camera * Parallax);
 	vec2 frac = fract(loc);
 
 	uvec2 loc0 = uvec2(floor(floor(loc) / scale));
@@ -34,4 +37,5 @@ void main() {
 	vec3 color = mix(tex0, tex1, frac.y);
 
 	fragColor = vec4(color, 1.0);
+
 }

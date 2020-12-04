@@ -11,8 +11,9 @@ class BackgroundFramebuffer : public Framebuffer {
 		void realloc(const glm::uvec2 &drawable_size) override;
 
 		GLint Time_float = 0;
+		GLint Camera_vec2 = 0;
+		GLint Parallax_float = 0;
 
 	private:
 		GLuint blue_noise_tex = 0;
-		GLuint star_program = 0;
 };

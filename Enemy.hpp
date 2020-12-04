@@ -6,50 +6,61 @@
  * and allow you to loop through them based on type.
  */
 
+#include "Animation.hpp"
 #include "BulletManager.hpp"
 #include "BulletSequencer.hpp"
+#include "Numeric.hpp"
 #include "Sprite.hpp"
 #include "SpriteManager.hpp"
 #include <glm/glm.hpp>
+#include <memory>
 #include <random>
 #include <string>
+#include <unordered_map>
 #include "EnemyData.hpp"
+#include "BulletShooter.hpp"
 
 class Enemy {
 	public:
 
 		~Enemy(){};
 
-		typedef std::map<float, BulletSequencer> AttackList;
+		void update(float elapsed, const glm::vec2 &player_pos);
 
-		void fire(const glm::vec2 &player_pos);
-		bool is_firing();
-		void update(float elapsed, std::shared_ptr<BulletManager> bw);
+		glm::vec2 size() const;
+		glm::vec2 position() const;
 
-
-		Enemy (
-			const AttackList &attack_list_,
-			const glm::vec2  &pos_,
-			std::shared_ptr<SpriteManager> spr_mgr_
-		);
-
-		//friend class EnemyManager;
+		friend class EnemyManager;
 
 	protected:
 
-		static std::mt19937 mt;
-		static std::uniform_real_distribution<float> dist;
+		// this struct holds all the inputs that are specific to an
+		// enemy type. that way, it can be cached and we don't have
+		// to look it up all the time
+		struct EnemyInputs {
+			Animation::Animation            anim_red;
+			Animation::Animation            anim_blue;
+			const BulletShooter::AttackList &attack_list;
+			BulletShooter::AimMode          aim_mode;
+			Numeric                         &shoot_delay;
+		};
 
-		const AttackList &attack_list;
+		Enemy(
+			const EnemyInputs &in,
+			std::shared_ptr<SpriteManager> spr_mgr_,
+			std::shared_ptr<BulletManager> blt_mgr,
+			const glm::vec2 &pos,
+			Bullet::Color color
+		);
 
 		glm::vec2 pos;
-		glm::vec2 saved_player_pos {0.0f, 0.0f};
-
+		Bullet::Color color;
 		std::shared_ptr<SpriteManager> spr_mgr;
+
 		std::shared_ptr<Sprite> spr;
 
-		std::list<BulletSequencer::ConcreteBulletInfo> firing_pattern;
-		float firing_timer = 0.0f;
+		BulletShooter shooter;
+
 
 
 };

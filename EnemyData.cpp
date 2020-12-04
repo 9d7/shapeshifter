@@ -92,7 +92,6 @@ namespace {
 			for (auto it2 = value.begin(); it2 != value.end(); it2++) {
 
 				std::string key = it2->first.as<std::string>();
-				printf("%s\n", key.c_str());
 
 				if (key == "attacks") {
 
@@ -140,7 +139,6 @@ namespace {
 
 						std::list<BulletSequencer::AbstractBulletInfo> bs_bullets;
 
-						printf("%zu\n", attack.size());
 						for (auto a : attack) {
 							bs_bullets.push_back(BulletSequencer::AbstractBulletInfo {
 								std::get<Numeric>(a["time"]),

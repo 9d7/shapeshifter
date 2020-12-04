@@ -1,6 +1,8 @@
+#include "Animation.hpp"
 #include "View.hpp"
 #include "SpriteFramebuffer.hpp"
 #include "GL.hpp"
+#include <chrono>
 
 SpriteFramebuffer::SpriteFramebuffer(GLuint empty_vao, GLuint sprite_tex_)
 	: Framebuffer(
@@ -9,14 +11,37 @@ SpriteFramebuffer::SpriteFramebuffer(GLuint empty_vao, GLuint sprite_tex_)
 		empty_vao
 	), sprite_tex(sprite_tex_) {
 
+	small_to_big_Camera_vec2 =
+		glGetUniformLocation(program, "Camera");
+
 	small_to_big_ViewportSize_uvec2 =
 		glGetUniformLocation(program, "ViewportSize");
+
+	small_to_big_Parallax_float =
+		glGetUniformLocation(program, "Parallax");
 
 	GLint small_to_big_TextureSize_uvec2 =
 		glGetUniformLocation(program, "TextureSize");
 
 	glUseProgram(program);
 	glUniform2ui(small_to_big_TextureSize_uvec2, View::ScreenWidth, View::ScreenHeight);
+	glUseProgram(0);
+
+	// star program
+	star_program = compile_shader_from_path(
+		data_path("shaders/bg_star_v.glsl"),
+		data_path("shaders/bg_star_f.glsl")
+	);
+
+	GLint star_ScreenSize_ivec2 = glGetUniformLocation(star_program, "ScreenSize");
+	star_Camera_vec2 = glGetUniformLocation(star_program, "Camera");
+	GLint star_NumStars_uint = glGetUniformLocation(star_program, "NumStars");
+	star_TexCoords_vec2v =
+		glGetUniformLocation(star_program, "TexCoords");
+	glGetUniformuiv(star_program, star_NumStars_uint, &num_stars);
+
+	glUseProgram(star_program);
+	glUniform2i(star_ScreenSize_ivec2, View::ScreenWidth, View::ScreenHeight);
 	glUseProgram(0);
 
 	// sprite program
@@ -87,6 +112,10 @@ SpriteFramebuffer::SpriteFramebuffer(GLuint empty_vao, GLuint sprite_tex_)
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	GL_ERRORS();
+
+
+	// set up star stuff
+
 }
 
 GLuint SpriteFramebuffer::draw(GLuint old_tex, std::vector<SpriteManager::Vertex> &verts) {
@@ -95,7 +124,21 @@ GLuint SpriteFramebuffer::draw(GLuint old_tex, std::vector<SpriteManager::Vertex
 
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_STENCIL_TEST);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	// star program
+	glUseProgram(star_program);
+	glBindVertexArray(empty_vao);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, sprite_tex);
+
+	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, num_stars);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindVertexArray(0);
+	glUseProgram(0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, sprite_vbo);
 	glBufferData(
@@ -106,7 +149,7 @@ GLuint SpriteFramebuffer::draw(GLuint old_tex, std::vector<SpriteManager::Vertex
 	);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	// sprite program
 	glUseProgram(sprite_program);
 	glBindVertexArray(sprite_vao);
 	glActiveTexture(GL_TEXTURE0);
@@ -121,5 +164,6 @@ GLuint SpriteFramebuffer::draw(GLuint old_tex, std::vector<SpriteManager::Vertex
 
 	GL_ERRORS();
 	return tex;
+
 }
 

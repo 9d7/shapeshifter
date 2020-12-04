@@ -7,6 +7,7 @@
 #include "SpriteManager.hpp"
 #include <memory>
 #include <vector>
+#include "Stars.hpp"
 
 class View {
 
@@ -41,6 +42,7 @@ class View {
 
 		std::unique_ptr<SpriteFramebuffer>     sprite_framebuffer;
 		std::unique_ptr<BackgroundFramebuffer> background_framebuffer;
+		std::unique_ptr<Stars>                 stars;
 
 		float total_time = 0.0f;
 

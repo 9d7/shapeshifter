@@ -4,6 +4,7 @@
 #include "Animation.hpp"
 #include "BulletManager.hpp"
 #include "Enemy.hpp"
+#include "EnemyManager.hpp"
 #include "Sprite.hpp"
 #include "View.hpp"
 
@@ -16,6 +17,7 @@ class Model {
 		static constexpr float FRICTION     = 0.95f;    // Currently unused
 		static constexpr float FRICTION_FORCE = 500.0f; // Currently used for force based friction
 		static constexpr float BULLET_SPEED = 300.0f;   // Same TODO as above
+		static constexpr float CAMERA_SMOOTHNESS = 0.075f; // [0, 1], lower = smoother
 
 		Model(std::shared_ptr<View> view_);
 
@@ -31,10 +33,9 @@ class Model {
 
 	protected:
 
-		std::shared_ptr<Enemy> enemy;
-
 		std::shared_ptr<View> view;
 		std::shared_ptr<BulletManager> bullets;
+		std::shared_ptr<EnemyManager> enemies;
 
 		void update_view();
 
@@ -49,6 +50,7 @@ class Model {
 		glm::vec2 player_friction {0.0f, 0.0f};
 
 		// camera
+		glm::vec2 ideal_camera_position {0.0f, 0.0f};
 		glm::vec2 camera_position {0.0f, 0.0f};
 
 		// mouse

@@ -11,7 +11,45 @@ purple_bullet:
   - [0.1, bullet_purple2]
 
 bullet_death:
-  - [0.1, star_dot]
+  - [0.1, star_pip]
   - [0.1, star_burst1]
   - [0.1, star_burst2]
   - [0.1, star_burst3]
+
+star_pip:
+  - [120, star_pip]
+
+star_twinkle:
+  - [5.0, star_pip]
+  - [0.5, star_twinkle1]
+  - [0.5, star_twinkle2]
+  - [0.5, star_twinkle3]
+  - [0.5, star_twinkle2]
+  - [0.5, star_twinkle1]
+
+star_expand:
+  - [0.5, star_pip]
+  - [0.5, star_twinkle1]
+  - [0.5, star_expand]
+  - [0.5, star_twinkle1]
+
+star_burst:
+  - [10.0, star_empty]
+  - [0.25, star_pip]
+  - [0.25, star_twinkle1]
+  - [0.25, star_burst1]
+  - [0.25, star_burst2]
+  - [0.25, star_burst3]
+
+star_shoot:
+  - [30.0, star_empty]
+  - [0.10, star_shoot1]
+  - [0.10, star_shoot2]
+  - [0.10, star_shoot3]
+  - [0.10, star_shoot4]
+
+star_x:
+  - [5.0, star_pip]
+  - [0.5, star_x1]
+  - [0.5, star_x2]
+  - [0.5, star_x1]
