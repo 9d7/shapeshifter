@@ -27,6 +27,9 @@ class Enemy {
 
 		void update(float elapsed, const glm::vec2 &player_pos);
 
+		glm::vec2 size() const;
+		glm::vec2 position() const;
+
 		friend class EnemyManager;
 
 	protected:

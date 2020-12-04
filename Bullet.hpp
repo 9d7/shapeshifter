@@ -18,12 +18,14 @@ class Bullet {
 			const glm::vec2         &position_,
 			const glm::vec2         &velocity_,
 			Color                   color_,
-			std::shared_ptr<Sprite> sprite_
-		) : position(position_), velocity(velocity_), color(color_), sprite(sprite_) {};
+			std::shared_ptr<Sprite> sprite_,
+			bool                    shot_by_player_
+		) : position(position_), velocity(velocity_), color(color_), sprite(sprite_), shot_by_player(shot_by_player_) {};
 
-		glm::vec2 get_position();
-		float     get_age();
+		glm::vec2 get_position() const;
+		float     get_age() const;
 		void      update(float elapsed);
+		bool      from_player() const;
 
 	private:
 
@@ -31,6 +33,7 @@ class Bullet {
 		glm::vec2               velocity;
 		Color                   color;
 		std::shared_ptr<Sprite> sprite;
+		bool                    shot_by_player;
 
 		float                   age = 0.0f;
 };

@@ -26,7 +26,8 @@ class BulletManager {
 			std::shared_ptr<SpriteManager> sprite_manager,
 			Bullet::Color                  color,
 			const glm::vec2                &position,
-			const glm::vec2                &velocity
+			const glm::vec2                &velocity,
+			bool                           shot_by_player
 		);
 
 

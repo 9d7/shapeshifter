@@ -52,7 +52,7 @@ void BulletShooter::update(
 		);
 
 		gun_to_player = rot * info.velocity * gun_to_player * Model::BULLET_SPEED;
-		blt_mgr->acquire(spr_mgr, color, gun_pos, gun_to_player);
+		blt_mgr->acquire(spr_mgr, color, gun_pos, gun_to_player, false);
 
 		if (firing_pattern.size() == 1) {
 			firing_timer -= info.time;

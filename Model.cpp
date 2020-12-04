@@ -1,5 +1,6 @@
 #include "Model.hpp"
 #include "Animation.hpp"
+#include "Bullet.hpp"
 #include "BulletManager.hpp"
 #include "EnemyData.hpp"
 #include "EnemyManager.hpp"
@@ -17,7 +18,7 @@ Model::Model(std::shared_ptr<View> view_) : view(view_) {
 
 	enemies = std::make_shared<EnemyManager>(view->sprites, bullets);
 
-	enemy = std::shared_ptr<Enemy>(enemies->acquire("soldier", Bullet::Blue, glm::vec2(0, 0)));
+	enemies->acquire("soldier", Bullet::Blue, glm::vec2(0, 0));
 }
 
 void Model::update(float elapsed) {
@@ -27,7 +28,37 @@ void Model::update(float elapsed) {
 	bullets->update(elapsed);
 	for (BulletManager::iterator b_it = bullets->begin(); b_it != bullets->end();) {
 
+		bool should_erase = false;
+		const Bullet b = **b_it;
+
 		if ((*b_it)->get_age() > 1.0f) {
+			should_erase = true;
+		} else {
+
+			if (b.from_player()) {
+				for (EnemyManager::iterator e_it = enemies->begin(); e_it != enemies->end();) {
+					const Enemy e = **e_it;
+					float radius = (e.size().x + e.size().y) / 4.0; // average of w and h, over 2
+
+					if (glm::length(e.position() - b.get_position()) < radius + 4.0) {
+						// kill enemy and bullet
+						e_it = enemies->erase(e_it);
+						should_erase = true;
+						break;
+					} else {
+						e_it++;
+					}
+				}
+			} else {
+				if (glm::length(player_position - b.get_position()) < 8.0 + 4.0) {
+					printf("Player hit\n");
+					should_erase = true;
+				}
+			}
+
+		}
+
+		if (should_erase) {
 			b_it = bullets->erase(b_it);
 		} else {
 			b_it++;
@@ -99,7 +130,7 @@ void Model::player_shoot(Bullet::Color color) {
 	}
 	direction *= BULLET_SPEED;
 
-	bullets->acquire(view->sprites, color, player_position, direction);
+	bullets->acquire(view->sprites, color, player_position, direction, true);
 }
 
 void Model::set_mouse_position(const glm::vec2 &position) {

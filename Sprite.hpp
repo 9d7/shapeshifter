@@ -15,6 +15,7 @@ class Sprite {
 
 		void set_position(const glm::vec2 &pos_);
 		void set_rotation(float rot_);
+		std::weak_ptr<const Animation::Static> frame();
 
 	private:
 		static void do_nothing() {}
@@ -39,5 +40,4 @@ class Sprite {
 		std::list<std::tuple<Animation::Animation, bool, std::function<void()>>> animations;
 
 		void update(float elapsed);
-		std::weak_ptr<const Animation::Static> frame();
 };

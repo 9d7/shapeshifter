@@ -32,8 +32,6 @@ class Model {
 
 	protected:
 
-		std::shared_ptr<Enemy> enemy;
-
 		std::shared_ptr<View> view;
 		std::shared_ptr<BulletManager> bullets;
 		std::shared_ptr<EnemyManager> enemies;

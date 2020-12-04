@@ -46,3 +46,12 @@ void Enemy::update(float elapsed, const glm::vec2 &player_pos) {
 	}
 
 }
+
+glm::vec2 Enemy::position() const {
+	return pos;
+}
+
+glm::vec2 Enemy::size() const {
+	const Animation::Static s = *(spr->frame().lock());
+	return glm::vec2(s.w, s.h);
+}
