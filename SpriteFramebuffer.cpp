@@ -40,8 +40,9 @@ SpriteFramebuffer::SpriteFramebuffer(GLuint empty_vao, GLuint sprite_tex_)
 	GLint star_NumStars_uint = glGetUniformLocation(star_program, "NumStars");
 	star_TexCoords_vec2v =
 		glGetUniformLocation(star_program, "TexCoords");
+	GL_ERRORS();
 	glGetUniformuiv(star_program, star_NumStars_uint, &num_stars);
-
+	GL_ERRORS();
 	glUseProgram(star_program);
 	glUniform2i(star_ScreenSize_ivec2, View::ScreenWidth, View::ScreenHeight);
 	glUseProgram(0);
@@ -70,7 +71,6 @@ SpriteFramebuffer::SpriteFramebuffer(GLuint empty_vao, GLuint sprite_tex_)
 
 	sprite_ViewportSize_vec2 =
 		glGetUniformLocation(sprite_program, "ViewportSize");
-
 	glUseProgram(sprite_program);
 	glUniform2f(glGetUniformLocation(sprite_program, "ScreenSize"), View::ScreenWidth, View::ScreenHeight);
 	glUseProgram(0);
@@ -80,7 +80,6 @@ SpriteFramebuffer::SpriteFramebuffer(GLuint empty_vao, GLuint sprite_tex_)
 
 	glBindVertexArray(sprite_vao);
 	glBindBuffer(GL_ARRAY_BUFFER, sprite_vbo);
-
 	GLuint Position_vec2 = glGetAttribLocation(sprite_program, "Position");
 	glVertexAttribPointer(
 		Position_vec2,
@@ -91,7 +90,6 @@ SpriteFramebuffer::SpriteFramebuffer(GLuint empty_vao, GLuint sprite_tex_)
 		(GLbyte *)0
 	);
 	glEnableVertexAttribArray(Position_vec2);
-
 	GLuint Rotation_float = glGetAttribLocation(sprite_program, "Rotation");
 	glVertexAttribPointer(
 		Rotation_float,
@@ -102,7 +100,6 @@ SpriteFramebuffer::SpriteFramebuffer(GLuint empty_vao, GLuint sprite_tex_)
 		(GLbyte *)0 + 4*2
 	);
 	glEnableVertexAttribArray(Rotation_float);
-
 	GLuint Size_vec2 = glGetAttribLocation(sprite_program, "Size");
 	glVertexAttribPointer(
 		Size_vec2,
@@ -113,7 +110,6 @@ SpriteFramebuffer::SpriteFramebuffer(GLuint empty_vao, GLuint sprite_tex_)
 		(GLbyte *)0 + 4*2 + 4*1
 	);
 	glEnableVertexAttribArray(Size_vec2);
-
 	GLuint TexCoords_vec2 = 3;
 	glVertexAttribPointer(
 		TexCoords_vec2,
@@ -125,7 +121,6 @@ SpriteFramebuffer::SpriteFramebuffer(GLuint empty_vao, GLuint sprite_tex_)
 	);
 	glEnableVertexAttribArray(TexCoords_vec2);
 
-	GL_ERRORS();
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 

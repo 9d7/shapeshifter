@@ -60,7 +60,7 @@ void Model::update(float elapsed) {
 					}
 				}
 			} else {
-				if (glm::length(player_position - b.get_position()) < 8.0f + 4.0f) {
+				if (glm::length(player->get_position() - b.get_position()) < 8.0f + 4.0f) {
 					if (lives > 0) lives--;
 					view->ui->set_health(lives);
 
