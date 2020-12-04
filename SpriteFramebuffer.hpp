@@ -1,9 +1,11 @@
 #pragma once
 
+#include "Animation.hpp"
 #include "Framebuffer.hpp"
 #include <glm/glm.hpp>
 #include "data_path.hpp"
 #include "SpriteManager.hpp"
+#include <random>
 #include <vector>
 #include "gl_errors.hpp"
 
@@ -15,16 +17,23 @@ class SpriteFramebuffer : public Framebuffer {
 
 		GLuint small_to_big_ViewportSize_uvec2   = 0;
 		GLuint sprite_Camera_vec2                = 0;
+		GLuint star_Camera_vec2                  = 0;
+		GLuint star_TexCoords_vec2v              = 0;
 
 		GLuint sprite_program;
+		GLuint star_program;
+
+		uint32_t num_stars;
 
 	protected:
+
 		// hide old draw function
 		GLuint draw(GLuint old_tex) {return 0;}
 
 		GLuint sprite_tex;
 		GLuint sprite_vao;
 		GLuint sprite_vbo;
+
 
 
 };

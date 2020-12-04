@@ -14,5 +14,4 @@ class BackgroundFramebuffer : public Framebuffer {
 
 	private:
 		GLuint blue_noise_tex = 0;
-		GLuint star_program = 0;
 };

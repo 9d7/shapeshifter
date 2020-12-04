@@ -12,10 +12,7 @@ BackgroundFramebuffer::BackgroundFramebuffer(GLuint empty_vao)
 		data_path("shaders/bg_cloud_f.glsl"),
 		empty_vao) {
 
-	star_program = compile_shader_from_path(
-		data_path("shaders/bg_star_v.glsl"),
-		data_path("shaders/bg_star_f.glsl")
-	);
+
 
 	Time_float = glGetUniformLocation(program, "Time");
 
@@ -61,28 +58,6 @@ GLuint BackgroundFramebuffer::draw(GLuint old_tex) {
 
 	// draw clouds, which don't need texture
 	Framebuffer::draw(blue_noise_tex);
-
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_STENCIL_TEST);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_BLEND);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-	glUseProgram(star_program);
-	glBindVertexArray(empty_vao);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, old_tex);
-
-	// TODO
-	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 1);
-
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glBindVertexArray(0);
-	glUseProgram(0);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	GL_ERRORS();
-
 	return tex;
 
 }

@@ -1,58 +1,65 @@
 #include "Stars.hpp"
-#include "Renderer.hpp"
-#include "gl_errors.hpp"
-#include "glm/fwd.hpp"
+#include "glm/common.hpp"
+#include <chrono>
 
-Stars::Stars() {
-	for (Star &s : stars) {
+std::mt19937 Stars::mt ((unsigned int)std::chrono::system_clock::now().time_since_epoch().count());
+std::uniform_real_distribution<float> Stars::dist (0.0f, 1.0f);
 
-		s.animation_index = (size_t)glm::floor(real(mt) * animations.size());
-		s.elapsed = real(mt) * 30.0f; // phase offset
+Stars::Stars(uint32_t num_stars) {
+
+	stars.reserve(num_stars);
+	star_tex_coords.reserve(num_stars);
+
+	star_animations = {
+		std::get<1>(Animation::find_dynamic("star_pip")),
+		std::get<1>(Animation::find_dynamic("star_twinkle")),
+		std::get<1>(Animation::find_dynamic("star_expand")),
+		std::get<1>(Animation::find_dynamic("star_burst")),
+		std::get<1>(Animation::find_dynamic("star_shoot")),
+		std::get<1>(Animation::find_dynamic("star_x"))
+	};
+
+	for (size_t i = 0; i < num_stars; i++) {
+
+		Star s;
+		s.animation_index = (size_t)glm::floor(dist(mt) * star_animations.size());
 		s.frame_index = 0;
-		s.speed_modifier = 0.95f + real(mt) * 0.1f;
+		s.elapsed = dist(mt) * 100.0f; // randomize phase
+		s.speed_modifier = 0.95f + dist(mt) * 0.10f;
+		stars.push_back(s);
 
-		s.parallax = real(mt) * 0.75f + 0.25f;
-		s.color = glm::vec4(1.0f, real(mt) * 0.25f + 0.75f, real(mt) * 0.75f, s.parallax - 0.15f);
-		s.pos = glm::vec2(
-			real(mt) * (float)Renderer::ScreenWidth * 2.0f,
-			real(mt) * (float)Renderer::ScreenHeight * 2.0f
-		);
+		const Animation::Static tc = *(*star_animations[s.animation_index].lock())[0].second.lock();
+		star_tex_coords.emplace_back(tc.x, tc.y);
+
+
 	}
-}
 
-Stars::~Stars() {}
+	update(0.0f);
+}
 
 void Stars::update(float elapsed) {
 
-	for (Star &s : stars) {
-		s.elapsed += elapsed * s.speed_modifier;
+	for (size_t i = 0; i < stars.size(); i++) {
 
-		while (s.elapsed >= animations[s.animation_index][s.frame_index].second) {
-			s.elapsed -= animations[s.animation_index][s.frame_index].second;
+		Star &s = stars[i];
+
+		s.elapsed += elapsed;
+		std::shared_ptr<const Animation::Dynamic> d = star_animations[s.animation_index].lock();
+
+		// move frames forward
+		bool changed_frames = false;
+		while (s.frame_index < d->size() && s.elapsed >= (*d)[s.frame_index].first) {
+			s.elapsed -= (*d)[s.frame_index].first;
 			s.frame_index++;
-			s.frame_index %= animations[s.animation_index].size();
+			s.frame_index %= d->size();
+			changed_frames = true;
 		}
 
-		s.tex_coords = animations[s.animation_index][s.frame_index].first;
-	}
-
-
-}
-
-void Stars::draw(
-		const std::array<GLint, NUM_INSTANCES> &TexCoords_ivec2, 
-		const std::array<GLint, NUM_INSTANCES> &Colors_vec4, 
-		const std::array<GLint, NUM_INSTANCES> &Positions_ivec2, 
-		const std::array<GLint, NUM_INSTANCES> &Parallax_float
-		) {
-	
-	for (size_t i = 0; i < NUM_INSTANCES; i++) {
-		
-		const Star &s = stars[i];
-		glUniform2i(TexCoords_ivec2[i], s.tex_coords.x, s.tex_coords.y);
-		glUniform4f(Colors_vec4[i], s.color.r, s.color.g, s.color.b, s.color.a);
-		glUniform2i(Positions_ivec2[i], s.pos.x, s.pos.y);
-		glUniform1f(Parallax_float[i], s.parallax);
+		if (changed_frames) {
+			const Animation::Static tc = *(*d)[s.frame_index].second.lock();
+			star_tex_coords[i] = glm::vec2(tc.x, tc.y);
+		}
 
 	}
+
 }

@@ -20,7 +20,7 @@ void main() {
 	uv = vec2(vert & 1, (vert & 2) / 2);
 
 	mat2 rot = mat2(
-		 cos(Rotation), sin(Rotation),
+		cos(Rotation), sin(Rotation),
 		-sin(Rotation), cos(Rotation)
 	);
 
