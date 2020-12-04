@@ -116,10 +116,16 @@ void View::draw(const glm::uvec2 &drawable_size) {
 		sprite_framebuffer->num_stars,
 		(GLfloat *)(stars->star_tex_coords.data())
 	);
+	glUniform2i(
+		sprite_framebuffer->star_ViewportSize_ivec2,
+		(int)viewport_size.x,
+		(int)viewport_size.y
+	);
 	glUseProgram(0);
 
 	glUseProgram(sprite_framebuffer->sprite_program);
 	glUniform2f(sprite_framebuffer->sprite_Camera_vec2, camera_position.x, camera_position.y);
+	glUniform2f(sprite_framebuffer->sprite_ViewportSize_vec2, (float)drawable_size.x, (float)drawable_size.y);
 
 	std::vector<SpriteManager::Vertex> sprite_verts;
 	sprites->draw(sprite_verts);

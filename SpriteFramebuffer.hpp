@@ -19,8 +19,10 @@ class SpriteFramebuffer : public Framebuffer {
 		GLuint small_to_big_ViewportSize_uvec2   = 0;
 		GLuint small_to_big_Parallax_float       = 0;
 		GLuint sprite_Camera_vec2                = 0;
+		GLuint sprite_ViewportSize_vec2          = 0;
 		GLuint star_Camera_vec2                  = 0;
 		GLuint star_TexCoords_vec2v              = 0;
+		GLuint star_ViewportSize_ivec2           = 0;
 
 		GLuint sprite_program;
 		GLuint star_program;

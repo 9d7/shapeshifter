@@ -35,6 +35,7 @@ SpriteFramebuffer::SpriteFramebuffer(GLuint empty_vao, GLuint sprite_tex_)
 
 	GLint star_ScreenSize_ivec2 = glGetUniformLocation(star_program, "ScreenSize");
 	star_Camera_vec2 = glGetUniformLocation(star_program, "Camera");
+	star_ViewportSize_ivec2 = glGetUniformLocation(star_program, "ViewportSize");
 	GLint star_NumStars_uint = glGetUniformLocation(star_program, "NumStars");
 	star_TexCoords_vec2v =
 		glGetUniformLocation(star_program, "TexCoords");
@@ -52,6 +53,9 @@ SpriteFramebuffer::SpriteFramebuffer(GLuint empty_vao, GLuint sprite_tex_)
 
 	sprite_Camera_vec2 =
 		glGetUniformLocation(sprite_program, "Camera");
+
+	sprite_ViewportSize_vec2 =
+		glGetUniformLocation(sprite_program, "ViewportSize");
 
 	glUseProgram(sprite_program);
 	glUniform2f(glGetUniformLocation(sprite_program, "ScreenSize"), View::ScreenWidth, View::ScreenHeight);
