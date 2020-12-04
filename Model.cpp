@@ -2,6 +2,7 @@
 #include "Animation.hpp"
 #include "BulletManager.hpp"
 #include "EnemyData.hpp"
+#include "EnemyManager.hpp"
 #include "View.hpp"
 #include "glm/geometric.hpp"
 #include <memory>
@@ -14,14 +15,15 @@ Model::Model(std::shared_ptr<View> view_) : view(view_) {
 	player_sprite = view->sprites->from_anim(player_blue, false);
 	bullets = std::make_shared<BulletManager>();
 
-	Enemy::set_managers(view->sprites, bullets);
-	enemy = std::shared_ptr<Enemy>(Enemy::acquire("soldier", Bullet::Blue, glm::vec2(0, 0)));
+	enemies = std::make_shared<EnemyManager>(view->sprites, bullets);
+
+	enemy = std::shared_ptr<Enemy>(enemies->acquire("soldier", Bullet::Blue, glm::vec2(0, 0)));
 }
 
 void Model::update(float elapsed) {
 
-	enemy->update(elapsed, player_position);
 
+	enemies->update(elapsed, player_position);
 	bullets->update(elapsed);
 	for (BulletManager::iterator b_it = bullets->begin(); b_it != bullets->end();) {
 

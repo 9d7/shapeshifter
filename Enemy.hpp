@@ -27,25 +27,9 @@ class Enemy {
 
 		void update(float elapsed, const glm::vec2 &player_pos);
 
-		static Enemy *acquire(
-			const std::string &name,
-			Bullet::Color color,
-			const glm::vec2 &pos
-		);
-
-		// this is my bad--this wouldn't have to be the case if spr_mgr
-		// and blt_mgr were namespaces, but it was scared of doing that for
-		// dumb reasons. likely this deserves a refactor, but that'll
-		// never happen in the time we have left :) - eric
-		static void set_managers(
-			std::shared_ptr<SpriteManager> spr_mgr,
-			std::shared_ptr<BulletManager> blt_mgr
-		);
+		friend class EnemyManager;
 
 	protected:
-
-		static std::shared_ptr<SpriteManager> spr_mgr;
-		static std::shared_ptr<BulletManager> blt_mgr;
 
 		// this struct holds all the inputs that are specific to an
 		// enemy type. that way, it can be cached and we don't have
@@ -57,16 +41,18 @@ class Enemy {
 			BulletShooter::AimMode          aim_mode;
 			Numeric                         &shoot_delay;
 		};
-		static std::unordered_map<std::string, EnemyInputs> enemy_inputs;
 
 		Enemy(
 			const EnemyInputs &in,
+			std::shared_ptr<SpriteManager> spr_mgr_,
+			std::shared_ptr<BulletManager> blt_mgr,
 			const glm::vec2 &pos,
 			Bullet::Color color
 		);
 
 		glm::vec2 pos;
 		Bullet::Color color;
+		std::shared_ptr<SpriteManager> spr_mgr;
 
 		std::shared_ptr<Sprite> spr;
 

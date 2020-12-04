@@ -4,6 +4,7 @@
 #include "Animation.hpp"
 #include "BulletManager.hpp"
 #include "Enemy.hpp"
+#include "EnemyManager.hpp"
 #include "Sprite.hpp"
 #include "View.hpp"
 
@@ -35,6 +36,7 @@ class Model {
 
 		std::shared_ptr<View> view;
 		std::shared_ptr<BulletManager> bullets;
+		std::shared_ptr<EnemyManager> enemies;
 
 		void update_view();
 
