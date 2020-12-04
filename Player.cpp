@@ -19,15 +19,10 @@ void Player::update(float elapsed) {
 	position += velocity * elapsed;
 
 	// Friction
-	bool force_based_friction = true; // TODO delete this variable and the lazy friction method
-	if (glm::length(velocity) > 0.0f && force_based_friction) { // friction force
+	if (glm::length(velocity) > 0.0f) { // friction force
 		friction = glm::normalize(velocity) * -1.0f * FRICTION_FORCE * elapsed;
 		if (glm::length(velocity) < glm::length(friction)) velocity = glm::vec2(0.0f, 0.0f);
 		else velocity += friction;
-	}
-	else { // lazy friction
-		// make friction timestep-independent
-		velocity *= glm::pow(FRICTION, 60 * elapsed);
 	}
 }
 
