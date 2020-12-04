@@ -31,19 +31,19 @@ void main() {
 	vec4 tex11 = texelFetch(TEX, ivec2(tile1.x, tile1.y), 0).rgba;
 
 
-	if (loc0.x < 0) {
+	if (loc0.x < 0.0 || loc0.x >= 8.0) {
 		tex00 = vec4(0.0, 0.0, 0.0, 0.0);
 		tex01 = vec4(0.0, 0.0, 0.0, 0.0);
 	}
-	if (loc0.y < 0) {
+	if (loc0.y < 0.0 || loc0.x >= 8.0) {
 		tex00 = vec4(0.0, 0.0, 0.0, 0.0);
 		tex10 = vec4(0.0, 0.0, 0.0, 0.0);
 	}
-	if (loc1.x >= 8.0) {
+	if (loc1.x < 0.0 || loc1.x >= 8.0) {
 		tex10 = vec4(0.0, 0.0, 0.0, 0.0);
 		tex11 = vec4(0.0, 0.0, 0.0, 0.0);
 	}
-	if (loc1.y >= 8.0) {
+	if (loc1.y < 0.0 || loc1.y >= 8.0) {
 		tex01 = vec4(0.0, 0.0, 0.0, 0.0);
 		tex11 = vec4(0.0, 0.0, 0.0, 0.0);
 	}

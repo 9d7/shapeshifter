@@ -19,9 +19,14 @@ Model::Model(std::shared_ptr<View> view_) : view(view_) {
 	enemies = std::make_shared<EnemyManager>(view->sprites, bullets);
 
 	enemies->acquire("soldier", Bullet::Blue, glm::vec2(0, 0));
+
+	view->ui->set_health(10);
 }
 
 void Model::update(float elapsed) {
+
+	static size_t score = 0;
+	static size_t lives = 10;
 
 
 	enemies->update(elapsed, player_position);
@@ -42,7 +47,11 @@ void Model::update(float elapsed) {
 
 					if (glm::length(e.position() - b.get_position()) < radius + 4.0f) {
 						// kill enemy and bullet
-						e_it = enemies->erase(e_it);
+
+						// e_it = enemies->erase(e_it);
+						score += 100;
+						view->ui->set_score(score);
+
 						should_erase = true;
 						break;
 					} else {
@@ -51,7 +60,9 @@ void Model::update(float elapsed) {
 				}
 			} else {
 				if (glm::length(player_position - b.get_position()) < 8.0f + 4.0f) {
-					printf("Player hit\n");
+					if (lives > 0) lives--;
+					view->ui->set_health(lives);
+
 					should_erase = true;
 				}
 			}
@@ -79,8 +90,8 @@ void Model::update(float elapsed) {
 
 	// update camera to be out of dead space
 	static const glm::vec2 MARGIN = glm::vec2(
-			View::ScreenWidth,
-			View::ScreenHeight
+			View::FieldWidth,
+			View::FieldHeight
 	) * 1.0f / 4.0f;
 
 	glm::vec2 space_from_camera_center = ideal_camera_position - player_position;
@@ -135,11 +146,13 @@ void Model::player_shoot(Bullet::Color color) {
 
 void Model::set_mouse_position(const glm::vec2 &position) {
 	mouse_ui_position = position;
-	mouse_world_position = position - glm::vec2(View::ScreenWidth, View::ScreenHeight) / 2.0f + camera_position;
+	mouse_world_position = position - glm::vec2(View::FieldWidth, View::FieldHeight) / 2.0f + camera_position;
+	view->ui->set_cursor(position);
 }
 
 void Model::player_color(Bullet::Color color) {
 	player_col = color;
 	Animation::Animation anim = player_col == Bullet::Color::Blue ? player_blue : player_red;
 	player_sprite->override_animation(anim, false);
+	view->ui->set_health_color(color);
 }

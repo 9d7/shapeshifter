@@ -30,19 +30,21 @@ void main() {
 	vec4 tex11 = texelFetch(TEX, ivec2(tile1.x, tile1.y), 0).rgba;
 
 
-	if (loc0.x < 0) {
+	// ensure we don't render adjacent sprites due to floating point
+	// precision errors
+	if (loc0.x < 0.0 || loc0.x >= size.x) {
 		tex00 = vec4(0.0, 0.0, 0.0, 0.0);
 		tex01 = vec4(0.0, 0.0, 0.0, 0.0);
 	}
-	if (loc0.y < 0) {
+	if (loc0.y < 0.0 || loc0.y >= size.y) {
 		tex00 = vec4(0.0, 0.0, 0.0, 0.0);
 		tex10 = vec4(0.0, 0.0, 0.0, 0.0);
 	}
-	if (loc1.x >= size.x) {
+	if (loc1.x < 0.0 || loc1.x >= size.x) {
 		tex10 = vec4(0.0, 0.0, 0.0, 0.0);
 		tex11 = vec4(0.0, 0.0, 0.0, 0.0);
 	}
-	if (loc1.y >= size.y) {
+	if (loc1.y < 0.0 || loc1.y >= size.y) {
 		tex01 = vec4(0.0, 0.0, 0.0, 0.0);
 		tex11 = vec4(0.0, 0.0, 0.0, 0.0);
 	}

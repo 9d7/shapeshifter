@@ -13,7 +13,12 @@ class SpriteFramebuffer : public Framebuffer {
 	public:
 
 		SpriteFramebuffer(GLuint empty_vao, GLuint sprite_tex_);
-		GLuint draw(GLuint old_tex, std::vector<SpriteManager::Vertex> &verts);
+		GLuint draw(
+			GLuint old_tex,
+			std::vector<SpriteManager::Vertex> &sprite_verts,
+			std::vector<SpriteManager::Vertex> &ui_field_verts,
+			std::vector<SpriteManager::Vertex> &ui_border_verts
+		);
 
 		GLuint small_to_big_Camera_vec2          = 0;
 		GLuint small_to_big_ViewportSize_uvec2   = 0;
@@ -26,6 +31,7 @@ class SpriteFramebuffer : public Framebuffer {
 
 		GLuint sprite_program;
 		GLuint star_program;
+		GLuint screen_edge_program;
 
 		uint32_t num_stars;
 
