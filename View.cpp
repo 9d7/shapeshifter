@@ -15,7 +15,7 @@ View::View() {
 
 	background_framebuffer = std::make_unique<BackgroundFramebuffer>(empty_vao);
 
-	static constexpr float CLOUD_PARALLAX = 0.8f;
+	static constexpr float CLOUD_PARALLAX = 0.6f;
 	glUseProgram(background_framebuffer->program);
 	glUniform1f(background_framebuffer->Parallax_float, CLOUD_PARALLAX);
 	glUseProgram(0);

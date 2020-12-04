@@ -15,6 +15,7 @@ class Model {
 		static constexpr float MAX_VELOCITY = 400.0f;
 		static constexpr float FRICTION     = 0.95f;
 		static constexpr float BULLET_SPEED = 300.0f;
+		static constexpr float CAMERA_SMOOTHNESS = 0.125f; // [0, 1], lower = smoother
 
 		Model(std::shared_ptr<View> view_);
 
@@ -47,6 +48,7 @@ class Model {
 		glm::vec2 player_position {0.0f, 0.0f};
 
 		// camera
+		glm::vec2 ideal_camera_position {0.0f, 0.0f};
 		glm::vec2 camera_position {0.0f, 0.0f};
 
 		// mouse

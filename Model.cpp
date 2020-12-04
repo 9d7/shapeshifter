@@ -57,29 +57,32 @@ void Model::update(float elapsed) {
 	}
 
 	player_position += player_velocity * elapsed;
-	player_velocity *= FRICTION;
+	// make friction timestep-independent
+	player_velocity *= glm::pow(FRICTION, 60 * elapsed);
 
 	// update camera to be out of dead space
 	static const glm::vec2 MARGIN = glm::vec2(
 			View::ScreenWidth,
 			View::ScreenHeight
-	) * 1.0f / 3.0f;
+	) * 1.0f / 4.0f;
 
 	glm::vec2 space_from_camera_center = camera_position - player_position;
 
 	if (space_from_camera_center.x > MARGIN.x) {
-		camera_position.x = MARGIN.x + player_position.x;
+		ideal_camera_position.x = MARGIN.x + player_position.x;
 	}
 	if (-space_from_camera_center.x > MARGIN.x) {
-		camera_position.x = player_position.x - MARGIN.x;
+		ideal_camera_position.x = player_position.x - MARGIN.x;
 	}
 
 	if (space_from_camera_center.y > MARGIN.y) {
-		camera_position.y = MARGIN.y + player_position.y;
+		ideal_camera_position.y = MARGIN.y + player_position.y;
 	}
 	if (-space_from_camera_center.y > MARGIN.y) {
-		camera_position.y = player_position.y - MARGIN.y;
+		ideal_camera_position.y = player_position.y - MARGIN.y;
 	}
+
+	camera_position += (ideal_camera_position - camera_position) * glm::pow(CAMERA_SMOOTHNESS, 60 * elapsed);
 	set_mouse_position(mouse_ui_position);
 	view->update_camera(camera_position);
 
