@@ -15,7 +15,7 @@ class Model {
 		static constexpr float MAX_VELOCITY = 400.0f;
 		static constexpr float FRICTION     = 0.95f;
 		static constexpr float BULLET_SPEED = 300.0f;
-		static constexpr float CAMERA_SMOOTHNESS = 0.125f; // [0, 1], lower = smoother
+		static constexpr float CAMERA_SMOOTHNESS = 0.075f; // [0, 1], lower = smoother
 
 		Model(std::shared_ptr<View> view_);
 

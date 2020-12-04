@@ -8,35 +8,19 @@
 
 Model::Model(std::shared_ptr<View> view_) : view(view_) {
 
-	// sprite allocation is done like this because the find_static and find_dynamic functions
-	// are relatively expensive--if you're constantly switching between certain animations
-	// (like player_blue, player_red, and all the bullets, for example)
-	// it might be a good idea to store the animations and then just run Animation::find_*
-	// in the constructor for the class
-	// - Eric
 	player_red = Animation::find_static("player_red");
 	player_blue = Animation::find_static("player_blue");
 
 	player_sprite = view->sprites->from_anim(player_blue, false);
 	bullets = std::make_shared<BulletManager>();
 
-	enemy = std::make_shared<Enemy>(
-		EnemyData::get_attack_list("soldier"),
-		glm::vec2(0.0f, 0.0f),
-		view->sprites
-	);
-
-	EnemyData::str("soldier", "movement style"); // -> "hunter"
-
-
+	Enemy::set_managers(view->sprites, bullets);
+	enemy = std::shared_ptr<Enemy>(Enemy::acquire("soldier", Bullet::Blue, glm::vec2(0, 0)));
 }
 
 void Model::update(float elapsed) {
 
-	enemy->update(elapsed, bullets);
-	if (!enemy->is_firing()) {
-		enemy->fire(player_position);
-	}
+	enemy->update(elapsed, player_position);
 
 	bullets->update(elapsed);
 	for (BulletManager::iterator b_it = bullets->begin(); b_it != bullets->end();) {
@@ -66,7 +50,7 @@ void Model::update(float elapsed) {
 			View::ScreenHeight
 	) * 1.0f / 4.0f;
 
-	glm::vec2 space_from_camera_center = camera_position - player_position;
+	glm::vec2 space_from_camera_center = ideal_camera_position - player_position;
 
 	if (space_from_camera_center.x > MARGIN.x) {
 		ideal_camera_position.x = MARGIN.x + player_position.x;

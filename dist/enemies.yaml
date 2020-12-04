@@ -18,6 +18,11 @@
 
 default:
   enemy:
+    red sprite: make sure to override this
+    blue sprite: make sure to override this
+    firing delay: 1..3
+    sprite type: static
+    aim: every
     health: 1
 
   bullet:
@@ -33,6 +38,8 @@ default:
 
 soldier:
   health: 2
+  red sprite: soldier_red
+  blue sprite: soldier_blue
   attacks:
     -
       chance: 1
@@ -43,7 +50,4 @@ soldier:
           angle:    -0.05..0.05
           number: 250
           sequence: serial
-        -
-          time: 5
-          velocity: 0
 
