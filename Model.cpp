@@ -38,9 +38,9 @@ void Model::update(float elapsed) {
 			if (b.from_player()) {
 				for (EnemyManager::iterator e_it = enemies->begin(); e_it != enemies->end();) {
 					const Enemy e = **e_it;
-					float radius = (e.size().x + e.size().y) / 4.0; // average of w and h, over 2
+					float radius = (e.size().x + e.size().y) / 4.0f; // average of w and h, over 2
 
-					if (glm::length(e.position() - b.get_position()) < radius + 4.0) {
+					if (glm::length(e.position() - b.get_position()) < radius + 4.0f) {
 						// kill enemy and bullet
 						e_it = enemies->erase(e_it);
 						should_erase = true;
@@ -50,7 +50,7 @@ void Model::update(float elapsed) {
 					}
 				}
 			} else {
-				if (glm::length(player_position - b.get_position()) < 8.0 + 4.0) {
+				if (glm::length(player_position - b.get_position()) < 8.0f + 4.0f) {
 					printf("Player hit\n");
 					should_erase = true;
 				}
