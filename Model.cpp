@@ -26,7 +26,7 @@ Model::Model(std::shared_ptr<View> view_) : view(view_) {
 		view->sprites
 	);
 
-	EnemyData::str("soldier", "movement style"); // -> "hunter"
+	EnemyData::str("hunter", "movement style"); // -> "hunter"
 
 
 }
@@ -49,15 +49,28 @@ void Model::update(float elapsed) {
 
 	}
 
+	float player_velocity_magnitude = glm::length(player_velocity); // just to save computation time, though likely unneeded tbh
+
+	bool force_based_friction = true; // TODO delete this variable and the lazy friction method
+	if (player_velocity_magnitude > 0.0f && force_based_friction) { // Actual friction force
+		player_friction = glm::normalize(player_velocity) * -1.0f * FRICTION_FORCE * elapsed;
+		if (player_velocity_magnitude < glm::length(player_friction)) player_velocity = glm::vec2(0.0f, 0.0f);
+		else player_velocity += player_friction;
+	}
+	else { // lazy friction
+		player_velocity *= FRICTION;
+	}
+	
 	player_velocity += player_force * elapsed;
+	printf("V: %f MAXV: %f ||| F: %f\n", glm::length(player_velocity), MAX_VELOCITY, glm::length(player_force)); // TODO remove
 	player_force = glm::vec2(0.0f, 0.0f);
 
-	if (glm::length(player_velocity) > MAX_VELOCITY) {
+	if (player_velocity_magnitude > MAX_VELOCITY) {
 		player_velocity = glm::normalize(player_velocity) * MAX_VELOCITY;
 	}
-
+	
 	player_position += player_velocity * elapsed;
-	player_velocity *= FRICTION;
+	
 
 	// update camera to be out of dead space
 	static const glm::vec2 MARGIN = glm::vec2(
@@ -94,6 +107,7 @@ void Model::update_view() {
 	glm::vec2 player_to_mouse = mouse_world_position - player_position;
 	if (player_to_mouse != glm::vec2(0.0f, 0.0f)) {
 		player_sprite->set_rotation(glm::atan(player_to_mouse.y, player_to_mouse.x));
+		//TODO set rotation to velocity and set turret to above^
 	}
 }
 

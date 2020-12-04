@@ -11,10 +11,11 @@ class Model {
 
 	public:
 
-		static constexpr float MOVE_FORCE   = 600.0f;
-		static constexpr float MAX_VELOCITY = 400.0f;
-		static constexpr float FRICTION     = 0.95f;
-		static constexpr float BULLET_SPEED = 300.0f;
+		static constexpr float MOVE_FORCE   = 1200.0f;  // Maybe as TODO below?
+		static constexpr float MAX_VELOCITY = 300.0f;   // TODO make a multiplier that we can adjust on the fly if we want powerups or slowing abilities
+		static constexpr float FRICTION     = 0.95f;    // Currently unused
+		static constexpr float FRICTION_FORCE = 500.0f; // Currently used for force based friction
+		static constexpr float BULLET_SPEED = 300.0f;   // Same TODO as above
 
 		Model(std::shared_ptr<View> view_);
 
@@ -45,6 +46,7 @@ class Model {
 		glm::vec2 player_force    {0.0f, 0.0f};
 		glm::vec2 player_velocity {0.0f, 0.0f};
 		glm::vec2 player_position {0.0f, 0.0f};
+		glm::vec2 player_friction {0.0f, 0.0f};
 
 		// camera
 		glm::vec2 camera_position {0.0f, 0.0f};

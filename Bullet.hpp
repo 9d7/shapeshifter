@@ -23,6 +23,7 @@ class Bullet {
 
 		glm::vec2 get_position();
 		float     get_age();
+		glm::vec2 get_velocity();
 		void      update(float elapsed);
 
 	private:
