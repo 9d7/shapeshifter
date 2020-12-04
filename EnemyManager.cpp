@@ -1,4 +1,5 @@
 #include "EnemyManager.hpp"
+#include <stdexcept>
 
 EnemyManager::iterator EnemyManager::erase(const_iterator position) {
 	return enemies.erase(position);
