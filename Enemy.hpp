@@ -26,11 +26,19 @@ class Enemy {
 		~Enemy(){};
 
 		void update(float elapsed, const glm::vec2 &player_pos);
+		void move(float elapsed, const glm::vec2 &player_position);
 
 		glm::vec2 size() const;
 		glm::vec2 position() const;
 
 		friend class EnemyManager;
+
+		enum MovementStyle
+		{
+			Hunter,
+			Soldier
+		};
+
 
 	protected:
 
@@ -50,7 +58,8 @@ class Enemy {
 			std::shared_ptr<SpriteManager> spr_mgr_,
 			std::shared_ptr<BulletManager> blt_mgr,
 			const glm::vec2 &pos,
-			Bullet::Color color
+			Bullet::Color color,
+			MovementStyle move
 		);
 
 		glm::vec2 pos;
@@ -61,6 +70,6 @@ class Enemy {
 
 		BulletShooter shooter;
 
-
+		MovementStyle moveStyle;
 
 };

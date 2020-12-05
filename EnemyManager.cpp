@@ -8,7 +8,8 @@ EnemyManager::iterator EnemyManager::erase(const_iterator position) {
 std::shared_ptr<Enemy> EnemyManager::acquire(
 	const std::string &name,
 	Bullet::Color color,
-	const glm::vec2 &pos
+	const glm::vec2 &pos,
+	Enemy::MovementStyle moveStyle
 ) {
 
 	if (spr_mgr == nullptr) {
@@ -51,7 +52,7 @@ std::shared_ptr<Enemy> EnemyManager::acquire(
 		it = enemy_inputs.find(name);
 	}
 
-	enemies.emplace_back(new Enemy(it->second, spr_mgr, blt_mgr, pos, color));
+	enemies.emplace_back(new Enemy(it->second, spr_mgr, blt_mgr, pos, color, moveStyle));
 	return enemies.back();
 
 }

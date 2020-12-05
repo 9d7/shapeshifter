@@ -28,7 +28,8 @@ class EnemyManager {
 		std::shared_ptr<Enemy> acquire(
 			const std::string &name,
 			Bullet::Color     color,
-			const glm::vec2   &pos
+			const glm::vec2   &pos,
+			Enemy::MovementStyle moveStyle
 		);
 
 		void update(float elapsed, const glm::vec2 &pos);
