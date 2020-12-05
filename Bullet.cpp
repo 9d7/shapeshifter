@@ -16,6 +16,10 @@ bool Bullet::from_player() const {
 	return shot_by_player;
 }
 
+Bullet::Color Bullet::get_color() const {
+	return color;
+}
+
 void Bullet::update(float elapsed) {
 	position += velocity * elapsed;
 	sprite->set_position(position);

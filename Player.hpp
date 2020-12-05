@@ -25,25 +25,39 @@ class Player {
 		void move(const glm::vec2& direction);
 		glm::vec2 shoot(const glm::vec2 mouse_world_position); // TODO create another shoot function or add a parameter to change whether direction is based on mouse pos or player direction
 		void reset_player();
+		void toggle_aim_assist();
 
 		// set/get functions
 		void set_color(Bullet::Color new_color);
-		void set_rotation(float new_rotation); // TODO add a parameter or refactor this when multilayer sprites are in
+		void set_rotation(float new_rotation); // Hard set an angle, disregarding speed limits. TODO add a parameter or refactor this when multilayer sprites are in
+		void set_rotation(float new_rotation, float elapsed); // Sets an angle within rotation speed limits
 		void set_position(glm::vec2 new_position);
 		void set_velocity(glm::vec2 new_velocity);
 		void set_sprite(std::shared_ptr<Sprite> new_sprite);
+		void set_aim_assist_angle(float new_assist_angle);
+		void set_rotation_limit(float new_rotation_limit);
 
 		glm::vec2 get_position() const;
 		glm::vec2 get_velocity() const;
 		std::shared_ptr<Sprite> get_sprite(); // Don't use unless you know what you're doing, not sure if this works as intended
 		Bullet::Color get_color() const;
+		float get_rotation();
 		
 
 	protected:
-		Bullet::Color color = Bullet::Color::Blue;
+		// Values needing to be set
 		Animation::Animation player_red;
 		Animation::Animation player_blue;
 		std::shared_ptr<Sprite> sprite;
+
+		// Editable values with defaults
+		Bullet::Color color = Bullet::Color::Blue;
+		float rotation = 0.0f;                     // Current rotation
+		float rotation_limit = 9.0f;               // Max number of rads/s, 0 is locked rotation, <0 is no limit
+		float aim_assist_angle = 0.0f;             // [0,1], representing angle of cone where shot goes towards enemy. 0 is no aim assist, 1 is hax.
+		bool aim_assist_active = true;             // Whether or not aim assist is active. TODO change this to an int and allow different aim assist modes
+
+		// Movement vectors
 		glm::vec2 force{ 0.0f, 0.0f };
 		glm::vec2 velocity{ 0.0f, 0.0f };
 		glm::vec2 position{ 0.0f, 0.0f };

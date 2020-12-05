@@ -27,6 +27,7 @@ class Bullet {
 		glm::vec2 get_velocity() const;
 		void      update(float elapsed);
 		bool      from_player() const;
+		Color     get_color() const;
 
 	private:
 

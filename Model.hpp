@@ -13,7 +13,7 @@ class Model {
 
 	public:
 		static constexpr float CAMERA_SMOOTHNESS = 0.075f; // [0, 1], lower = smoother
-		static constexpr float BULLET_SPEED = Player::BULLET_SPEED; // TODO change this so different enemy types have the ability to set their own bullet speeds
+		static constexpr float BULLET_SPEED = Player::BULLET_SPEED; // Current hack to get this working for BulletShooter.cpp
 
 		Model(std::shared_ptr<View> view_);
 
@@ -26,7 +26,7 @@ class Model {
 
 		void set_mouse_position(const glm::vec2 &position);
 
-		float get_bullet_speed() const; 
+		float get_bullet_speed() const; // TODO change this so different enemy types have the ability to set their own bullet speeds
 
 	protected:
 
@@ -35,7 +35,7 @@ class Model {
 		std::shared_ptr<EnemyManager> enemies;
 		std::shared_ptr<Player> player;
 
-		void update_view();
+		void update_view(float elapsed);
 
 		// camera
 		glm::vec2 ideal_camera_position {0.0f, 0.0f};

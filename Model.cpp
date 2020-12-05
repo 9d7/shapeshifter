@@ -61,7 +61,7 @@ void Model::update(float elapsed) {
 				}
 			} else {
 				if (glm::length(player->get_position() - b.get_position()) < 8.0f + 4.0f) {
-					if (lives > 0) lives--;
+					if (lives > 0 && b.get_color() != player->get_color()) lives--;
 					view->ui->set_health(lives);
 
 					should_erase = true;
@@ -105,16 +105,16 @@ void Model::update(float elapsed) {
 	set_mouse_position(mouse_ui_position);
 	view->update_camera(camera_position);
 
-	update_view();
+	update_view(elapsed);
 }
 
-void Model::update_view() {
+void Model::update_view(float elapsed) {
 
 	player->update_sprite();
 
 	glm::vec2 player_to_mouse = mouse_world_position - player->get_position();
 	if (player_to_mouse != glm::vec2(0.0f, 0.0f)) {
-		player->set_rotation(glm::atan(player_to_mouse.y, player_to_mouse.x));
+		player->set_rotation(glm::atan(player_to_mouse.y, player_to_mouse.x), elapsed);
 		//TODO set rotation to velocity and set turret to above^ when multilayered sprites are in
 	}
 }
