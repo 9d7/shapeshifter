@@ -27,7 +27,7 @@ class View {
 
 		enum : size_t {
 			FieldWidth  = 320,
-			FieldHeight = 224
+			FieldHeight = 240 //224
 		};
 
 		// use this to get new sprites, as well as Animation::find_* functions

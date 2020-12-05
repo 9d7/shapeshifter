@@ -17,15 +17,22 @@ class Player {
 		static constexpr float FRICTION_FORCE = 500.0f; // Currently used for force based friction
 		static constexpr float BULLET_SPEED = 300.0f;   // Same TODO as above
 
+		enum AssistMode {
+			Off,
+			Mouse,
+			Closest,
+			Furthest,
+			Homing
+		};
+
 		// Update functions
 		void update(float elapsed);
 		void update_sprite();
 
 		// Player functions
-		void move(const glm::vec2& direction);
-		glm::vec2 shoot(const glm::vec2 mouse_world_position); // TODO create another shoot function or add a parameter to change whether direction is based on mouse pos or player direction
-		void reset_player();
-		void toggle_aim_assist();
+		void      move(const glm::vec2& direction);
+		glm::vec2 shoot(const glm::vec2 target_position); // TODO create another shoot function or add a parameter to change whether direction is based on mouse pos or player direction
+		void      reset_player();
 
 		// set/get functions
 		void set_color(Bullet::Color new_color);
@@ -35,13 +42,15 @@ class Player {
 		void set_velocity(glm::vec2 new_velocity);
 		void set_sprite(std::shared_ptr<Sprite> new_sprite);
 		void set_aim_assist_angle(float new_assist_angle);
+		void set_aim_assist_mode(AssistMode new_assist_mode);
 		void set_rotation_limit(float new_rotation_limit);
 
-		glm::vec2 get_position() const;
-		glm::vec2 get_velocity() const;
-		std::shared_ptr<Sprite> get_sprite(); // Don't use unless you know what you're doing, not sure if this works as intended
-		Bullet::Color get_color() const;
-		float get_rotation();
+		glm::vec2               get_position() const;
+		glm::vec2               get_velocity() const;
+		std::shared_ptr<Sprite> get_sprite() const; // Don't use unless you know what you're doing, not sure if this works as intended
+		Bullet::Color           get_color() const;
+		float                   get_rotation() const;
+		AssistMode              get_assist_mode() const;
 		
 
 	protected:
@@ -55,7 +64,7 @@ class Player {
 		float rotation = 0.0f;                     // Current rotation
 		float rotation_limit = 9.0f;               // Max number of rads/s, 0 is locked rotation, <0 is no limit
 		float aim_assist_angle = 0.0f;             // [0,1], representing angle of cone where shot goes towards enemy. 0 is no aim assist, 1 is hax.
-		bool aim_assist_active = true;             // Whether or not aim assist is active. TODO change this to an int and allow different aim assist modes
+		AssistMode assist_mode = Off;              // Current aim assist mode
 
 		// Movement vectors
 		glm::vec2 force{ 0.0f, 0.0f };
