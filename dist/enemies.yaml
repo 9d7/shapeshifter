@@ -52,3 +52,19 @@ soldier:
           number: 1
           color: 0..1
 
+hunter:
+  health: 1
+  red sprite: hunter_red
+  blue sprite: hunter_blue
+  firing delay: 0.5
+  attacks:
+    -
+      chance: 0
+      bullets:
+        -
+          time: 0
+          velocity: 1
+          angle:    0
+          number: 1
+          color: 0..1
+
