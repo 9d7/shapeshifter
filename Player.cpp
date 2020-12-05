@@ -67,6 +67,7 @@ void Player::set_rotation(float new_rotation) {
 
 void Player::set_rotation(float new_rotation, float elapsed) {
 	if (rotation_limit < 0.0f) return set_rotation(new_rotation);
+	if (rotation_lock_active) return set_rotation(rotation);
 	while (abs(rotation) > glm::pi<float>()) rotation -= 2 * glm::pi<float>() * (rotation < 0.0f ? -1.0f : 1.0f);
 
 	float delta = new_rotation - rotation;
@@ -111,6 +112,10 @@ void Player::set_aim_assist_mode(AssistMode new_assist_mode) {
 
 void Player::set_rotation_limit(float new_rotation_limit) {
 	rotation_limit = new_rotation_limit;
+}
+
+void Player::set_rotation_lock(bool new_rotation_lock) {
+	rotation_lock_active = new_rotation_lock;
 }
 
 glm::vec2 Player::get_position() const {

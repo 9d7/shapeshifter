@@ -11,6 +11,7 @@ Controller::Controller(std::shared_ptr<Model> model_) : model(model_) {}
 void Controller::update(float elapsed) {
 
 	glm::vec2 player_force(0.0f, 0.0f);
+	bool lock_rotation = false;
 	for (SDL_Scancode s : pressed) {
 		switch (s) {
 
@@ -19,6 +20,7 @@ void Controller::update(float elapsed) {
 			case SDL_SCANCODE_A: player_force += glm::vec2(-1.0f,  0.0f); break;
 			case SDL_SCANCODE_S: player_force += glm::vec2( 0.0f, -1.0f); break;
 			case SDL_SCANCODE_D: player_force += glm::vec2( 1.0f,  0.0f); break;
+			case SDL_SCANCODE_SPACE: lock_rotation = true;
 			default: break;
 
 		}
@@ -28,6 +30,7 @@ void Controller::update(float elapsed) {
 		player_force = glm::normalize(player_force);
 	}
 	model->player_move(player_force);
+	model->lock_rotation(lock_rotation);
 }
 
 bool Controller::handle_event(

@@ -167,6 +167,10 @@ void Model::set_player_color(Bullet::Color color) {
 	view->ui->set_health_color(color);
 }
 
+void Model::lock_rotation(bool rotation_lock) {
+	player->set_rotation_lock(rotation_lock);
+}
+
 void Model::set_mouse_position(const glm::vec2 &position) {
 	mouse_ui_position = position;
 	mouse_world_position = position - glm::vec2(View::FieldWidth, View::FieldHeight) / 2.0f + camera_position;

@@ -23,6 +23,7 @@ class Model {
 		void player_shoot(); //wrapper for Player::shoot
 		void player_move(glm::vec2 direction);
 		void set_player_color(Bullet::Color color);
+		void lock_rotation(bool rotation_lock);
 
 		void set_mouse_position(const glm::vec2 &position);
 

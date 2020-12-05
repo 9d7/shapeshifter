@@ -44,6 +44,7 @@ class Player {
 		void set_aim_assist_angle(float new_assist_angle);
 		void set_aim_assist_mode(AssistMode new_assist_mode);
 		void set_rotation_limit(float new_rotation_limit);
+		void set_rotation_lock(bool new_rotation_lock);
 
 		glm::vec2               get_position() const;
 		glm::vec2               get_velocity() const;
@@ -61,9 +62,10 @@ class Player {
 
 		// Editable values with defaults
 		Bullet::Color color = Bullet::Color::Blue;
+		bool rotation_lock_active = false;
 		float rotation = 0.0f;                     // Current rotation
 		float rotation_limit = 9.0f;               // Max number of rads/s, 0 is locked rotation, <0 is no limit
-		float aim_assist_angle = 0.0f;             // [0,1], representing angle of cone where shot goes towards enemy. 0 is no aim assist, 1 is hax.
+		float aim_assist_angle = 0.3f;             // [0,1], representing angle of cone where shot goes towards enemy. 0 is no aim assist, 1 is hax.
 		AssistMode assist_mode = Off;              // Current aim assist mode
 
 		// Movement vectors
