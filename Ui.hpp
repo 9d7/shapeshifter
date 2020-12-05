@@ -14,6 +14,8 @@ class Ui {
 
 		static constexpr float MARGIN_X = 8.0f;
 		static constexpr float MARGIN_TOP = 8.0f;
+		static constexpr size_t NUM_DIGITS = 7;
+		static constexpr float SCORE_SPEED = 0.15f;
 
 		Ui();
 		~Ui() = default;
@@ -28,6 +30,9 @@ class Ui {
 		void draw_border(std::vector<SpriteManager::Vertex> &verts);
 
 	private:
+		glm::vec2 lives_label_size;
+		glm::vec2 score_label_size;
+
 		SpriteManager on_field;
 		SpriteManager on_border;
 
@@ -48,8 +53,11 @@ class Ui {
 		glm::vec2 cursor {-1000.0f, -1000.0f};
 		float ideal_score = 0.0f;
 		float score = 0.0f;
+		size_t score_to_render = 0;
 		Bullet::Color health_color = Bullet::Red;
 		size_t health = 0;
 
+		void update_hearts();
+		void update_score();
 
 };

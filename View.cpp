@@ -183,6 +183,7 @@ void View::update(float elapsed) {
 	total_time += elapsed;
 	sprites->update(elapsed);
 	stars->update(elapsed);
+	ui->update(elapsed);
 }
 
 void View::update_camera(const glm::vec2 &pos) {

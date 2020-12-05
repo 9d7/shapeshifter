@@ -8,6 +8,7 @@
 #include "Load.hpp"
 
 //For sound init:
+#include "SDL_mouse.h"
 #include "Sound.hpp"
 
 //GL.hpp will include a non-namespace-polluting set of opengl prototypes:
@@ -117,6 +118,8 @@ int main(int argc, char **argv) {
 		glViewport(0, 0, drawable_size.x, drawable_size.y);
 	};
 	on_resize();
+
+	SDL_ShowCursor(SDL_DISABLE);
 
 	//This will loop until the current mode is set to null:
 	while (Mode::current) {
