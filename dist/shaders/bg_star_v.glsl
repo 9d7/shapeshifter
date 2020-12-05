@@ -26,8 +26,8 @@ void main() {
 
 	// dummy call to make sure NumStars exists
 	if (NumStars > 1000000U) {
-        uv += vec2(1.0, 1.0);
-    }
+		uv += vec2(1.0, 1.0);
+	}
 
 	vec2 pos = vec2(gold_noise(gl_InstanceID + 1.0, 1.0), gold_noise(gl_InstanceID + 1.0, 2.0));
 	pos *= ScreenSize * 2;
