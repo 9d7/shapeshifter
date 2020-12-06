@@ -36,7 +36,10 @@ class Enemy {
 		enum MovementStyle
 		{
 			Hunter,
-			Soldier
+			Soldier,
+			Turret,
+			Ninja,
+			Wizard
 		};
 
 
@@ -51,6 +54,7 @@ class Enemy {
 			const BulletShooter::AttackList &attack_list;
 			BulletShooter::AimMode          aim_mode;
 			Numeric                         &shoot_delay;
+			MovementStyle					move;
 		};
 
 		Enemy(
@@ -58,13 +62,17 @@ class Enemy {
 			std::shared_ptr<SpriteManager> spr_mgr_,
 			std::shared_ptr<BulletManager> blt_mgr,
 			const glm::vec2 &pos,
-			Bullet::Color color,
-			MovementStyle move
+			Bullet::Color color
 		);
 
 		glm::vec2 pos;
 		Bullet::Color color;
 		std::shared_ptr<SpriteManager> spr_mgr;
+
+		// maybe make these part of yaml
+		float strafe = 0.0f;
+		bool strafeDir = false;
+		float tp = 0.0f;
 
 		std::shared_ptr<Sprite> spr;
 
