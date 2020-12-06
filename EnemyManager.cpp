@@ -8,8 +8,7 @@ EnemyManager::iterator EnemyManager::erase(const_iterator position) {
 std::shared_ptr<Enemy> EnemyManager::acquire(
 	const std::string &name,
 	Bullet::Color color,
-	const glm::vec2 &pos,
-	Enemy::MovementStyle moveStyle
+	const glm::vec2 &pos
 ) {
 
 	if (spr_mgr == nullptr) {
@@ -39,6 +38,19 @@ std::shared_ptr<Enemy> EnemyManager::acquire(
 			aim_mode = BulletShooter::AimMode::Always;
 		}
 
+		Enemy::MovementStyle move_style;
+		if (EnemyData::str(name, "movement") == "soldier") {
+			move_style = Enemy::MovementStyle::Soldier;
+		} else if (EnemyData::str(name, "movement") == "hunter") {
+			move_style = Enemy::MovementStyle::Hunter;
+		} else if (EnemyData::str(name, "movement") == "turret") {
+			move_style = Enemy::MovementStyle::Turret;
+		} else if (EnemyData::str(name, "movement") == "ninja") {
+			move_style = Enemy::MovementStyle::Ninja;
+		} else if (EnemyData::str(name, "movement") == "wizard") {
+			move_style = Enemy::MovementStyle::Wizard;
+		}
+
 		// build and insert the struct in one move
 		enemy_inputs.insert(std::pair<std::string, Enemy::EnemyInputs>(name,
 			{
@@ -46,13 +58,14 @@ std::shared_ptr<Enemy> EnemyManager::acquire(
 				blue_anim,
 				EnemyData::get_attack_list(name),
 				aim_mode,
-				EnemyData::num(name, "firing delay")
+				EnemyData::num(name, "firing delay"),
+				move_style
 			}
 		));
 		it = enemy_inputs.find(name);
 	}
 
-	enemies.emplace_back(new Enemy(it->second, spr_mgr, blt_mgr, pos, color, moveStyle));
+	enemies.emplace_back(new Enemy(it->second, spr_mgr, blt_mgr, pos, color));
 	return enemies.back();
 
 }

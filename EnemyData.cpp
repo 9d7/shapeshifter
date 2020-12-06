@@ -185,7 +185,7 @@ Numeric &EnemyData::num(const std::string &enemy_name, const std::string &key) {
 const std::string &EnemyData::str(const std::string &enemy_name, const std::string &key) {
 
 	if (enemies.size() == 0) { load_enemies(); }
-
+	
 	return std::get<std::string>(enemies[enemy_name][key]);
 }
 

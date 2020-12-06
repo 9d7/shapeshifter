@@ -41,6 +41,7 @@ soldier:
   red sprite: soldier_red
   blue sprite: soldier_blue
   firing delay: 0.5
+  movement: soldier
   attacks:
     -
       chance: 1
@@ -57,6 +58,7 @@ hunter:
   red sprite: hunter_red
   blue sprite: hunter_blue
   firing delay: 0.5
+  movement: hunter
   attacks:
     -
       chance: 0
@@ -68,3 +70,143 @@ hunter:
           number: 1
           color: 0..1
 
+turret:
+  health: 1
+  aim: once
+  red sprite: turret_red
+  blue sprite: turret_blue
+  firing delay: 1
+  movement: turret
+  attacks:
+    -
+      chance: 0.5
+      bullets:
+        -
+          time: 0.05
+          velocity: 1
+          angle:    -0.175..0.175
+          number: 8
+          color: 0
+          sequence: serial
+          dispatch: after
+    -
+      chance: 0.5
+      bullets:
+        -
+          time: 0.05
+          velocity: 1
+          angle:    -0.175..0.175
+          number: 8
+          color: 1
+          sequence: serial
+          dispatch: after
+    -
+      chance: 1
+      bullets:
+        -
+          time: 0.05
+          velocity: 1
+          angle:    0
+          number: 1
+          color: 0..1
+          sequence: parallel
+          dispatch: with
+        -
+          time: 0.05
+          velocity: 1
+          angle:    0.524
+          number: 1
+          color: 0..1
+          sequence: parallel
+          dispatch: with
+        -
+          time: 0.05
+          velocity: 1
+          angle:    -0.524
+          number: 1
+          color: 0..1
+          sequence: parallel
+          dispatch: with
+        -
+          time: 0.05
+          velocity: 1
+          angle:    0.262
+          number: 1
+          color: 0..1
+          sequence: parallel
+          dispatch: with
+        -
+          time: 0.05
+          velocity: 1
+          angle:    -0.262
+          number: 1
+          color: 0..1
+          sequence: parallel
+          dispatch: with
+
+ninja:
+  health: 1
+  aim: once
+  red sprite: ninja_red
+  blue sprite: ninja_blue
+  firing delay: 0.7
+  movement: ninja
+  attacks:
+    -
+      chance: 1
+      bullets:
+        -
+          time: 0.05
+          velocity: 1
+          angle:    0
+          number: 1
+          color: 0..1
+          sequence: parallel
+          dispatch: with
+        -
+          time: 0.05
+          velocity: 1
+          angle:    0.262
+          number: 1
+          color: 0..1
+          sequence: parallel
+          dispatch: with
+        -
+          time: 0.05
+          velocity: 1
+          angle:    -0.262
+          number: 1
+          color: 0..1
+          sequence: parallel
+          dispatch: with
+
+
+wizard:
+  health: 2
+  red sprite: wizard_red
+  blue sprite: wizard_blue
+  firing delay: 1
+  movement: wizard
+  attacks:
+    -
+      chance: 1
+      bullets:
+        -
+          time: 0.01
+          velocity: 0.5
+          angle:    -0.35..0.35
+          number: 30
+          color: 0.4..1
+          sequence: serial
+          dispatch: after
+    -
+      chance: 1
+      bullets:
+        -
+          time: 0.01
+          velocity: 0.5
+          angle:    -0.35..0.35
+          number: 30
+          color: 0..0.6
+          sequence: serial
+          dispatch: after

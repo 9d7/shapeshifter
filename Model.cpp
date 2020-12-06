@@ -17,10 +17,13 @@ Model::Model(std::shared_ptr<View> view_) : view(view_) {
 
 	enemies = std::make_shared<EnemyManager>(view->sprites, bullets);
 
-	enemies->acquire("soldier", Bullet::Blue, glm::vec2(0, 5.0f), Enemy::Soldier);
-	enemies->acquire("soldier", Bullet::Red, glm::vec2(0, -5.0f), Enemy::Soldier);
+	//enemies->acquire("soldier", Bullet::Blue, glm::vec2(0, 5.0f), Enemy::Soldier);
+	//enemies->acquire("soldier", Bullet::Red, glm::vec2(0, -5.0f), Enemy::Soldier);
 
-	enemies->acquire("hunter", Bullet::Red, glm::vec2(5.0f, 0), Enemy::Hunter);
+	//enemies->acquire("hunter", Bullet::Red, glm::vec2(5.0f, 0), Enemy::Hunter);
+
+	enemies->acquire("wizard", Bullet::Red, glm::vec2(10.0f, 0));
+	enemies->acquire("ninja", Bullet::Blue, glm::vec2(-10.0f, 0));
 
 	view->ui->set_health(10);
 }
