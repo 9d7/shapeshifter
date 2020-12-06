@@ -1,0 +1,73 @@
+# spawn: initial spawn location for the level
+# rooms: list of all rooms in the level
+
+# center: Room center
+# bounds: How far you are allowed to go in the x and y directions from center
+# room type: what type of room it is and how waves are interpreted. random spawn, boss
+# enemy waves: List of waves in the room. Next wave spawns after a number or all enemies are killed or time expires. If boss, change to health and next boss phase
+
+# time limit: Number of seconds before next wave spawns
+# kill limit: Number of kills before next wave spawns. Should default to all enemies dead if no limit is set
+# health limit: Amount of health boss
+# enemies: List of enemies in the wave
+
+# enemy type: The type of enemy
+# number: How many enemies of that type you want to spawn in the wave
+# color: What color the enemy should be. "random" can be used instead of a color for a random red or blue
+default:
+  level:
+    spawn: [0.0, 0.0]
+    rooms:
+      -
+        center: [0.0, 0.0] 
+        bounds: [300.0, 300.0] 
+        room type: random spawn
+        enemy waves:
+          -
+            time limit: 10.0
+            kill limit: 1
+            enemies:
+              -
+                enemy type: soldier
+                number: 1
+                color: blue
+          -
+            enemies:
+              -
+                enemy type: hunter
+                number: 1
+                color: red
+              -
+                enemy type: soldier
+                number: 1..4
+                color: random
+      -
+        center: [400.0, 400.0]
+        bounds: [300.0, 300.0] 
+        room type: boss
+        enemy waves:
+          -
+            time limit: 15.0
+            kill limit: 3
+            health limit: 25
+            enemies:
+              -
+                enemy type: boss
+                number: 1
+              -
+                enemy type: soldier
+                number: 3
+          -
+            health limit: 50
+          -
+            health limit: 25
+            enemies:
+              -
+                enemy type: hunter
+                number: 6
+
+
+
+
+level one:
+  spawn: [0.0, 0.0]

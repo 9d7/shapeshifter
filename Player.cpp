@@ -29,6 +29,7 @@ void Player::update(float elapsed) {
 
 void Player::update_sprite() {
 	sprite->set_position(position);
+	sprite->set_rotation(rotation);
 }
 
 void Player::move(const glm::vec2& direction) {
@@ -46,12 +47,13 @@ glm::vec2 Player::shoot(const glm::vec2 target_position) {
 	
 }
 
-void Player::reset_player(){
-	position = glm::vec2(0.0f, 0.0f);
-	velocity = glm::vec2(0.0f, 0.0f);
-	rotation = 0.0f;
-	sprite->set_rotation(0.0f);
-	sprite->set_position(position);
+void Player::reset_player(glm::vec2 reset_position, glm::vec2 reset_velocity, float reset_rotation){
+	position = reset_position;
+	velocity = reset_velocity;
+	rotation = reset_rotation;
+	update_sprite();
+	//sprite->set_rotation(0.0f);
+	//sprite->set_position(position);
 }
 
 void Player::set_color(Bullet::Color new_color) {

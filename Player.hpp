@@ -32,7 +32,11 @@ class Player {
 		// Player functions
 		void      move(const glm::vec2& direction);
 		glm::vec2 shoot(const glm::vec2 target_position); // TODO create another shoot function or add a parameter to change whether direction is based on mouse pos or player direction
-		void      reset_player();
+		void      reset_player(
+			glm::vec2 reset_position = glm::vec2(0.0f), 
+			glm::vec2 reset_velocity = glm::vec2(0.0f), 
+			float reset_rotation = 0.0f
+		);
 
 		// set/get functions
 		void set_color(Bullet::Color new_color);
@@ -69,8 +73,8 @@ class Player {
 		AssistMode assist_mode = Off;              // Current aim assist mode
 
 		// Movement vectors
-		glm::vec2 force{ 0.0f, 0.0f };
-		glm::vec2 velocity{ 0.0f, 0.0f };
-		glm::vec2 position{ 0.0f, 0.0f };
-		glm::vec2 friction{ 0.0f, 0.0f };
+		glm::vec2 force    { 0.0f, 0.0f };
+		glm::vec2 velocity { 0.0f, 0.0f };
+		glm::vec2 position { 0.0f, 0.0f };
+		glm::vec2 friction { 0.0f, 0.0f };
 };

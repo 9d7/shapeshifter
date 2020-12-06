@@ -30,7 +30,7 @@ void Model::update(float elapsed) {
 
 	player->update(elapsed);
 	enemies->update(elapsed, player->get_position());
-	static size_t score = 0;
+	static size_t score = 0; // TODO change this to be better
 	static size_t lives = 10;
 
 	bullets->update(elapsed);
