@@ -35,14 +35,14 @@ void Player::move(const glm::vec2& direction) {
 	force += direction * MOVE_FORCE;
 }
 
-glm::vec2 Player::shoot(const glm::vec2 mouse_world_position) {
+glm::vec2 Player::shoot(const glm::vec2 target_position) {
+	// TODO add slight variation here and a way to control it
 	glm::vec2 direction(1.0f, 0.0f);
-	glm::vec2 player_to_mouse = mouse_world_position - position;
-	if (player_to_mouse != glm::vec2(0.0f, 0.0f)) {
-		direction = glm::normalize(player_to_mouse);
+	glm::vec2 player_to_target = target_position - position;
+	if (player_to_target != glm::vec2(0.0f, 0.0f)) {
+		direction = glm::normalize(player_to_target);
 	}
-	direction *= BULLET_SPEED;
-	return direction;
+	return direction *= BULLET_SPEED;
 	
 }
 
@@ -52,10 +52,6 @@ void Player::reset_player(){
 	rotation = 0.0f;
 	sprite->set_rotation(0.0f);
 	sprite->set_position(position);
-}
-
-void Player::toggle_aim_assist() {
-	aim_assist_active = !aim_assist_active;
 }
 
 void Player::set_color(Bullet::Color new_color) {
@@ -71,6 +67,7 @@ void Player::set_rotation(float new_rotation) {
 
 void Player::set_rotation(float new_rotation, float elapsed) {
 	if (rotation_limit < 0.0f) return set_rotation(new_rotation);
+	if (rotation_lock_active) return set_rotation(rotation);
 	while (abs(rotation) > glm::pi<float>()) rotation -= 2 * glm::pi<float>() * (rotation < 0.0f ? -1.0f : 1.0f);
 
 	float delta = new_rotation - rotation;
@@ -109,8 +106,16 @@ void Player::set_aim_assist_angle(float new_assist_angle) {
 	aim_assist_angle = new_assist_angle;
 }
 
+void Player::set_aim_assist_mode(AssistMode new_assist_mode) {
+	assist_mode = new_assist_mode;
+}
+
 void Player::set_rotation_limit(float new_rotation_limit) {
 	rotation_limit = new_rotation_limit;
+}
+
+void Player::set_rotation_lock(bool new_rotation_lock) {
+	rotation_lock_active = new_rotation_lock;
 }
 
 glm::vec2 Player::get_position() const {
@@ -121,7 +126,7 @@ glm::vec2 Player::get_velocity() const {
 	return velocity;
 }
 
-std::shared_ptr<Sprite> Player::get_sprite() {
+std::shared_ptr<Sprite> Player::get_sprite() const {
 	return sprite;
 }
 
@@ -129,6 +134,10 @@ Bullet::Color Player::get_color() const {
 	return color;
 }
 
-float Player::get_rotation() {
+float Player::get_rotation() const {
 	return rotation;
+}
+
+Player::AssistMode Player::get_assist_mode() const {
+	return assist_mode;
 }
