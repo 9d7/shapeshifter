@@ -27,6 +27,7 @@ class Enemy {
 
 		void update(float elapsed, const glm::vec2 &player_pos);
 		void move(float elapsed, const glm::vec2 &player_position);
+		int take_damage(int damage);
 
 		glm::vec2 size() const;
 		glm::vec2 position() const;
@@ -39,9 +40,14 @@ class Enemy {
 			Soldier,
 			Turret,
 			Ninja,
-			Wizard
+			Wizard,
+			Shifter,
+			Shield,
+			Deadturret,
+			Repairman
 		};
-
+		
+		MovementStyle moveStyle;
 
 	protected:
 
@@ -55,6 +61,7 @@ class Enemy {
 			BulletShooter::AimMode          aim_mode;
 			Numeric                         &shoot_delay;
 			MovementStyle					move;
+			int					       		health;
 		};
 
 		Enemy(
@@ -71,13 +78,14 @@ class Enemy {
 
 		// maybe make these part of yaml
 		float strafe = 0.0f;
-		bool strafeDir = false;
-		float tp = 0.0f;
+		bool strafeDir = rand() % 2;
+		float tp = 3.0f;
+		bool tped = false;
+		float shift = 0.0f;
 
 		std::shared_ptr<Sprite> spr;
 
 		BulletShooter shooter;
 
-		MovementStyle moveStyle;
-
+		int health;
 };

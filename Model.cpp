@@ -22,8 +22,13 @@ Model::Model(std::shared_ptr<View> view_) : view(view_) {
 
 	//enemies->acquire("hunter", Bullet::Red, glm::vec2(5.0f, 0), Enemy::Hunter);
 
-	enemies->acquire("wizard", Bullet::Red, glm::vec2(10.0f, 0));
-	enemies->acquire("ninja", Bullet::Blue, glm::vec2(-10.0f, 0));
+	//enemies->acquire("shifter", Bullet::Red, glm::vec2(10.0f, 0));
+	//enemies->acquire("shield", Bullet::Red, glm::vec2(10.0f, 0));
+	//enemies->acquire("ninja", Bullet::Blue, glm::vec2(-20.0f, 0));
+	//enemies->acquire("wizard", Bullet::Blue, glm::vec2(0.0f, 10.0f));
+	enemies->acquire("turret", Bullet::Blue, glm::vec2(0, -10.0f));
+	enemies->acquire("repairman", Bullet::Blue, glm::vec2(10, -10.0f));
+	enemies->acquire("repairman", Bullet::Red, glm::vec2(10, -20.0f));
 
 	view->ui->set_health(10);
 }
@@ -33,7 +38,7 @@ void Model::update(float elapsed) {
 
 	player->update(elapsed);
 	enemies->update(elapsed, player->get_position());
-	static size_t score = 0; // TODO change this to be better
+	static size_t score = 0;
 	static size_t lives = 10;
 
 	bullets->update(elapsed);
@@ -55,8 +60,10 @@ void Model::update(float elapsed) {
 
 					if (glm::length(e.position() - b.get_position()) < radius + 4.0f) {
 						// kill enemy and bullet
-
-						// e_it = enemies->erase(e_it);
+						int health = (**(e_it)).take_damage(1);
+						if (health == 0 && e.moveStyle != Enemy::MovementStyle::Turret) {
+							e_it = enemies->erase(e_it);
+						}
 						score += 100;
 						view->ui->set_score(score);
 
