@@ -15,6 +15,7 @@
 #include "GL.hpp"
 
 //for screenshots:
+#include "data_path.hpp"
 #include "load_save_png.hpp"
 
 //Includes for libSDL:
@@ -26,6 +27,14 @@
 #include <stdexcept>
 #include <memory>
 #include <algorithm>
+
+Load< Sound::Sample > music(LoadTagDefault, []() -> Sound::Sample const *{
+	Sound::Sample *s = new Sound::Sample(data_path("80s_space_detective.wav"));
+
+	Sound::loop(*s);
+
+	return s;
+});
 
 int main(int argc, char **argv) {
 #ifdef _WIN32
@@ -101,6 +110,8 @@ int main(int argc, char **argv) {
 
 	//------------ create game mode + make current --------------
 	Mode::set_current(std::make_shared< MenuMode >(MenuMode::Message::None));
+
+	//------------ loop audio ---------------
 
 	//------------ main loop ------------
 
