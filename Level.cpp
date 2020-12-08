@@ -3,23 +3,49 @@
 #include <map>
 #include <yaml-cpp/yaml.h>
 
-const std::string& Level::str(const std::string& level_name, const std::string& key) {
+const std::string& Level::str(const std::string& level_name, const int room, const int wave, const std::string& key) {
 	
 	if (levels_map.size() == 0) { load_levels(); }
 
-	return std::get<std::string>(levels_map[level_name][key]);
+	return std::get<std::string>(levels_map[level_name][room][wave][key]);
 }
 
-Numeric& Level::num(const std::string& level_name, const std::string& key)
+Numeric& Level::num(const std::string& level_name, const int room, const int wave, const std::string& key)
 {
 	if (levels_map.size() == 0) { load_levels(); }
 
-	return std::get<Numeric>(levels_map[level_name][key]);
+	return std::get<Numeric>(levels_map[level_name][room][wave][key]);
 }
 
-std::vector<float> Level::generate_wave(const std::string& level_name, const int room_number, const int wave_number, EnemyManager& enemies)
-{
-	return std::vector<float>();
+// TODO fix this
+std::vector<WaveEnemy> Level::get_wave_enemies(const std::string& level_name, const int room, const int wave) {
+	std::vector<WaveEnemy> enemies;
+
+	for (std::string e : EnemyList) {
+		if (levels_map[level_name][room][wave].find(e) != levels_map[level_name][room][wave].end()) {
+			WaveEnemy new_e;
+			new_e.name = e;
+			new_e.number = int(levels_map[level_name][room][wave][e][0]);
+			new_e.color = Bullet::Blue; //levels_map[level_name][room][wave][e][1];
+			for (int i = new_e.number) {
+				new_e.locations.emplace_back(glm::vec2(0.0f));
+			}
+		}
+	}
+
+	return enemies;
+}
+
+std::vector<float> Level::generate_wave(const std::string& level_name, const int room, const int wave, std::shared_ptr<EnemyManager> enemies) {
+	
+	enemies->acquire("hunter", Bullet::Red, glm::vec2(5.0f, 0), Enemy::Hunter);
+	std::vector<WaveEnemy> enemy_list = get_wave_enemies(level_name, room, wave);
+	for (WaveEnemy e : enemy_list) {
+		for (int i = 0; i < e.number; i++) {
+			enemies->acquire(e.name, e.color, e.pos);
+		}
+	}
+	return std::vector<float>{0.0f, 0.0f, 0.0f});
 }
 
 void Level::load_levels() {

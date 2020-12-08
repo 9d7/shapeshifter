@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include "Level.hpp"
 #include "Animation.hpp"
 #include "BulletManager.hpp"
 #include "Enemy.hpp"
@@ -40,6 +41,7 @@ class Model {
 		std::shared_ptr<BulletManager> bullets;
 		static std::shared_ptr<EnemyManager> enemies;
 		std::shared_ptr<Player> player;
+		std::shared_ptr<Level> level;
 
 		void update_view(float elapsed);
 

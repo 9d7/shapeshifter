@@ -27,10 +27,9 @@ default:
             time limit: 10.0
             kill limit: 1
             soldier: [1, blue]
-            # TODO reimplement below as above
           -
             hunter: [1, red]
-            soldier: [1..4, random]
+            soldier: [1..4, blue]
       -
         center: [400.0, 400.0]
         bounds: [300.0, 300.0] 
@@ -53,3 +52,33 @@ default:
 
 level one:
   spawn: [0.0, 0.0]
+  rooms:
+    -
+      center: [0.0, 0.0] 
+      bounds: [300.0, 300.0] 
+      room type: random spawn
+      enemy waves:
+        -
+          time limit: 10.0
+          kill limit: 1
+          soldier: [1, blue]
+        -
+          hunter: [1, red]
+          soldier: [1..4, random]
+    -
+      center: [400.0, 400.0]
+      bounds: [300.0, 300.0]
+      room type: boss
+      enemy waves:
+        -
+          time limit: 15.0
+          kill limit: 3
+          health limit: 25
+          boss: [1]
+          soldier: [3]
+        -
+          health limit: 50
+          ninja: [2, split]
+        -
+          health limit: 25
+          hunter: [6]

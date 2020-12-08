@@ -28,21 +28,23 @@ Model::Model(std::shared_ptr<View> view_) : view(view_) {
 
 	Model::enemies = std::make_shared<EnemyManager>(view->sprites, bullets);
 
+	level = std::make_shared<Level>();
+
 	//enemies->acquire("soldier", Bullet::Blue, glm::vec2(0, 5.0f), Enemy::Soldier);
 	//enemies->acquire("soldier", Bullet::Red, glm::vec2(0, -5.0f), Enemy::Soldier);
 
 	//enemies->acquire("hunter", Bullet::Red, glm::vec2(5.0f, 0), Enemy::Hunter);
-
+	//level->get_wave_enemies("", 0, 0);
 	//enemies->acquire("shifter", Bullet::Red, glm::vec2(10.0f, 0));
 	//enemies->acquire("shield", Bullet::Red, glm::vec2(10.0f, 0));
 	//enemies->acquire("ninja", Bullet::Blue, glm::vec2(-20.0f, 0));
 	//enemies->acquire("wizard", Bullet::Blue, glm::vec2(0.0f, 10.0f));
-	enemies->acquire("turret", Bullet::Blue, glm::vec2(0, -10.0f));
+	/*enemies->acquire("turret", Bullet::Blue, glm::vec2(0, -10.0f));
 	enemies->acquire("turret", Bullet::Red, glm::vec2(0, 10.0f));
 	enemies->acquire("repairman", Bullet::Blue, glm::vec2(10, -10.0f));
 	enemies->acquire("repairman", Bullet::Red, glm::vec2(15, -10.0f));
 	enemies->acquire("repairman", Bullet::Red, glm::vec2(-10, -15.0f));
-	enemies->acquire("repairman", Bullet::Blue, glm::vec2(-15, -10.0f));
+	enemies->acquire("repairman", Bullet::Blue, glm::vec2(-15, -10.0f));*/
 
 	view->ui->set_health(10);
 }
