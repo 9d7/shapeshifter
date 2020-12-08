@@ -1,4 +1,6 @@
 #include "Controller.hpp"
+#include "MenuMode.hpp"
+#include "Mode.hpp"
 #include "Model.hpp"
 #include "SDL_events.h"
 #include "SDL_scancode.h"
@@ -41,6 +43,7 @@ void Controller::update(float elapsed) {
 			case SDL_SCANCODE_A: player_force += glm::vec2(-1.0f,  0.0f); break;
 			case SDL_SCANCODE_S: player_force += glm::vec2( 0.0f, -1.0f); break;
 			case SDL_SCANCODE_D: player_force += glm::vec2( 1.0f,  0.0f); break;
+			case SDL_SCANCODE_ESCAPE: Mode::set_current(std::make_shared<MenuMode>(MenuMode::None)); return;
 			case SDL_SCANCODE_SPACE: lock_rotation = true;
 			default: break;
 
