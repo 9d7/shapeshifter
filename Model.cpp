@@ -9,6 +9,7 @@
 #include "glm/geometric.hpp"
 #include <memory>
 #include <glm/gtx/rotate_vector.hpp>
+#include "MenuMode.hpp"
 
 std::shared_ptr<EnemyManager> Model::enemies;
 
@@ -50,12 +51,16 @@ Model::Model(std::shared_ptr<View> view_) : view(view_) {
 }
 
 void Model::update(float elapsed) {
-
+	if (player->get_lives() <= 0) {
+		//Mode::set_current(std::make_shared< MenuMode >(MenuMode::Message::None));
+		player->reset_player();
+		view->ui->set_health(10);
+		view->ui->set_score(0);
+	}
 
 	player->update(elapsed);
 	enemies->update(elapsed, player->get_position());
 	static size_t score = 0;
-	static size_t lives = 10;
 
 	bullets->update(elapsed);
 
@@ -83,9 +88,10 @@ void Model::update(float elapsed) {
 								Sound::play(*enemy_die, 1.0f, 0.0f);
 								if ((**(e_it)).move_style == Enemy::MovementStyle::Turret) (**(e_it)).dead_turret();
 								else e_it = enemies->erase(e_it);
+								
 							}
+							score += 100;
 						}
-						score += 100;
 						view->ui->set_score(score);
 
 						should_erase = true;
@@ -96,9 +102,8 @@ void Model::update(float elapsed) {
 				}
 			} else {
 				if (glm::length(player->get_position() - b.get_position()) < 8.0f + 4.0f) {
-					if (lives > 0 && b.get_color() != player->get_color()) lives--;
-					view->ui->set_health(lives);
-
+					if (player->get_lives() > 0 && b.get_color() != player->get_color()) player->hit();
+					view->ui->set_health(player->get_lives());
 					should_erase = true;
 				}
 			}

@@ -30,11 +30,16 @@ PlayMode::PlayMode(std::shared_ptr<Mode> menu_) : menu(menu_) {
 PlayMode::~PlayMode() {}
 
 bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size) {
+
+	std::shared_ptr<Mode> m = shared_from_this();
+
 	return controller->handle_event(evt, window_size);
 
 }
 
 void PlayMode::update(float elapsed) {
+
+	std::shared_ptr<Mode> m = shared_from_this();
 
 	controller->update(elapsed);
 	model->update(elapsed);
@@ -43,5 +48,9 @@ void PlayMode::update(float elapsed) {
 }
 
 void PlayMode::draw(glm::uvec2 const &drawable_size) {
+
+	std::shared_ptr<Mode> m = shared_from_this();
+
 	view->draw(drawable_size);
+
 }
