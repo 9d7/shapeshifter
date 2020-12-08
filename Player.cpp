@@ -9,10 +9,10 @@ Player::Player(std::shared_ptr<View> view)
 }
 
 void Player::update(float elapsed) {
-
+	
 	velocity += force * elapsed;
 	force = glm::vec2(0.0f, 0.0f);
-
+	if (hit_cd >= 0) hit_cd -= elapsed;
 	if (glm::length(velocity) > MAX_VELOCITY) {
 		velocity = glm::normalize(velocity) * MAX_VELOCITY;
 	}
@@ -59,7 +59,9 @@ void Player::reset_player(glm::vec2 reset_position, glm::vec2 reset_velocity, fl
 
 void Player::hit()
 {
+	if (hit_cd > 0) return;
 	lives--;
+	hit_cd = 0.5f;
 
 }
 

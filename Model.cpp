@@ -54,12 +54,13 @@ void Model::update(float elapsed) {
 	if (player->get_lives() <= 0) {
 		//Mode::set_current(std::make_shared< MenuMode >(MenuMode::Message::None));
 		player->reset_player();
+		view->ui->set_health(10);
+		view->ui->set_score(0);
 	}
 
 	player->update(elapsed);
 	enemies->update(elapsed, player->get_position());
 	static size_t score = 0;
-	//static size_t lives = 10;
 
 	bullets->update(elapsed);
 
@@ -86,9 +87,10 @@ void Model::update(float elapsed) {
 								Sound::play(*enemy_die, 1.0f, 0.0f);
 								if ((**(e_it)).move_style == Enemy::MovementStyle::Turret) (**(e_it)).dead_turret();
 								else e_it = enemies->erase(e_it);
+								
 							}
+							score += 100;
 						}
-						score += 100;
 						view->ui->set_score(score);
 
 						should_erase = true;
