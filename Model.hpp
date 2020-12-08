@@ -33,6 +33,18 @@ class Model {
 
 		static std::shared_ptr<Enemy> get_closest(glm::vec2 enemy_pos);
 
+		static void level1(); 
+		void level2();
+		void level3();
+		void level4();
+		void level5(); 
+		void level6(); 
+		void level7(); 
+		void level8(); 
+		void level9(); 
+		int lnum = 1;
+		int turrets_dead = 0;
+
 		//std::shared_ptr< Sound::PlayingSample > enemy_die;
 
 	protected:

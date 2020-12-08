@@ -145,7 +145,7 @@ turret:
           dispatch: with
 
 ninja:
-  health: 1
+  health: 3
   aim: once
   red sprite: ninja_red
   blue sprite: ninja_blue
@@ -182,7 +182,7 @@ ninja:
 
 
 wizard:
-  health: 2
+  health: 3
   red sprite: wizard_red
   blue sprite: wizard_blue
   firing delay: 0
@@ -212,7 +212,7 @@ wizard:
           dispatch: after
 
 shifter:
-  health: 2
+  health: 3
   aim: once
   red sprite: shifter_red
   blue sprite: shifter_blue
