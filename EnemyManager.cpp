@@ -57,6 +57,8 @@ std::shared_ptr<Enemy> EnemyManager::acquire(
 			move_style = Enemy::MovementStyle::Deadturret;
 		} else if (EnemyData::str(name, "movement") == "repairman") {
 			move_style = Enemy::MovementStyle::Repairman;
+		} else {
+			throw std::runtime_error("No valid move style");
 		}
 
 		Numeric h = EnemyData::num(name, "health");

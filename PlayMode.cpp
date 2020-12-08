@@ -18,7 +18,7 @@
  * - Eric
  */
 
-PlayMode::PlayMode() {
+PlayMode::PlayMode(std::shared_ptr<Mode> menu_) : menu(menu_) {
 
 	// using shared ptrs to handle deallocation
 	view = std::make_shared<View>();
@@ -31,6 +31,7 @@ PlayMode::~PlayMode() {}
 
 bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size) {
 	return controller->handle_event(evt, window_size);
+
 }
 
 void PlayMode::update(float elapsed) {

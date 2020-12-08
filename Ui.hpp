@@ -29,6 +29,8 @@ class Ui {
 		void draw_field(std::vector<SpriteManager::Vertex> &verts);
 		void draw_border(std::vector<SpriteManager::Vertex> &verts);
 
+		friend struct MenuMode;
+
 	private:
 		glm::vec2 lives_label_size;
 		glm::vec2 score_label_size;

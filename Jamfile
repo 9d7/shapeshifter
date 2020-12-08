@@ -132,6 +132,7 @@ GAME_NAMES =
 	Model
 	Controller
 	PlayMode
+	MenuMode
 	main
 	Sound
 	load_wav

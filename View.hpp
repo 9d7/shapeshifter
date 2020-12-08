@@ -33,6 +33,7 @@ class View {
 		// use this to get new sprites, as well as Animation::find_* functions
 		std::shared_ptr<SpriteManager> sprites;
 		std::shared_ptr<Ui> ui;
+		bool draw_ui = true;
 
 		void update_camera(const glm::vec2 &pos);
 

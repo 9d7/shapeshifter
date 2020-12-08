@@ -56,6 +56,9 @@ void Ui::update(float elapsed) {
 		update_score();
 	}
 
+	on_border.update(elapsed);
+	on_field.update(elapsed);
+
 }
 
 void Ui::set_cursor(const glm::vec2 &pos) {

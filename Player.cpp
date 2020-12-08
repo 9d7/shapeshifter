@@ -9,7 +9,7 @@ Player::Player(std::shared_ptr<View> view)
 }
 
 void Player::update(float elapsed) {
-	
+
 	velocity += force * elapsed;
 	force = glm::vec2(0.0f, 0.0f);
 
@@ -44,7 +44,7 @@ glm::vec2 Player::shoot(const glm::vec2 target_position) {
 		direction = glm::normalize(player_to_target);
 	}
 	return direction *= BULLET_SPEED;
-	
+
 }
 
 void Player::reset_player(glm::vec2 reset_position, glm::vec2 reset_velocity, float reset_rotation){
@@ -70,19 +70,20 @@ void Player::set_rotation(float new_rotation) {
 void Player::set_rotation(float new_rotation, float elapsed) {
 	if (rotation_limit < 0.0f) return set_rotation(new_rotation);
 	if (rotation_lock_active) return set_rotation(rotation);
-	while (abs(rotation) > glm::pi<float>()) rotation -= 2 * glm::pi<float>() * (rotation < 0.0f ? -1.0f : 1.0f);
+	while (glm::abs(rotation) > glm::pi<float>()) rotation -= 2 * glm::pi<float>() * (rotation < 0.0f ? -1.0f : 1.0f);
+
 
 	float delta = new_rotation - rotation;
 	float sign = delta < 0.0f ? -1.0f : 1.0f;
-	if (rotation < 0.0f != new_rotation < 0.0f) {
+	if ((rotation < 0.0f) != (new_rotation < 0.0f)) {
 		delta -= 2 * glm::pi<float>() * sign;
-		if (abs(rotation) + abs(new_rotation) > glm::pi<float>()) sign *= -1.0f;
+		if (glm::abs(rotation) + glm::abs(new_rotation) > glm::pi<float>()) sign *= -1.0f;
 	}
-	
+
 	float max_delta = rotation_limit * elapsed;
 	// printf("rot %f | new %f | delta %f | maxlim %f | sign %f | sum %f\n", rotation, new_rotation, delta, max_delta, sign, abs(rotation) + abs(new_rotation)); //TODO remove
 
-	if (abs(delta) < max_delta) {
+	if (glm::abs(delta) < max_delta) {
 		rotation = new_rotation;
 	}
 	else {

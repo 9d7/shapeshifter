@@ -76,10 +76,10 @@ void Model::update(float elapsed) {
 
 					if (glm::length(e.position() - b.get_position()) < radius + 4.0f) {
 						// kill enemy and bullet
-						int health = (**(e_it)).take_damage(1);
+						int health = (*e_it)->take_damage(1);
 						if (health == 0) {
 							Sound::play(*enemy_die, 1.0f, 0.0f);
-							if ((**(e_it)).moveStyle == Enemy::MovementStyle::Turret) (**(e_it)).dead_turret();
+							if ((*e_it)->move_style == Enemy::MovementStyle::Turret) (**(e_it)).dead_turret();
 							else e_it = enemies->erase(e_it);
 						}
 						score += 100;
@@ -108,7 +108,7 @@ void Model::update(float elapsed) {
 		}
 
 	}
-	
+
 	// update camera to be out of dead space
 	static const glm::vec2 MARGIN = glm::vec2(
 			View::FieldWidth,
@@ -157,7 +157,7 @@ void Model::update_view(float elapsed) {
 void Model::player_shoot() {
 	Sound::play(*player_shoot_sound, 1.0f, 0.0f);
 	glm::vec2 shot_target = mouse_world_position;
-	
+
 	if (player->get_assist_mode() != Player::AssistMode::Off) {
 		std::shared_ptr<Enemy> target = nullptr;
 		for (EnemyManager::iterator e_it = enemies->begin(); e_it != enemies->end(); e_it++) {
@@ -183,7 +183,7 @@ void Model::player_shoot() {
 	}
 
 	glm::vec2 shot_vector = player->shoot(shot_target);
-	
+
 	bullets->acquire(view->sprites, player->get_color(), player->get_position(), shot_vector, true);
 }
 
@@ -214,8 +214,8 @@ std::shared_ptr<Enemy> Model::get_closest(glm::vec2 pos) {
 	std::shared_ptr<Enemy> closest = nullptr;
 	float dist = 3.40282e+038f;
 	for (EnemyManager::iterator e_it = enemies->begin(); e_it != enemies->end(); e_it++) {
-		if ((**(e_it)).moveStyle == Enemy::MovementStyle::Deadturret) {
-			glm::vec2 diff = (**(e_it)).position() - pos;
+		if ((*e_it)->move_style == Enemy::MovementStyle::Deadturret) {
+			glm::vec2 diff = (*e_it)->position() - pos;
 			float new_dist = sqrt(dot(diff, diff));
 			if (new_dist < dist) {
 				dist = new_dist;
