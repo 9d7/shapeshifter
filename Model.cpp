@@ -21,8 +21,12 @@ Load< Sound::Sample > player_shoot_sound(LoadTagDefault, []() -> Sound::Sample c
 	return new Sound::Sample(data_path("shoot.wav"));
 });
 
-Model::Model(std::shared_ptr<View> view_) : view(view_) {
+Load< Sound::Sample > background(LoadTagDefault, []() -> Sound::Sample const* {
+	return new Sound::Sample(data_path("ericadventure3-bad.wav"));
+	});
 
+Model::Model(std::shared_ptr<View> view_) : view(view_) {
+	Sound::loop(*background);
 	player = std::make_shared<Player>(view);
 
 	bullets = std::make_shared<BulletManager>();
@@ -52,7 +56,7 @@ Model::Model(std::shared_ptr<View> view_) : view(view_) {
 
 void Model::update(float elapsed) {
 	if (player->get_lives() <= 0) {
-		//Mode::set_current(std::make_shared< MenuMode >(MenuMode::Message::None));
+		Mode::set_current(std::make_shared< MenuMode >(MenuMode::Message::None));
 		player->reset_player();
 		view->ui->set_health(10);
 		view->ui->set_score(0);
