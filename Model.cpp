@@ -9,6 +9,7 @@
 #include "glm/geometric.hpp"
 #include <memory>
 #include <glm/gtx/rotate_vector.hpp>
+#include "MenuMode.hpp"
 
 std::shared_ptr<EnemyManager> Model::enemies;
 
@@ -50,12 +51,15 @@ Model::Model(std::shared_ptr<View> view_) : view(view_) {
 }
 
 void Model::update(float elapsed) {
-
+	if (player->get_lives() <= 0) {
+		//Mode::set_current(std::make_shared< MenuMode >(MenuMode::Message::None));
+		player->reset_player();
+	}
 
 	player->update(elapsed);
 	enemies->update(elapsed, player->get_position());
 	static size_t score = 0;
-	static size_t lives = 10;
+	//static size_t lives = 10;
 
 	bullets->update(elapsed);
 
@@ -95,9 +99,8 @@ void Model::update(float elapsed) {
 				}
 			} else {
 				if (glm::length(player->get_position() - b.get_position()) < 8.0f + 4.0f) {
-					if (lives > 0 && b.get_color() != player->get_color()) lives--;
-					view->ui->set_health(lives);
-
+					if (player->get_lives() > 0 && b.get_color() != player->get_color()) player->hit();
+					view->ui->set_health(player->get_lives());
 					should_erase = true;
 				}
 			}

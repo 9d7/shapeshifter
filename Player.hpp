@@ -37,8 +37,10 @@ class Player {
 			glm::vec2 reset_velocity = glm::vec2(0.0f), 
 			float reset_rotation = 0.0f
 		);
+		void      hit();
 
 		// set/get functions
+		void set_lives(int new_lives);
 		void set_color(Bullet::Color new_color);
 		void set_rotation(float new_rotation); // Hard set an angle, disregarding speed limits. TODO add a parameter or refactor this when multilayer sprites are in
 		void set_rotation(float new_rotation, float elapsed); // Sets an angle within rotation speed limits
@@ -56,6 +58,7 @@ class Player {
 		Bullet::Color           get_color() const;
 		float                   get_rotation() const;
 		AssistMode              get_assist_mode() const;
+		int                     get_lives() const;
 		
 
 	protected:
@@ -65,6 +68,7 @@ class Player {
 		std::shared_ptr<Sprite> sprite;
 
 		// Editable values with defaults
+		int lives = 10;
 		Bullet::Color color = Bullet::Color::Blue;
 		bool rotation_lock_active = false;
 		float rotation = 0.0f;                     // Current rotation

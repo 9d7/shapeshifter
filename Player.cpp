@@ -51,9 +51,21 @@ void Player::reset_player(glm::vec2 reset_position, glm::vec2 reset_velocity, fl
 	position = reset_position;
 	velocity = reset_velocity;
 	rotation = reset_rotation;
+	set_lives(10);
 	update_sprite();
 	//sprite->set_rotation(0.0f);
 	//sprite->set_position(position);
+}
+
+void Player::hit()
+{
+	lives--;
+
+}
+
+void Player::set_lives(int new_lives)
+{
+	lives = new_lives;
 }
 
 void Player::set_color(Bullet::Color new_color) {
@@ -143,4 +155,9 @@ float Player::get_rotation() const {
 
 Player::AssistMode Player::get_assist_mode() const {
 	return assist_mode;
+}
+
+int Player::get_lives() const
+{
+	return lives;
 }
