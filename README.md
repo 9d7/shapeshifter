@@ -26,3 +26,7 @@ L - enable debug output
 H - enable dev values output (enabled by default)
 O - turn off all console outputs
 
+
+Sound credits:
+Enemy dying sound by cabled_mess from https://freesound.org/s/350976/
+Player shooting sound made by MATRIXXX_ at https://freesound.org/s/459145/

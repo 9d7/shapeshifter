@@ -71,7 +71,7 @@ hunter:
           color: 0..1
 
 turret:
-  health: 1
+  health: 5
   aim: once
   red sprite: turret_red
   blue sprite: turret_blue
@@ -157,7 +157,7 @@ ninja:
       bullets:
         -
           time: 0.05
-          velocity: 1
+          velocity: 1.5
           angle:    0
           number: 1
           color: 0..1
@@ -165,7 +165,7 @@ ninja:
           dispatch: with
         -
           time: 0.05
-          velocity: 1
+          velocity: 1.5
           angle:    0.262
           number: 1
           color: 0..1
@@ -173,7 +173,7 @@ ninja:
           dispatch: with
         -
           time: 0.05
-          velocity: 1
+          velocity: 1.5
           angle:    -0.262
           number: 1
           color: 0..1
@@ -185,7 +185,7 @@ wizard:
   health: 2
   red sprite: wizard_red
   blue sprite: wizard_blue
-  firing delay: 1
+  firing delay: 0
   movement: wizard
   attacks:
     -
@@ -210,3 +210,116 @@ wizard:
           color: 0..0.6
           sequence: serial
           dispatch: after
+
+shifter:
+  health: 2
+  aim: once
+  red sprite: shifter_red
+  blue sprite: shifter_blue
+  firing delay: 1
+  movement: shifter
+  attacks:
+    -
+      chance: 1
+      bullets:
+        -
+          time: 0.05
+          velocity: 1
+          angle:    0
+          number: 5
+          color: 0
+          sequence: serial
+          dispatch: after
+    -
+      chance: 0.25 #these need to live longer to be effective
+      bullets:
+        -
+          time: 0.05
+          velocity: 0.1
+          angle:    0..6.283
+          number: 15
+          color: 0..1
+          sequence: parallel
+          dispatch: with
+
+shield:
+  health: 10
+  aim: once
+  red sprite: shield_red
+  blue sprite: shield_blue
+  firing delay: 1.5
+  movement: shield
+  attacks:
+    -
+      chance: 1
+      bullets:
+        -
+          time: 0.05
+          velocity: 0.5
+          angle:    0
+          number: 1
+          color: 0..1
+          sequence: parallel
+          dispatch: with
+        -
+          time: 0.05
+          velocity: 0.5
+          angle:    0.524
+          number: 1
+          color: 0..1
+          sequence: parallel
+          dispatch: with
+        -
+          time: 0.05
+          velocity: 0.5
+          angle:    -0.524
+          number: 1
+          color: 0..1
+          sequence: parallel
+          dispatch: with
+        -
+          time: 0.05
+          velocity: 0.5
+          angle:    0.262
+          number: 1
+          color: 0..1
+          sequence: parallel
+          dispatch: with
+        -
+          time: 0.05
+          velocity: 0.5
+          angle:    -0.262
+          number: 1
+          color: 0..1
+          sequence: parallel
+          dispatch: with
+
+deadturret:
+  health: 500
+  aim: once
+  red sprite: deadturret_red
+  blue sprite: deadturret_blue
+  firing delay: 1
+  movement: deadturret
+  attacks:
+
+
+repairman:
+  health: 1
+  aim: once
+  red sprite: repairman_red
+  blue sprite: repairman_blue
+  firing delay: 3
+  movement: repairman
+  attacks:
+    -
+      chance: 1
+      bullets:
+        -
+          time: 0.05
+          velocity: 1
+          angle:    0
+          number: 1
+          color: 0..1
+          sequence: parallel
+          dispatch: with

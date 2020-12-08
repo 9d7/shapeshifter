@@ -49,7 +49,18 @@ std::shared_ptr<Enemy> EnemyManager::acquire(
 			move_style = Enemy::MovementStyle::Ninja;
 		} else if (EnemyData::str(name, "movement") == "wizard") {
 			move_style = Enemy::MovementStyle::Wizard;
+		} else if (EnemyData::str(name, "movement") == "shifter") {
+			move_style = Enemy::MovementStyle::Shifter;
+		} else if (EnemyData::str(name, "movement") == "shield") {
+			move_style = Enemy::MovementStyle::Shield;
+		} else if (EnemyData::str(name, "movement") == "deadturret") {
+			move_style = Enemy::MovementStyle::Deadturret;
+		} else if (EnemyData::str(name, "movement") == "repairman") {
+			move_style = Enemy::MovementStyle::Repairman;
 		}
+
+		Numeric h = EnemyData::num(name, "health");
+		float health = h();
 
 		// build and insert the struct in one move
 		enemy_inputs.insert(std::pair<std::string, Enemy::EnemyInputs>(name,
@@ -59,7 +70,8 @@ std::shared_ptr<Enemy> EnemyManager::acquire(
 				EnemyData::get_attack_list(name),
 				aim_mode,
 				EnemyData::num(name, "firing delay"),
-				move_style
+				move_style,
+				(int)health
 			}
 		));
 		it = enemy_inputs.find(name);
