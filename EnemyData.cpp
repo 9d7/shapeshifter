@@ -13,13 +13,12 @@
 
 namespace {
 
-	typedef std::variant<std::string, Numeric> ValueType;
-	typedef std::unordered_map<std::string, ValueType>    ValueStore;
-	typedef std::unordered_map<std::string, ValueStore>   EnemyMap;
+
+	typedef std::unordered_map<std::string, Numeric::ValueStore> EnemyMap;
 
 	EnemyMap enemies;
 
-	typedef std::vector<ValueStore> Attack;
+	typedef std::vector<Numeric::ValueStore> Attack;
 	typedef std::map<float, BulletSequencer> AttackList;
 	std::unordered_map<std::string, AttackList> attacks;
 
@@ -27,59 +26,20 @@ namespace {
 
 		YAML::Node yaml = YAML::LoadFile(data_path("enemies.yaml"));
 
-		auto parse_arg = [](const std::string &in) -> ValueType {
-
-			// wow, regex is so pretty and readable. :)
-			static std::regex range_regex (R"(^\s*(-?\d*\.?\d+)\s*\.\.\s*(-?\d*\.?\d+)\s*$)");
-			static std::regex choice_regex (R"(^\s*((-?\d*\.?\d+)\s*,\s*)+(-?\d*\.?\d+)\s*$)");
-			static std::regex full_float_regex (R"(^\s*(-?\d*\.?\d+)\s*$)");
-			static std::regex float_regex (R"(-?\d*\.?\d+)");
-
-			std::smatch sm;
-			if (std::regex_match(in, sm, range_regex)) { // range
-
-				return Numeric(Numeric::Range(
-					(float)std::atof(sm[1].str().c_str()),
-					(float)std::atof(sm[2].str().c_str())
-				));
-			}
-
-			if (std::regex_match(in, choice_regex)) { // choice
-
-				std::string i = in;
-				std::regex_iterator<std::string::iterator> rit ( i.begin(), i.end(), float_regex );
-				std::regex_iterator<std::string::iterator> rend;
-
-				Numeric::Choice ret;
-				while (rit != rend) {
-					ret.push_back((float)std::atof(rit->str().c_str()));
-					rit++;
-				}
-				return Numeric(ret);
-			}
-
-			if (std::regex_match(in, sm, full_float_regex)) { // float
-				return Numeric((float)std::atof(sm[1].str().c_str()));
-			}
-
-			// none matched -- assume a string
-			return in;
-		};
-
-		ValueStore default_bullet;
-		ValueStore default_enemy;
+		Numeric::ValueStore default_bullet;
+		Numeric::ValueStore default_enemy;
 		float      default_attack_chance = yaml["default"]["chance"].as<float>();
 
 		YAML::Node default_ = yaml["default"];
 		for (auto it = default_["enemy"].begin(); it != default_["enemy"].end(); it++) {
 			default_enemy[it->first.as<std::string>()] =
-				parse_arg(it->second.as<std::string>());
+				Numeric::parse(it->second.as<std::string>());
 		}
 		enemies["default"] = default_enemy;
 
 		for (auto it = default_["bullet"].begin(); it != default_["bullet"].end(); it++) {
 			default_bullet[it->first.as<std::string>()] =
-				parse_arg(it->second.as<std::string>());
+				Numeric::parse(it->second.as<std::string>());
 		}
 
 		for (auto it = yaml.begin(); it != yaml.end(); it++) {
@@ -88,7 +48,7 @@ namespace {
 			YAML::Node value = it->second;
 			if (name == "default") continue;
 
-			ValueStore new_;
+			Numeric::ValueStore new_;
 			for (auto it2 = value.begin(); it2 != value.end(); it2++) {
 
 				std::string key = it2->first.as<std::string>();
@@ -109,10 +69,10 @@ namespace {
 							if (attack_param == "bullets") {
 
 								for (auto it5 = it4->second.begin(); it5 != it4->second.end(); it5++) {
-									ValueStore bullet;
+									Numeric::ValueStore bullet;
 									for (auto it6 = it5->begin(); it6 != it5->end(); it6++) {
 										bullet[it6->first.as<std::string>()] =
-											parse_arg(it6->second.as<std::string>());
+											Numeric::parse(it6->second.as<std::string>());
 									}
 									// put in defaults if they don't exist
 									for (auto db : default_bullet) {
@@ -158,7 +118,7 @@ namespace {
 					attacks[name] = attack_list;
 
 				} else {
-					new_[key] = parse_arg(it2->second.as<std::string>());
+					new_[key] = Numeric::parse(it2->second.as<std::string>());
 				}
 
 			}

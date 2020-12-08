@@ -16,11 +16,11 @@ Enemy::Enemy (
 	const glm::vec2   &pos_,
 	Bullet::Color     color_
 ) :
+	move_style(in.move),
 	pos(pos_),
 	color(color_),
 	spr_mgr(spr_mgr_),
 	shooter(in.attack_list, spr_mgr_, blt_mgr, in.aim_mode, in.shoot_delay),
-	moveStyle(in.move),
 	health(in.health)
 {
 
@@ -37,10 +37,10 @@ Enemy::Enemy (
 }
 
 void Enemy::update(float elapsed, const glm::vec2 &player_pos) {
-	
+
 	// face player
 	glm::vec2 to_player = player_pos - pos;
-	if (glm::length(to_player) > 0.0f && moveStyle != Deadturret) {
+	if (glm::length(to_player) > 0.0f && move_style != Deadturret) {
 		spr->set_rotation(glm::atan(to_player.y, to_player.x));
 	}
 
@@ -64,7 +64,7 @@ Bullet::Color Enemy::get_color() const {
 void Enemy::move(float elapsed, const glm::vec2 &player_position) {
 	glm::vec2 diff = player_position - pos;
 	glm::vec2 move_enemy = glm::normalize(player_position - pos);
-	if (moveStyle == Soldier) {
+	if (move_style == Soldier) {
 		float dist = sqrt(dot(diff, diff));
 		move_enemy = move_enemy * 110.0f * elapsed;
 		if (dist > 150.0f) {
@@ -74,20 +74,20 @@ void Enemy::move(float elapsed, const glm::vec2 &player_position) {
 		} else {
 			shooter.update(elapsed, color, player_position, pos);
 		}
-	} else if (moveStyle == Hunter) {
+	} else if (move_style == Hunter) {
 		move_enemy = move_enemy * 150.0f * elapsed;
 		pos = pos + move_enemy;
-	} else if (moveStyle == Turret) {
+	} else if (move_style == Turret) {
 		// don't move
 		shooter.update(elapsed, color, player_position, pos);
-	} else if (moveStyle == Ninja) {
+	} else if (move_style == Ninja) {
 		auto perp = glm::vec2(move_enemy.y, -move_enemy.x);
-		if (!strafeDir) perp = glm::vec2(-perp.x, -perp.y);
+		if (!strafe_dir) perp = glm::vec2(-perp.x, -perp.y);
 		perp = perp * 200.0f * elapsed;
 		strafe += elapsed;
 		if (strafe > 0.4f) {
 			strafe = 0.0f;
-			strafeDir = !strafeDir;
+			strafe_dir = !strafe_dir;
 		}
 		move_enemy = move_enemy * 140.0f * elapsed;
 		pos = pos + perp;
@@ -99,7 +99,7 @@ void Enemy::move(float elapsed, const glm::vec2 &player_position) {
 		} else {
 			shooter.update(elapsed, color, player_position, pos);
 		}
-	} else if (moveStyle == Wizard) {
+	} else if (move_style == Wizard) {
 		float dist = sqrt(dot(diff, diff));
 		move_enemy = move_enemy * 110.0f * elapsed;
 		tp += elapsed;
@@ -118,7 +118,7 @@ void Enemy::move(float elapsed, const glm::vec2 &player_position) {
 			if (tped) shooter.update(elapsed, color, player_position, pos);
 			if (tp > 0.6f) tped = false;
 		}
-	} else if (moveStyle == Shifter) {
+	} else if (move_style == Shifter) {
 		shift += elapsed;
 		if (shift > 2.0f) {
 			Animation::Animation anim;
@@ -142,7 +142,7 @@ void Enemy::move(float elapsed, const glm::vec2 &player_position) {
 		} else {
 			shooter.update(elapsed, color, player_position, pos);
 		}
-	} else if (moveStyle == Shield) {
+	} else if (move_style == Shield) {
 		float dist = sqrt(dot(diff, diff));
 		move_enemy = move_enemy * 120.0f * elapsed;
 		if (dist > 20.0f) {
@@ -151,13 +151,13 @@ void Enemy::move(float elapsed, const glm::vec2 &player_position) {
 		if (dist < 80.0f) {
 			shooter.update(elapsed, color, player_position, pos);
 		}
-	} else if (moveStyle == Repairman) {
+	} else if (move_style == Repairman) {
 		std::shared_ptr<Enemy> closest = Model::get_closest(pos);
 		glm::vec2 perp;
 		strafe += elapsed;
 		if (strafe > 1.0f) {
 			strafe = 0.0f;
-			strafeDir = !strafeDir;
+			strafe_dir = !strafe_dir;
 		}
 		float dist = sqrt(dot(diff, diff));
 		if (dist < 70.0f) {
@@ -165,7 +165,7 @@ void Enemy::move(float elapsed, const glm::vec2 &player_position) {
 			pos = pos - move_enemy;
 			perp = glm::vec2(move_enemy.y, -move_enemy.x);
 			perp = perp * 180.0f * elapsed;
-			if (!strafeDir) perp = glm::vec2(-perp.x, -perp.y);
+			if (!strafe_dir) perp = glm::vec2(-perp.x, -perp.y);
 			pos = pos + perp;
 
 		} else if (dist > 75.0f && closest != nullptr) {
@@ -176,19 +176,19 @@ void Enemy::move(float elapsed, const glm::vec2 &player_position) {
 			float turret_dist = sqrt(dot((*closest).position() - pos, (*closest).position() - pos));
 			if (turret_dist > 30.0f) {
 				perp = perp * 180.0f * elapsed;
-				if (!strafeDir) perp = glm::vec2(-perp.x, -perp.y);
+				if (!strafe_dir) perp = glm::vec2(-perp.x, -perp.y);
 				pos = pos + perp;
 			} else if (turret_dist < 10.0f) repair_turret(closest);
-			
+
 		} else {
 			perp = glm::vec2(move_enemy.y, -move_enemy.x);
 			perp = perp * 180.0f * elapsed;
-			if (!strafeDir) perp = glm::vec2(-perp.x, -perp.y);
+			if (!strafe_dir) perp = glm::vec2(-perp.x, -perp.y);
 			pos = pos + perp;
 		}
-	
+
 		shooter.update(elapsed, color, player_position, pos);
-	} else if (moveStyle == Boss) {
+	} else if (move_style == Boss) {
 		boss_move(elapsed, player_position);
 	}
 }
@@ -201,17 +201,15 @@ void Enemy::boss_move(float elapsed, const glm::vec2 &player_position) {
 	float dist = sqrt(dot(diff, diff));
 
 	strafe += elapsed;
-	upStrafe += elapsed;
-	update_dir += elapsed;
 
 	boss_dir = glm::vec2(move_enemy.y, -move_enemy.x);
 
 	if (strafe > 1.0f) {
 		strafe = 0.0f;
-		strafeDir = !strafeDir;
+		strafe_dir = !strafe_dir;
 	}
 
-	if (!strafeDir) boss_dir = glm::vec2(-boss_dir.x, -boss_dir.y);
+	if (!strafe_dir) boss_dir = glm::vec2(-boss_dir.x, -boss_dir.y);
 	pos = pos - boss_dir * 100.0f * elapsed;
 
 	if (dist > 150.0f) {
@@ -232,14 +230,14 @@ void Enemy::dead_turret() {
 	if (color == Bullet::Color::Blue) anim = Animation::find_static("deadturret_blue");
 	spr = spr_mgr->from_anim(anim, true);
 	health = 500;
-	moveStyle = Deadturret;
+	move_style = Deadturret;
 }
 
 void Enemy::repair_turret(std::shared_ptr<Enemy> e) {
 	Animation::Animation anim;
-	if ((*e).color ==  Bullet::Color::Red) anim = Animation::find_static("turret_red");
-	if ((*e).color == Bullet::Color::Blue) anim = Animation::find_static("turret_blue");
-	(*e).spr = (*e).spr_mgr->from_anim(anim, true);
-	(*e).health = 5;
-	(*e).moveStyle = Turret;
+	if (e->color ==  Bullet::Color::Red) anim = Animation::find_static("turret_red");
+	if (e->color == Bullet::Color::Blue) anim = Animation::find_static("turret_blue");
+	e->spr = e->spr_mgr->from_anim(anim, true);
+	e->health = 5;
+	e->move_style = Turret;
 }

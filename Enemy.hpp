@@ -51,8 +51,8 @@ class Enemy {
 			Repairman,
 			Boss
 		};
-		
-		MovementStyle moveStyle;
+
+		MovementStyle move_style;
 
 	protected:
 
@@ -83,11 +83,9 @@ class Enemy {
 
 		// maybe make these part of yaml
 		float strafe = 0.0f;
-		bool strafeDir = true;
-		float upStrafe = 0.0f;
-		bool upStrafeDir = false;
 		glm::vec2 boss_dir;
 		float update_dir = 1.0f;
+		bool strafe_dir = rand() % 2;
 		float tp = 3.0f;
 		bool tped = false;
 		float shift = 0.0f;

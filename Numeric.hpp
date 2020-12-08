@@ -2,14 +2,19 @@
 
 #include <vector>
 #include <functional>
-#include <variant>
 #include <random>
 #include <cmath>
+#include <variant>
+#include <map>
 
 class Numeric {
 	public:
+
 		typedef std::vector<float>      Choice;
 		typedef std::pair<float, float> Range;
+	
+		typedef std::variant<std::string, Numeric> ValueType;
+		typedef std::unordered_map<std::string, ValueType> ValueStore;
 
 		~Numeric(){}
 		Numeric(float f)  : val_(f) {}
@@ -18,6 +23,7 @@ class Numeric {
 
 		float operator()() const;
 
+		static std::variant<std::string, Numeric> parse(const std::string& in);
 
 	private:
 		static std::mt19937 mt;

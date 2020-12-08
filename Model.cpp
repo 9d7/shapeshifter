@@ -28,11 +28,13 @@ Model::Model(std::shared_ptr<View> view_) : view(view_) {
 
 	Model::enemies = std::make_shared<EnemyManager>(view->sprites, bullets);
 
+	level = std::make_shared<Level>();
+
 	//enemies->acquire("soldier", Bullet::Blue, glm::vec2(0, 5.0f), Enemy::Soldier);
 	//enemies->acquire("soldier", Bullet::Red, glm::vec2(0, -5.0f), Enemy::Soldier);
 
 	//enemies->acquire("hunter", Bullet::Red, glm::vec2(5.0f, 0), Enemy::Hunter);
-
+	//level->get_wave_enemies("", 0, 0);
 	//enemies->acquire("shifter", Bullet::Red, glm::vec2(10.0f, 0));
 	//enemies->acquire("shield", Bullet::Red, glm::vec2(10.0f, 0));
 	//enemies->acquire("ninja", Bullet::Blue, glm::vec2(-20.0f, 0));
@@ -42,7 +44,7 @@ Model::Model(std::shared_ptr<View> view_) : view(view_) {
 	//enemies->acquire("repairman", Bullet::Blue, glm::vec2(10, -10.0f));
 	//enemies->acquire("repairman", Bullet::Red, glm::vec2(15, -10.0f));
 	//enemies->acquire("repairman", Bullet::Red, glm::vec2(-10, -15.0f));
-	enemies->acquire("boss", Bullet::Blue, glm::vec2(-15, -10.0f));
+	//enemies->acquire("boss", Bullet::Blue, glm::vec2(-15, -10.0f));
 
 	view->ui->set_health(10);
 }
@@ -74,11 +76,11 @@ void Model::update(float elapsed) {
 
 					if (glm::length(e.position() - b.get_position()) < radius + 4.0f) {
 						// kill enemy and bullet
-						if (e.get_color() != b.get_color() || e.moveStyle == Enemy::MovementStyle::Boss) {
+						if (e.get_color() != b.get_color() || e.move_style == Enemy::MovementStyle::Boss) {
 							int health = (**(e_it)).take_damage(1);
 							if (health == 0) {
 								Sound::play(*enemy_die, 1.0f, 0.0f);
-								if ((**(e_it)).moveStyle == Enemy::MovementStyle::Turret) (**(e_it)).dead_turret();
+								if ((**(e_it)).move_style == Enemy::MovementStyle::Turret) (**(e_it)).dead_turret();
 								else e_it = enemies->erase(e_it);
 							}
 						}
@@ -108,7 +110,7 @@ void Model::update(float elapsed) {
 		}
 
 	}
-	
+
 	// update camera to be out of dead space
 	static const glm::vec2 MARGIN = glm::vec2(
 			View::FieldWidth,
@@ -157,7 +159,7 @@ void Model::update_view(float elapsed) {
 void Model::player_shoot() {
 	Sound::play(*player_shoot_sound, 1.0f, 0.0f);
 	glm::vec2 shot_target = mouse_world_position;
-	
+
 	if (player->get_assist_mode() != Player::AssistMode::Off) {
 		std::shared_ptr<Enemy> target = nullptr;
 		for (EnemyManager::iterator e_it = enemies->begin(); e_it != enemies->end(); e_it++) {
@@ -183,7 +185,7 @@ void Model::player_shoot() {
 	}
 
 	glm::vec2 shot_vector = player->shoot(shot_target);
-	
+
 	bullets->acquire(view->sprites, player->get_color(), player->get_position(), shot_vector, true);
 }
 
@@ -214,8 +216,8 @@ std::shared_ptr<Enemy> Model::get_closest(glm::vec2 pos) {
 	std::shared_ptr<Enemy> closest = nullptr;
 	float dist = 3.40282e+038f;
 	for (EnemyManager::iterator e_it = enemies->begin(); e_it != enemies->end(); e_it++) {
-		if ((**(e_it)).moveStyle == Enemy::MovementStyle::Deadturret) {
-			glm::vec2 diff = (**(e_it)).position() - pos;
+		if ((*e_it)->move_style == Enemy::MovementStyle::Deadturret) {
+			glm::vec2 diff = (*e_it)->position() - pos;
 			float new_dist = sqrt(dot(diff, diff));
 			if (new_dist < dist) {
 				dist = new_dist;

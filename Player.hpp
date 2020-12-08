@@ -4,11 +4,11 @@
 #include "Animation.hpp"
 #include "BulletManager.hpp"
 #include "View.hpp"
-
+#include <variant>
 class Player {
 
 	public:
-
+		
 		Player(std::shared_ptr<View> view);
 		~Player() = default;
 
