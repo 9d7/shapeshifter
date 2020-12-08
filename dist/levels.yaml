@@ -13,7 +13,7 @@
 
 # enemy type: The type of enemy
 # number: How many enemies of that type you want to spawn in the wave
-# color: What color the enemy should be. "random" can be used instead of a color for a random red or blue
+# color: What color the enemy should be. "random" can be used instead of a color for a random red or blue. "split" can be used for an even distribution
 default:
   level:
     spawn: [0.0, 0.0]
@@ -26,21 +26,11 @@ default:
           -
             time limit: 10.0
             kill limit: 1
-            enemies:
-              -
-                enemy type: soldier
-                number: 1
-                color: blue
+            soldier: [1, blue]
+            # TODO reimplement below as above
           -
-            enemies:
-              -
-                enemy type: hunter
-                number: 1
-                color: red
-              -
-                enemy type: soldier
-                number: 1..4
-                color: random
+            hunter: [1, red]
+            soldier: [1..4, random]
       -
         center: [400.0, 400.0]
         bounds: [300.0, 300.0] 
@@ -50,22 +40,14 @@ default:
             time limit: 15.0
             kill limit: 3
             health limit: 25
-            enemies:
-              -
-                enemy type: boss
-                number: 1
-              -
-                enemy type: soldier
-                number: 3
+            boss: [1]
+            soldier: [3]
           -
             health limit: 50
+            ninja: [2, split]
           -
             health limit: 25
-            enemies:
-              -
-                enemy type: hunter
-                number: 6
-
+            hunter: [6]
 
 
 
