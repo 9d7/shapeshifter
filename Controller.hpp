@@ -16,6 +16,7 @@ class Controller {
 
 		void update(float elapsed);
 		bool handle_event(const SDL_Event &evt, const glm::uvec2 &window_size);
+		static glm::vec2 fix_mouse(const glm::uvec2 &window_size, int x, int y);
 
 	protected:
 		std::shared_ptr<Model> model;

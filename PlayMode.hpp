@@ -7,7 +7,7 @@
 
 struct PlayMode : Mode {
 
-	PlayMode();
+	PlayMode(std::shared_ptr<Mode> menu_);
 	virtual ~PlayMode();
 
 	//functions called by main loop:
@@ -19,5 +19,7 @@ struct PlayMode : Mode {
 	std::shared_ptr<Model>      model      = nullptr;
 	std::shared_ptr<View>       view       = nullptr;
 	std::shared_ptr<Controller> controller = nullptr;
+
+	std::shared_ptr<Mode>   menu;
 
 };

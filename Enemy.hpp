@@ -48,8 +48,8 @@ class Enemy {
 			Deadturret,
 			Repairman
 		};
-		
-		MovementStyle moveStyle;
+
+		MovementStyle move_style;
 
 	protected:
 
@@ -80,7 +80,7 @@ class Enemy {
 
 		// maybe make these part of yaml
 		float strafe = 0.0f;
-		bool strafeDir = rand() % 2;
+		bool strafe_dir = rand() % 2;
 		float tp = 3.0f;
 		bool tped = false;
 		float shift = 0.0f;

@@ -136,7 +136,7 @@ void View::draw(const glm::uvec2 &drawable_size) {
 	std::vector<SpriteManager::Vertex> ui_border_verts;
 
 	ui->draw_field(ui_field_verts);
-	ui->draw_border(ui_border_verts);
+	if (draw_ui) ui->draw_border(ui_border_verts);
 
 	GLuint sprite_tex = sprite_framebuffer->draw(bg_tex, sprite_verts, ui_field_verts, ui_border_verts);
 

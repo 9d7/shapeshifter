@@ -53,3 +53,11 @@ star_x:
   - [0.5, star_x1]
   - [0.5, star_x2]
   - [0.5, star_x1]
+
+died:
+  - [0.5, died]
+  - [0.5, star_empty]
+
+win:
+  - [0.5, win]
+  - [0.5, star_empty]
