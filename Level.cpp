@@ -2,76 +2,85 @@
 #include "data_path.hpp"
 #include <map>
 #include <yaml-cpp/yaml.h>
+#include <string>
 
-const std::string& Level::str(const std::string& level_name, const int room, const int wave, const std::string& key) {
-	
-	if (levels_map.size() == 0) { load_levels(); }
+//const std::string& Level::str(const std::string& level_name, const int room, const int wave, const std::string& key) {
+//	
+//	if (levels_map.size() == 0) { load_levels(); }
+//
+//	return std::get<std::string>((((levels_map[level_name])[room])[wave])[key]);
+//}
+//
+//Numeric& Level::num(const std::string& level_name, const int room, const int wave, const std::string& key)
+//{
+//	if (levels_map.size() == 0) { load_levels(); }
+//
+//	return std::get<Numeric>(levels_map[level_name][room][wave][key]);
+//}
 
-	return std::get<std::string>(levels_map[level_name][room][wave][key]);
-}
+Level::Level() {
 
-Numeric& Level::num(const std::string& level_name, const int room, const int wave, const std::string& key)
-{
-	if (levels_map.size() == 0) { load_levels(); }
-
-	return std::get<Numeric>(levels_map[level_name][room][wave][key]);
+	//std::unordered_map<std::string, std::variant<ValueType, RoomVector>> test = levels_map[""];
 }
 
 // TODO fix this
-std::vector<WaveEnemy> Level::get_wave_enemies(const std::string& level_name, const int room, const int wave) {
-	std::vector<WaveEnemy> enemies;
-
+std::vector<struct Level::WaveEnemy> Level::get_wave_enemies(const std::string& level_name, const int room, const int wave) {
+	std::vector<struct WaveEnemy> enemies;
 	for (std::string e : EnemyList) {
-		if (levels_map[level_name][room][wave].find(e) != levels_map[level_name][room][wave].end()) {
-			WaveEnemy new_e;
+		//std::get<Numeric>(std::get<std::vector<ValueType>>(std::get<WaveVector>(std::get<RoomVector>(levels_map[level_name]["rooms"])[room]["waves"])[wave][e])[0]);
+
+
+		if ( true ){//std::get<WaveVector>(std::get<RoomVector>(levels_map[level_name]["rooms"])[room]["waves"])[wave] ) {
+			struct WaveEnemy new_e;
 			new_e.name = e;
-			new_e.number = int(levels_map[level_name][room][wave][e][0]);
+			new_e.number = int(std::get<Numeric>(std::get<std::vector<ValueType>>(std::get<WaveVector>(std::get<RoomVector>(levels_map[level_name]["rooms"])[room]["waves"])[wave][e])[0])() );
 			new_e.color = Bullet::Blue; //levels_map[level_name][room][wave][e][1];
-			for (int i = new_e.number) {
+			for (int i = new_e.number; i > 0; i--) {
 				new_e.locations.emplace_back(glm::vec2(0.0f));
 			}
+			enemies.emplace_back(new_e);
 		}
 	}
 
 	return enemies;
 }
 
-std::vector<float> Level::generate_wave(const std::string& level_name, const int room, const int wave, std::shared_ptr<EnemyManager> enemies) {
+void Level::generate_wave(const std::string& level_name, const int room, const int wave, std::shared_ptr<EnemyManager> enemies) {
 	
-	enemies->acquire("hunter", Bullet::Red, glm::vec2(5.0f, 0), Enemy::Hunter);
-	std::vector<WaveEnemy> enemy_list = get_wave_enemies(level_name, room, wave);
-	for (WaveEnemy e : enemy_list) {
+	//enemies->acquire("hunter", Bullet::Red, glm::vec2(5.0f, 0), Enemy::Hunter);
+	std::vector<struct WaveEnemy> enemy_list = get_wave_enemies(level_name, room, wave);
+	for (struct WaveEnemy e : enemy_list) {
 		for (int i = 0; i < e.number; i++) {
-			enemies->acquire(e.name, e.color, e.pos);
+			enemies->acquire(e.name, e.color, e.locations[0]);
 		}
 	}
-	return std::vector<float>{0.0f, 0.0f, 0.0f});
+	//return std::vector<float>{0.0f, 0.0f, 0.0f});
 }
 
 void Level::load_levels() {
 
 	YAML::Node levels_yaml = YAML::LoadFile(data_path("levels.yaml"));
 
-	Numeric::ValueStore default_level;
-	Numeric::ValueStore default_room; // Maybe unneeded?
-	Numeric::ValueStore default_wave;
+	//Numeric::ValueStore default_level;
+	//Numeric::ValueStore default_room; // Maybe unneeded?
+	//Numeric::ValueStore default_wave;
 
-	// Setting up and storing defaults
-	YAML::Node default_ = levels_yaml["default"];
-	for (auto it = default_["level"].begin(); it != default_["level"].end(); it++) {
-		default_level[it->first.as<std::string>()] =
-			Numeric::parse(it->second.as<std::string>());
-	}
-	level_map["default"] = default_level;
+	//// Setting up and storing defaults
+	//YAML::Node default_ = levels_yaml["default"];
+	//for (auto it = default_["level"].begin(); it != default_["level"].end(); it++) {
+	//	default_level[it->first.as<std::string>()] =
+	//		Numeric::parse(it->second.as<std::string>());
+	//}
+	//levels_map["default"] = default_level;
 
-	for (auto it = default_["rooms"].begin(); it != default_["rooms"].end(); it++) {
-		default_room[it->first.as<std::string>()] =
-			Numeric::parse(it->second.as<std::string>());
-	}
-	for (auto it = default_["waves"].begin(); it != default_["waves"].end(); it++) {
-		default_wave[it->first.as<std::string>()] =
-			Numeric::parse(it->second.as<std::string>());
-	}
+	//for (auto it = default_["rooms"].begin(); it != default_["rooms"].end(); it++) {
+	//	default_room[it->first.as<std::string>()] =
+	//		Numeric::parse(it->second.as<std::string>());
+	//}
+	//for (auto it = default_["waves"].begin(); it != default_["waves"].end(); it++) {
+	//	default_wave[it->first.as<std::string>()] =
+	//		Numeric::parse(it->second.as<std::string>());
+	//}
 
 	// Parsing through the yaml
 	for (auto it = levels_yaml.begin(); it != levels_yaml.end(); it++) { // Each level

@@ -34,8 +34,8 @@ Model::Model(std::shared_ptr<View> view_) : view(view_) {
 	//enemies->acquire("soldier", Bullet::Red, glm::vec2(0, -5.0f), Enemy::Soldier);
 
 	//enemies->acquire("hunter", Bullet::Red, glm::vec2(5.0f, 0), Enemy::Hunter);
-	//level->get_wave_enemies("", 0, 0);
-	//enemies->acquire("shifter", Bullet::Red, glm::vec2(10.0f, 0));
+	//level->get_wave_enemies("level one", 0, 0);
+	enemies->acquire("shifter", Bullet::Red, glm::vec2(10.0f, 0));
 	//enemies->acquire("shield", Bullet::Red, glm::vec2(10.0f, 0));
 	//enemies->acquire("ninja", Bullet::Blue, glm::vec2(-20.0f, 0));
 	//enemies->acquire("wizard", Bullet::Blue, glm::vec2(0.0f, 10.0f));

@@ -7,10 +7,13 @@
 #include <vector>
 #include "EnemyManager.hpp"
 #include "BulletManager.hpp"
+#include <unordered_map>
+#include <iostream>
+
 
 class Level {
 public:
-	Level() = default;
+	Level();
 	~Level() = default;
 
 
@@ -21,12 +24,12 @@ public:
 		"turret"
 	};
 
-	typedef struct WaveEnemy {
+	struct WaveEnemy {
 		std::string name;
 		int number;
 		Bullet::Color color;
 		std::vector<glm::vec2> locations;
-	} WaveEnemy;
+	};
 
 	typedef std::variant<std::string, Numeric> ValueType;
 	typedef std::unordered_map<std::string, std::variant<ValueType, std::vector<ValueType>>> WaveMap;
@@ -43,10 +46,10 @@ public:
 	const std::string& str(const std::string& level_name, const int room, const int wave, const std::string& key);
 	Numeric& num(const std::string& level_name, const int room, const int wave, const std::string& key);
 
-	std::vector<WaveEnemy> get_wave_enemies(const std::string& level_name, const int room, const int wave);
+	std::vector<struct WaveEnemy> get_wave_enemies(const std::string& level_name, const int room, const int wave);
 
 	// Generates enemy wave and returns wave time and kill limits. <time, kills, boss health>
-	std::vector<float> generate_wave(const std::string& level_name, const int room, const int wave, std::shared_ptr<EnemyManager> enemies);
+	void generate_wave(const std::string& level_name, const int room, const int wave, std::shared_ptr<EnemyManager> enemies);
 	void load_levels();
 protected:
 	//std::unordered_map<std::string, Numeric::ValueStore> level_map;
