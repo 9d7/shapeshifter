@@ -28,6 +28,8 @@ class Enemy {
 		void update(float elapsed, const glm::vec2 &player_pos);
 		void move(float elapsed, const glm::vec2 &player_position);
 		int take_damage(int damage);
+		void repair_turret(std::shared_ptr<Enemy> e);
+		void dead_turret();
 
 		glm::vec2 size() const;
 		glm::vec2 position() const;

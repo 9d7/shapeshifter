@@ -8,6 +8,7 @@
 #include "Sprite.hpp"
 #include "View.hpp"
 #include "Player.hpp"
+#include "Sound.hpp"
 
 class Model {
 
@@ -29,11 +30,15 @@ class Model {
 
 		float get_bullet_speed() const; // TODO change this so different enemy types have the ability to set their own bullet speeds
 
+		static std::shared_ptr<Enemy> get_closest(glm::vec2 enemy_pos);
+
+		//std::shared_ptr< Sound::PlayingSample > enemy_die;
+
 	protected:
 
 		std::shared_ptr<View> view;
 		std::shared_ptr<BulletManager> bullets;
-		std::shared_ptr<EnemyManager> enemies;
+		static std::shared_ptr<EnemyManager> enemies;
 		std::shared_ptr<Player> player;
 
 		void update_view(float elapsed);

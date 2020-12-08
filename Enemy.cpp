@@ -39,7 +39,6 @@ Enemy::Enemy (
 void Enemy::update(float elapsed, const glm::vec2 &player_pos) {
 	
 	// face player
-	//printf("b4 update %d\n", health);
 	glm::vec2 to_player = player_pos - pos;
 	if (glm::length(to_player) > 0.0f && moveStyle != Deadturret) {
 		spr->set_rotation(glm::atan(to_player.y, to_player.x));
@@ -47,7 +46,6 @@ void Enemy::update(float elapsed, const glm::vec2 &player_pos) {
 
 	move(elapsed, player_pos);
 	spr->set_position(pos);
-	//printf("atfer update %d\n", health);
 }
 
 glm::vec2 Enemy::position() const {
@@ -150,33 +148,64 @@ void Enemy::move(float elapsed, const glm::vec2 &player_position) {
 			shooter.update(elapsed, color, player_position, pos);
 		}
 	} else if (moveStyle == Repairman) {
-		auto perp = glm::vec2(move_enemy.y, -move_enemy.x);
-		if (!strafeDir) perp = glm::vec2(-perp.x, -perp.y);
-		perp = perp * 200.0f * elapsed;
+		std::shared_ptr<Enemy> closest = Model::get_closest(pos);
+		glm::vec2 perp;
 		strafe += elapsed;
-		if (strafe > 0.2f) {
+		if (strafe > 1.0f) {
 			strafe = 0.0f;
 			strafeDir = !strafeDir;
 		}
-		move_enemy = move_enemy * 150.0f * elapsed;
-		pos = pos + perp;
 		float dist = sqrt(dot(diff, diff));
 		if (dist < 70.0f) {
+			move_enemy = move_enemy * 150.0f * elapsed;
 			pos = pos - move_enemy;
-		} 
+			perp = glm::vec2(move_enemy.y, -move_enemy.x);
+			perp = perp * 180.0f * elapsed;
+			if (!strafeDir) perp = glm::vec2(-perp.x, -perp.y);
+			pos = pos + perp;
+
+		} else if (dist > 75.0f && closest != nullptr) {
+			glm::vec2 move_turret = glm::normalize((*closest).position() - pos);
+			move_turret = move_turret * 150.0f * elapsed;
+			pos = pos + move_turret;
+			perp = glm::vec2(move_turret.y, -move_turret.x);
+			float turret_dist = sqrt(dot((*closest).position() - pos, (*closest).position() - pos));
+			if (turret_dist > 30.0f) {
+				perp = perp * 180.0f * elapsed;
+				if (!strafeDir) perp = glm::vec2(-perp.x, -perp.y);
+				pos = pos + perp;
+			} else if (turret_dist < 10.0f) repair_turret(closest);
+			
+		} else {
+			perp = glm::vec2(move_enemy.y, -move_enemy.x);
+			perp = perp * 180.0f * elapsed;
+			if (!strafeDir) perp = glm::vec2(-perp.x, -perp.y);
+			pos = pos + perp;
+		}
+	
 		shooter.update(elapsed, color, player_position, pos);
 	}
 }
 
 int Enemy::take_damage(int damage) {
 	health -= damage;
-	if (health <= 0 && moveStyle == Turret) {
-		Animation::Animation anim;
-		if (color == Bullet::Color::Red) anim = Animation::find_static("deadturret_red");
-		if (color == Bullet::Color::Blue) anim = Animation::find_static("deadturret_blue");
-		spr = spr_mgr->from_anim(anim, true);
-		health = 1000;
-		moveStyle = Deadturret;
-	}
 	return health;
+}
+
+void Enemy::dead_turret() {
+	Animation::Animation anim;
+	if (color == Bullet::Color::Red) anim = Animation::find_static("deadturret_red");
+	if (color == Bullet::Color::Blue) anim = Animation::find_static("deadturret_blue");
+	spr = spr_mgr->from_anim(anim, true);
+	health = 500;
+	moveStyle = Deadturret;
+}
+
+void Enemy::repair_turret(std::shared_ptr<Enemy> e) {
+	Animation::Animation anim;
+	if ((*e).color ==  Bullet::Color::Red) anim = Animation::find_static("turret_red");
+	if ((*e).color == Bullet::Color::Blue) anim = Animation::find_static("turret_blue");
+	(*e).spr = (*e).spr_mgr->from_anim(anim, true);
+	(*e).health = 5;
+	(*e).moveStyle = Turret;
 }

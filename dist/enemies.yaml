@@ -71,7 +71,7 @@ hunter:
           color: 0..1
 
 turret:
-  health: 1
+  health: 5
   aim: once
   red sprite: turret_red
   blue sprite: turret_blue
