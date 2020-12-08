@@ -40,7 +40,7 @@ Model::Model(std::shared_ptr<View> view_) : view(view_) {
 
 	//enemies->acquire("hunter", Bullet::Red, glm::vec2(5.0f, 0), Enemy::Hunter);
 	//level->get_wave_enemies("level one", 0, 0);
-	enemies->acquire("shifter", Bullet::Red, glm::vec2(10.0f, 0));
+	//level1();
 	//enemies->acquire("shield", Bullet::Red, glm::vec2(10.0f, 0));
 	//enemies->acquire("ninja", Bullet::Blue, glm::vec2(-20.0f, 0));
 	//enemies->acquire("wizard", Bullet::Blue, glm::vec2(0.0f, 10.0f));
@@ -73,7 +73,7 @@ void Model::update(float elapsed) {
 
 		bool should_erase = false;
 		const Bullet b = **b_it;
-
+		turrets_dead = 0;
 		if ((*b_it)->get_age() > 1.0f) {
 			should_erase = true;
 		} else {
@@ -82,7 +82,8 @@ void Model::update(float elapsed) {
 				for (EnemyManager::iterator e_it = enemies->begin(); e_it != enemies->end();) {
 					const Enemy e = **e_it;
 					float radius = (e.size().x + e.size().y) / 4.0f; // average of w and h, over 2
-
+					if (e.move_style == Enemy::MovementStyle::Turret) turrets_dead = false;
+					if (e.move_style == Enemy::MovementStyle::Deadturret) turrets_dead += 1;
 					if (glm::length(e.position() - b.get_position()) < radius + 4.0f) {
 						// kill enemy and bullet
 						if (e.get_color() != b.get_color() || e.move_style == Enemy::MovementStyle::Boss) {
@@ -118,6 +119,19 @@ void Model::update(float elapsed) {
 			b_it++;
 		}
 
+	}
+
+	if (enemies->enemies.size() == 0 || (turrets_dead == enemies->enemies.size())) {
+		enemies->enemies.clear();
+		lnum += 1;
+		if (lnum == 2) level2();
+		if (lnum == 3) level3();
+		if (lnum == 4) level4();
+		if (lnum == 5) level5();
+		if (lnum == 6) level6();
+		if (lnum == 7) level7();
+		if (lnum == 8) level8();
+		if (lnum == 9) level9();
 	}
 
 	// update camera to be out of dead space
@@ -236,3 +250,76 @@ std::shared_ptr<Enemy> Model::get_closest(glm::vec2 pos) {
 	}
 	return closest;
 }
+
+void Model::level1() {
+	enemies->acquire("soldier", Bullet::Red, glm::vec2(20, 40.0f));
+	enemies->acquire("soldier", Bullet::Red, glm::vec2(0, 40.0f));
+	enemies->acquire("soldier", Bullet::Blue, glm::vec2(-20, 40.0f));
+}
+
+void Model::level2() {
+	(*(player)).set_position(glm::vec2(0,0));
+	enemies->acquire("turret", Bullet::Red, glm::vec2(20, 40.0f));
+	enemies->acquire("turret", Bullet::Blue, glm::vec2(-20, 40.0f));
+	enemies->acquire("soldier", Bullet::Blue, glm::vec2(20, -40.0f));
+	enemies->acquire("soldier", Bullet::Red, glm::vec2(-20, 40.0f));
+}
+
+
+
+void Model::level3() {
+	(*(player)).set_position(glm::vec2(0,0));
+	enemies->acquire("soldier", Bullet::Red, glm::vec2(40, 40.0f));
+	enemies->acquire("ninja", Bullet::Blue, glm::vec2(-40, 40.0f));
+}
+
+
+void Model::level4() {
+	(*(player)).set_position(glm::vec2(0,0));
+	enemies->acquire("soldier", Bullet::Red, glm::vec2(40, 40.0f));
+	enemies->acquire("wizard", Bullet::Blue, glm::vec2(-40, 40.0f));
+	enemies->acquire("soldier", Bullet::Red, glm::vec2(40, -40.0f));
+}
+
+
+void Model::level5() {
+	(*(player)).set_position(glm::vec2(0,0));
+	enemies->acquire("turret", Bullet::Red, glm::vec2(40, 40.0f));
+	enemies->acquire("turret", Bullet::Blue, glm::vec2(-40, 40.0f));
+	enemies->acquire("repairman", Bullet::Blue, glm::vec2(40, -40.0f));
+	enemies->acquire("repairman", Bullet::Red, glm::vec2(-40, -40.0f));
+}
+
+
+void Model::level6() {
+	(*(player)).set_position(glm::vec2(0,0));
+	enemies->acquire("shifter", Bullet::Red, glm::vec2(40, 40.0f));
+	enemies->acquire("shifter", Bullet::Blue, glm::vec2(-40, 40.0f));
+	enemies->acquire("shifter", Bullet::Blue, glm::vec2(40, -40.0f));
+	enemies->acquire("shifter", Bullet::Red, glm::vec2(-40, -40.0f));
+}
+
+void Model::level7() {
+	(*(player)).set_position(glm::vec2(0,0));
+	enemies->acquire("shifter", Bullet::Red, glm::vec2(40, 40.0f));
+	enemies->acquire("shifter", Bullet::Blue, glm::vec2(-40, 40.0f));
+	enemies->acquire("shield", Bullet::Blue, glm::vec2(40, 20.0f));
+	enemies->acquire("shield", Bullet::Red, glm::vec2(-40, 20.0f));
+}
+
+void Model::level8() {
+	(*(player)).set_position(glm::vec2(0,0));
+	enemies->acquire("turret", Bullet::Red, glm::vec2(40, 50.0f));
+	enemies->acquire("repairman", Bullet::Blue, glm::vec2(40, -40.0f));
+	enemies->acquire("wizard", Bullet::Red, glm::vec2(40, 40.0f));
+	enemies->acquire("ninja", Bullet::Blue, glm::vec2(-40, 40.0f));
+	enemies->acquire("wizard", Bullet::Blue, glm::vec2(40, -20.0f));
+	enemies->acquire("ninja", Bullet::Red, glm::vec2(-40, -20.0f));
+}
+
+void Model::level9() {
+	(*(player)).set_position(glm::vec2(0,0));
+	enemies->acquire("boss", Bullet::Red, glm::vec2(40, 50.0f));
+}
+
+
