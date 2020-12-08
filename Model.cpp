@@ -39,12 +39,12 @@ Model::Model(std::shared_ptr<View> view_) : view(view_) {
 	//enemies->acquire("shield", Bullet::Red, glm::vec2(10.0f, 0));
 	//enemies->acquire("ninja", Bullet::Blue, glm::vec2(-20.0f, 0));
 	//enemies->acquire("wizard", Bullet::Blue, glm::vec2(0.0f, 10.0f));
-	/*enemies->acquire("turret", Bullet::Blue, glm::vec2(0, -10.0f));
-	enemies->acquire("turret", Bullet::Red, glm::vec2(0, 10.0f));
-	enemies->acquire("repairman", Bullet::Blue, glm::vec2(10, -10.0f));
-	enemies->acquire("repairman", Bullet::Red, glm::vec2(15, -10.0f));
-	enemies->acquire("repairman", Bullet::Red, glm::vec2(-10, -15.0f));
-	enemies->acquire("repairman", Bullet::Blue, glm::vec2(-15, -10.0f));*/
+	//enemies->acquire("turret", Bullet::Blue, glm::vec2(0, -10.0f));
+	//enemies->acquire("turret", Bullet::Red, glm::vec2(0, 10.0f));
+	//enemies->acquire("repairman", Bullet::Blue, glm::vec2(10, -10.0f));
+	//enemies->acquire("repairman", Bullet::Red, glm::vec2(15, -10.0f));
+	//enemies->acquire("repairman", Bullet::Red, glm::vec2(-10, -15.0f));
+	//enemies->acquire("boss", Bullet::Blue, glm::vec2(-15, -10.0f));
 
 	view->ui->set_health(10);
 }
@@ -76,11 +76,13 @@ void Model::update(float elapsed) {
 
 					if (glm::length(e.position() - b.get_position()) < radius + 4.0f) {
 						// kill enemy and bullet
-						int health = (*e_it)->take_damage(1);
-						if (health == 0) {
-							Sound::play(*enemy_die, 1.0f, 0.0f);
-							if ((*e_it)->move_style == Enemy::MovementStyle::Turret) (**(e_it)).dead_turret();
-							else e_it = enemies->erase(e_it);
+						if (e.get_color() != b.get_color() || e.move_style == Enemy::MovementStyle::Boss) {
+							int health = (**(e_it)).take_damage(1);
+							if (health == 0) {
+								Sound::play(*enemy_die, 1.0f, 0.0f);
+								if ((**(e_it)).move_style == Enemy::MovementStyle::Turret) (**(e_it)).dead_turret();
+								else e_it = enemies->erase(e_it);
+							}
 						}
 						score += 100;
 						view->ui->set_score(score);

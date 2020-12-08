@@ -30,9 +30,11 @@ class Enemy {
 		int take_damage(int damage);
 		void repair_turret(std::shared_ptr<Enemy> e);
 		void dead_turret();
+		void boss_move(float elapsed, const glm::vec2 &player_position);
 
 		glm::vec2 size() const;
 		glm::vec2 position() const;
+		Bullet::Color get_color() const;
 
 		friend class EnemyManager;
 
@@ -46,7 +48,8 @@ class Enemy {
 			Shifter,
 			Shield,
 			Deadturret,
-			Repairman
+			Repairman,
+			Boss
 		};
 
 		MovementStyle move_style;
@@ -80,6 +83,8 @@ class Enemy {
 
 		// maybe make these part of yaml
 		float strafe = 0.0f;
+		glm::vec2 boss_dir;
+		float update_dir = 1.0f;
 		bool strafe_dir = rand() % 2;
 		float tp = 3.0f;
 		bool tped = false;

@@ -323,3 +323,129 @@ repairman:
           color: 0..1
           sequence: parallel
           dispatch: with
+
+
+boss:
+  health: 30
+  aim: once
+  red sprite: boss
+  blue sprite: boss
+  firing delay: 1
+  movement: boss
+  attacks:
+    -
+      chance: 0.5
+      bullets:
+        -
+          time: 0.01
+          velocity: 0.8
+          angle:    -0.525..0.525
+          number: 50
+          color: 0..0.55
+          sequence: serial
+          dispatch: after
+    -
+      chance: 0.5
+      bullets:
+        -
+          time: 0.01
+          velocity: 0.8
+          angle:    -0.525..0.525
+          number: 50
+          color: 0.45..1
+          sequence: serial
+          dispatch: after
+    -
+      chance: 0.5
+      bullets:
+        -
+          time: 0.05
+          velocity: 1.5
+          angle:    0
+          number: 12
+          color: 0..1
+          sequence: serial
+          dispatch: after
+    -
+      chance: 1
+      bullets:
+        -
+          time: 1
+          velocity: 1
+          angle:    0
+          number: 1
+          color: 0..1
+          sequence: parallel
+          dispatch: with
+        -
+          time: 1
+          velocity: 1
+          angle:    0.628
+          number: 1
+          color: 0..1
+          sequence: parallel
+          dispatch: with
+        -
+          time: 1
+          velocity: 1
+          angle:    -0.628
+          number: 1
+          color: 0..1
+          sequence: parallel
+          dispatch: with
+        -
+          time: 1
+          velocity: 1
+          angle:    1.256
+          number: 1
+          color: 0..1
+          sequence: parallel
+          dispatch: with
+        -
+          time: 1
+          velocity: 1
+          angle:    -1.256
+          number: 1
+          color: 0..1
+          sequence: parallel
+          dispatch: with
+        -
+          time: 1
+          velocity: 1
+          angle:    1.885
+          number: 1
+          color: 0..1
+          sequence: parallel
+          dispatch: with
+        -
+          time: 1
+          velocity: 1
+          angle:    -1.885
+          number: 1
+          color: 0..1
+          sequence: parallel
+          dispatch: with
+        -
+          time: 1
+          velocity: 1
+          angle:    2.513
+          number: 1
+          color: 0..1
+          sequence: parallel
+          dispatch: with
+        -
+          time: 1
+          velocity: 1
+          angle:    -2.513
+          number: 1
+          color: 0..1
+          sequence: parallel
+          dispatch: with
+        -
+          time: 1
+          velocity: 1
+          angle:    3.1415
+          number: 1
+          color: 0..1
+          sequence: parallel
+          dispatch: with

@@ -57,6 +57,10 @@ glm::vec2 Enemy::size() const {
 	return glm::vec2(s.w, s.h);
 }
 
+Bullet::Color Enemy::get_color() const {
+	return color;
+}
+
 void Enemy::move(float elapsed, const glm::vec2 &player_position) {
 	glm::vec2 diff = player_position - pos;
 	glm::vec2 move_enemy = glm::normalize(player_position - pos);
@@ -184,7 +188,35 @@ void Enemy::move(float elapsed, const glm::vec2 &player_position) {
 		}
 
 		shooter.update(elapsed, color, player_position, pos);
+	} else if (move_style == Boss) {
+		boss_move(elapsed, player_position);
 	}
+}
+
+void Enemy::boss_move(float elapsed, const glm::vec2 &player_position) {
+
+	// tried doing something fancier w/ boss, it was buggy though so its out for now :(
+	glm::vec2 diff = player_position - pos;
+	glm::vec2 move_enemy = glm::normalize(player_position - pos);
+	float dist = sqrt(dot(diff, diff));
+
+	strafe += elapsed;
+
+	boss_dir = glm::vec2(move_enemy.y, -move_enemy.x);
+
+	if (strafe > 1.0f) {
+		strafe = 0.0f;
+		strafe_dir = !strafe_dir;
+	}
+
+	if (!strafe_dir) boss_dir = glm::vec2(-boss_dir.x, -boss_dir.y);
+	pos = pos - boss_dir * 100.0f * elapsed;
+
+	if (dist > 150.0f) {
+		pos = pos + move_enemy * 100.0f * elapsed;
+	}
+
+	shooter.update(elapsed, color, player_position, pos);
 }
 
 int Enemy::take_damage(int damage) {
