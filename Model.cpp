@@ -26,7 +26,7 @@ Load< Sound::Sample > background(LoadTagDefault, []() -> Sound::Sample const* {
 	});
 
 Model::Model(std::shared_ptr<View> view_) : view(view_) {
-	Sound::loop(*background);
+	//Sound::loop(*background);
 	player = std::make_shared<Player>(view);
 
 	bullets = std::make_shared<BulletManager>();
