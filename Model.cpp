@@ -121,7 +121,7 @@ void Model::update(float elapsed) {
 
 	}
 
-	if (enemies->enemies.size() == 0 || (turrets_dead == enemies->enemies.size())) {
+	if (enemies->enemies.size() == 0 || ((size_t)turrets_dead == enemies->enemies.size())) {
 		enemies->enemies.clear();
 		lnum += 1;
 		if (lnum == 2) level2();
