@@ -172,7 +172,7 @@ void Model::update_view(float elapsed) {
 }
 
 void Model::player_shoot() {
-	Sound::play(*player_shoot_sound, 1.0f, 0.0f);
+	
 	glm::vec2 shot_target = mouse_world_position;
 
 	if (player->get_assist_mode() != Player::AssistMode::Off) {
@@ -199,9 +199,12 @@ void Model::player_shoot() {
 		}
 	}
 
-	glm::vec2 shot_vector = player->shoot(shot_target);
-
-	bullets->acquire(view->sprites, player->get_color(), player->get_position(), shot_vector, true);
+	if (player->get_cd() <= 0.0f) {
+		Sound::play(*player_shoot_sound, 1.0f, 0.0f);
+		glm::vec2 shot_vector = player->shoot(shot_target);
+		bullets->acquire(view->sprites, player->get_color(), player->get_position(), shot_vector, true);
+	}
+	
 }
 
 void Model::player_move(glm::vec2 direction) {

@@ -61,6 +61,7 @@ class Player {
 		float                   get_rotation() const;
 		AssistMode              get_assist_mode() const;
 		int                     get_lives() const;
+		float                   get_cd() const;
 
 		bool is_bound();
 		
