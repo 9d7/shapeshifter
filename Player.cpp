@@ -25,6 +25,14 @@ void Player::update(float elapsed) {
 		if (glm::length(velocity) < glm::length(friction)) velocity = glm::vec2(0.0f, 0.0f);
 		else velocity += friction;
 	}
+
+	// Binding player to area
+	if (bound) {
+		if (position.x > max_x) position.x = max_x;
+		if (position.y > max_y) position.y = max_y;
+		if (position.x < min_x) position.x = min_x;
+		if (position.y < min_y) position.y = min_y;
+	}
 }
 
 void Player::update_sprite() {
@@ -47,14 +55,13 @@ glm::vec2 Player::shoot(const glm::vec2 target_position) {
 
 }
 
-void Player::reset_player(glm::vec2 reset_position, glm::vec2 reset_velocity, float reset_rotation){
+void Player::reset_player(glm::vec2 reset_position, glm::vec2 reset_velocity, float reset_rotation) {
 	position = reset_position;
 	velocity = reset_velocity;
 	rotation = reset_rotation;
+	bound = false;
 	set_lives(10);
 	update_sprite();
-	//sprite->set_rotation(0.0f);
-	//sprite->set_position(position);
 }
 
 void Player::hit()
@@ -63,6 +70,18 @@ void Player::hit()
 	lives--;
 	hit_cd = 0.5f;
 
+}
+
+void Player::bind(glm::vec2 center, glm::vec2 bounds) {
+	max_x = center.x + bounds.x;
+	max_y = center.y + bounds.y;
+	min_x = center.x - bounds.x;
+	min_y = center.y - bounds.y;
+	bound = true;
+}
+
+void Player::unbind() {
+	bound = false;
 }
 
 void Player::set_lives(int new_lives)
@@ -162,4 +181,8 @@ Player::AssistMode Player::get_assist_mode() const {
 int Player::get_lives() const
 {
 	return lives;
+}
+
+bool Player::is_bound() {
+	return bound;
 }

@@ -29,6 +29,8 @@ class Model {
 
 		void set_mouse_position(const glm::vec2 &position);
 
+		void bind_player();
+
 		float get_bullet_speed() const; // TODO change this so different enemy types have the ability to set their own bullet speeds
 
 		void hunter_kill();
