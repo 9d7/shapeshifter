@@ -36,6 +36,8 @@ class Enemy {
 		glm::vec2 position() const;
 		Bullet::Color get_color() const;
 
+		void kill_turret();
+
 		friend class EnemyManager;
 
 		enum MovementStyle
@@ -92,6 +94,8 @@ class Enemy {
 		float shift = 0.0f;
 
 		float speed;
+
+		float turret_time;
 
 		std::shared_ptr<Sprite> spr;
 

@@ -39,6 +39,7 @@ class Model {
 
 		void hunter_kill();
 		bool turrets_dead();
+		static void kill_turret(Enemy *e);
 
 		static std::shared_ptr<Enemy> get_closest(glm::vec2 enemy_pos);
 		static void spawn_hunter(glm::vec2 pos, Bullet::Color col);

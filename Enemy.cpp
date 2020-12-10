@@ -57,7 +57,7 @@ Enemy::Enemy (
 		std::uniform_real_distribution<float> dist(85.0, 100.0);
 		speed = dist(generator);
 	} else if (move_style == MovementStyle::Shield) {
-		std::uniform_real_distribution<float> dist(95.0, 105.0);
+		std::uniform_real_distribution<float> dist(80.0, 85.0);
 		speed = dist(generator);
 	} else if (move_style == MovementStyle::Deadturret) {
 		speed = 0;
@@ -115,8 +115,8 @@ void Enemy::move(float elapsed, const glm::vec2 &player_position) {
 		pos = pos + move_enemy;
 	} else if (move_style == Turret) {
 		// don't move
-		float dist = sqrt(dot(diff, diff));
-		if (dist < 200.0f) shooter.update(elapsed, color, player_position, pos);
+		
+		shooter.update(elapsed, color, player_position, pos);
 	} else if (move_style == Ninja) {
 		auto perp = glm::vec2(move_enemy.y, -move_enemy.x);
 		if (!strafe_dir) perp = glm::vec2(-perp.x, -perp.y);
@@ -129,9 +129,9 @@ void Enemy::move(float elapsed, const glm::vec2 &player_position) {
 		move_enemy = move_enemy * speed * elapsed;
 		pos = pos + perp;
 		float dist = sqrt(dot(diff, diff));
-		if (dist > 110.0f) {
+		if (dist > 120.0f) {
 			pos = pos + move_enemy;
-		} else if (dist < 50.0f) {
+		} else if (dist < 30.0f) {
 			pos = pos - move_enemy;
 		} else {
 			shooter.update(elapsed, color, player_position, pos);
@@ -153,7 +153,7 @@ void Enemy::move(float elapsed, const glm::vec2 &player_position) {
 				tped = true;
 			}
 			if (tped) shooter.update(elapsed, color, player_position, pos);
-			if (tp > 0.6f) tped = false;
+			if (tp > 0.3f) tped = false;
 		}
 	} else if (move_style == Shifter) {
 		shift += elapsed;
@@ -185,14 +185,14 @@ void Enemy::move(float elapsed, const glm::vec2 &player_position) {
 		if (dist > 20.0f) {
 			pos = pos + move_enemy;
 		}
-		if (dist < 80.0f) {
+		if (dist < 130.0f) {
 			shooter.update(elapsed, color, player_position, pos);
 		}
 	} else if (move_style == Repairman) {
 		std::shared_ptr<Enemy> closest = Model::get_closest(pos);
 		glm::vec2 perp;
 		strafe += elapsed;
-		if (strafe > 1.0f) {
+		if (strafe > 0.5f) {
 			strafe = 0.0f;
 			strafe_dir = !strafe_dir;
 		}
@@ -201,7 +201,7 @@ void Enemy::move(float elapsed, const glm::vec2 &player_position) {
 			move_enemy = move_enemy * speed * elapsed;
 			pos = pos - move_enemy;
 			perp = glm::vec2(move_enemy.y, -move_enemy.x);
-			perp = perp * 180.0f * elapsed;
+			perp = perp * 50.0f * elapsed;
 			if (!strafe_dir) perp = glm::vec2(-perp.x, -perp.y);
 			pos = pos + perp;
 
@@ -212,14 +212,14 @@ void Enemy::move(float elapsed, const glm::vec2 &player_position) {
 			perp = glm::vec2(move_turret.y, -move_turret.x);
 			float turret_dist = sqrt(dot((*closest).position() - pos, (*closest).position() - pos));
 			if (turret_dist > 30.0f) {
-				perp = perp * 180.0f * elapsed;
+				perp = perp * 50.0f * elapsed;
 				if (!strafe_dir) perp = glm::vec2(-perp.x, -perp.y);
 				pos = pos + perp;
 			} else if (turret_dist < 10.0f) repair_turret(closest);
 
 		} else {
 			perp = glm::vec2(move_enemy.y, -move_enemy.x);
-			perp = perp * 180.0f * elapsed;
+			perp = perp * 50.0f * elapsed;
 			if (!strafe_dir) perp = glm::vec2(-perp.x, -perp.y);
 			pos = pos + perp;
 		}
@@ -232,7 +232,7 @@ void Enemy::move(float elapsed, const glm::vec2 &player_position) {
 			tped = true;
 		}
 
-		if (dist < 100.0f) {
+		if (dist > 50.0f) {
 			move_enemy = move_enemy * speed * elapsed;
 			pos = pos + move_enemy;
 		} else {
@@ -248,6 +248,11 @@ void Enemy::move(float elapsed, const glm::vec2 &player_position) {
 		}
 	} else if (move_style == Boss) {
 		boss_move(elapsed, player_position);
+	} else if (move_style == Deadturret) {
+		turret_time += elapsed;
+		if (turret_time > 5.0f) {
+			kill_turret();
+		}
 	}
 }
 
@@ -282,6 +287,10 @@ int Enemy::take_damage(int damage) {
 	return health;
 }
 
+void Enemy::kill_turret() {
+	Model::kill_turret(this);
+}
+
 void Enemy::dead_turret() {
 	Animation::Animation anim;
 	if (color == Bullet::Color::Red) anim = Animation::find_static("deadturret_red");
@@ -292,6 +301,7 @@ void Enemy::dead_turret() {
 }
 
 void Enemy::repair_turret(std::shared_ptr<Enemy> e) {
+	turret_time = 0.0f;
 	Animation::Animation anim;
 	if (e->color ==  Bullet::Color::Red) anim = Animation::find_static("turret_red");
 	if (e->color == Bullet::Color::Blue) anim = Animation::find_static("turret_blue");
