@@ -115,7 +115,7 @@ void Model::update(float elapsed) {
 				}
 			} else {
 				if (b.get_color() != player->get_color() && glm::length(player->get_position() - b.get_position()) < 8.0f + 4.0f) {
-					if (player->get_lives() > 0) //player->hit(); TODOTODOTODO READD++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+					if (player->get_lives() > 0) player->hit();
 					view->ui->set_health(player->get_lives());
 					should_erase = true;
 				}

@@ -13,6 +13,7 @@ void Player::update(float elapsed) {
 	velocity += force * elapsed;
 	force = glm::vec2(0.0f, 0.0f);
 	if (hit_cd >= 0) hit_cd -= elapsed;
+	if (shot_cd >= 0) shot_cd -= elapsed;
 	if (glm::length(velocity) > MAX_VELOCITY) {
 		velocity = glm::normalize(velocity) * MAX_VELOCITY;
 	}

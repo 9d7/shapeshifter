@@ -29,7 +29,7 @@ float Numeric::operator()() const {
 }
 
 std::variant<std::string, Numeric> Numeric::parse(const std::string& in) {
-	printf("starting to parse %s\n", in.c_str());
+	//printf("starting to parse %s\n", in.c_str());
 	// wow, regex is so pretty and readable. :)
 	static std::regex range_regex(R"(^\s*(-?\d*\.?\d+)\s*\.\.\s*(-?\d*\.?\d+)\s*$)");
 	static std::regex choice_regex(R"(^\s*((-?\d*\.?\d+)\s*,\s*)+(-?\d*\.?\d+)\s*$)");
