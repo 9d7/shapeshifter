@@ -82,7 +82,6 @@ void Model::update(float elapsed) {
 				for (EnemyManager::iterator e_it = enemies->begin(); e_it != enemies->end();) {
 					const Enemy e = **e_it;
 					float radius = (e.size().x + e.size().y) / 4.0f; // average of w and h, over 2
-					if (e.move_style == Enemy::MovementStyle::Turret) turrets_dead = false;
 					if (e.move_style == Enemy::MovementStyle::Deadturret) turrets_dead += 1;
 					if (glm::length(e.position() - b.get_position()) < radius + 4.0f) {
 						// kill enemy and bullet
