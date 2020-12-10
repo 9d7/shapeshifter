@@ -30,6 +30,7 @@ class Model {
 		void bind_player();
 		void set_player_position(glm::vec2 new_position);
 		void reset_player(glm::vec2 reset_position = {0.0f, 0.0f});
+		void switch_player_color();
 
 		void set_mouse_position(const glm::vec2 &position);
 

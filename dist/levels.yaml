@@ -124,6 +124,7 @@ level one:
           soldier: [1, random, point, 300..500, 300..500]
         -
           health limit: 50
+          time limit: 10.0
           ninja: [1, random, point, 300..500, 300..500]
           wizard: [1, random, point, 300..500, 300..500]
         -

@@ -240,6 +240,15 @@ void Model::reset_player(glm::vec2 reset_position) {
 	view->update_camera(reset_position);
 }
 
+void Model::switch_player_color() {
+	if (player->get_color() == Bullet::Blue) {
+		set_player_color(Bullet::Red);
+	}
+	else {
+		set_player_color(Bullet::Blue);
+	}
+}
+
 float Model::get_bullet_speed() const {
 	return Player::BULLET_SPEED;
 }

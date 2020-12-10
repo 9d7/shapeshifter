@@ -90,13 +90,14 @@ bool Controller::handle_event(
 
 		if (evt.button.button == SDL_BUTTON_LEFT) {
 
-			model->set_player_color(Bullet::Color::Blue);
+			//model->set_player_color(Bullet::Color::Blue);
 			model->player_shoot();
 
 		} else if (evt.button.button == SDL_BUTTON_RIGHT) {
 
-			model->set_player_color(Bullet::Color::Red);
-			model->player_shoot();
+			//model->set_player_color(Bullet::Color::Red);
+			//model->player_shoot();
+			model->switch_player_color();
 
 		}
 
