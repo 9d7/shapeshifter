@@ -6,13 +6,14 @@
 #include <cmath>
 #include <variant>
 #include <map>
+#include <unordered_map>
 
 class Numeric {
 	public:
 
 		typedef std::vector<float>      Choice;
 		typedef std::pair<float, float> Range;
-	
+
 		typedef std::variant<std::string, Numeric> ValueType;
 		typedef std::unordered_map<std::string, ValueType> ValueStore;
 

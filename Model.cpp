@@ -26,7 +26,7 @@ Load< Sound::Sample > background(LoadTagDefault, []() -> Sound::Sample const* {
 	});
 
 Model::Model(std::shared_ptr<View> view_) : view(view_) {
-	Sound::loop(*background);
+	//Sound::loop(*background);
 	player = std::make_shared<Player>(view);
 
 	bullets = std::make_shared<BulletManager>();
@@ -120,7 +120,7 @@ void Model::update(float elapsed) {
 
 	}
 
-	if (enemies->enemies.size() == 0 || (turrets_dead == enemies->enemies.size())) {
+	if (enemies->enemies.size() == 0 || ((size_t)turrets_dead == enemies->enemies.size())) {
 		enemies->enemies.clear();
 		lnum += 1;
 		if (lnum == 2) level2();
