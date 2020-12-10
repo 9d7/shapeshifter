@@ -6,7 +6,6 @@
 
 Level::Level(std::shared_ptr<EnemyManager> enemy_mgr) {
 
-	//std::unordered_map<std::string, std::variant<ValueType, RoomVector>> test = levels_map[""];
 	levels_yaml = YAML::LoadFile(data_path("levels.yaml"));
 	//printf("yaml: %s\n", levels_yaml.as<std::string>().c_str());
 	enemies = enemy_mgr;
@@ -36,7 +35,7 @@ int Level::start_next_room() {
 }
 
 int Level::start_level(int level_number) {
-	printf("starting %s\n", level_names[level_number].c_str());
+	//printf("starting %s\n", level_names[level_number].c_str());
 	current_level = level_number;
 	current_room = -1;
 	current_wave = -1;
