@@ -12,9 +12,9 @@ class Player {
 		Player(std::shared_ptr<View> view);
 		~Player() = default;
 
-		static constexpr float MOVE_FORCE = 1200.0f;  // Maybe as TODO below?
-		static constexpr float MAX_VELOCITY = 250.0f;   // TODO make a multiplier that we can adjust on the fly if we want powerups or slowing abilities
-		static constexpr float FRICTION_FORCE = 500.0f; // Currently used for force based friction
+		static constexpr float MOVE_FORCE = 1000.0f;  // Maybe as TODO below?
+		static constexpr float MAX_VELOCITY = 180.0f;   // TODO make a multiplier that we can adjust on the fly if we want powerups or slowing abilities
+		static constexpr float FRICTION_FORCE = 600.0f; // Currently used for force based friction
 		static constexpr float BULLET_SPEED = 300.0f;   // Same TODO as above
 
 		enum AssistMode {

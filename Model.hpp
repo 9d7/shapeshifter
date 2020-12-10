@@ -31,6 +31,9 @@ class Model {
 
 		float get_bullet_speed() const; // TODO change this so different enemy types have the ability to set their own bullet speeds
 
+		void hunter_kill();
+		bool turrets_dead();
+
 		static std::shared_ptr<Enemy> get_closest(glm::vec2 enemy_pos);
 
 		static void level1(); 
@@ -43,8 +46,6 @@ class Model {
 		void level8(); 
 		void level9(); 
 		int lnum = 1;
-		int turrets_dead = 0;
-
 		//std::shared_ptr< Sound::PlayingSample > enemy_die;
 
 	protected:

@@ -90,6 +90,8 @@ class Enemy {
 		bool tped = false;
 		float shift = 0.0f;
 
+		float speed;
+
 		std::shared_ptr<Sprite> spr;
 
 		BulletShooter shooter;
