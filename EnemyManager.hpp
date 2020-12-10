@@ -31,6 +31,8 @@ class EnemyManager {
 			const glm::vec2   &pos
 		);
 
+		int get_num_enemies();
+
 		void update(float elapsed, const glm::vec2 &pos);
 		list_type enemies;
 

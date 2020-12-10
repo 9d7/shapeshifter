@@ -33,10 +33,10 @@ Model::Model(std::shared_ptr<View> view_) : view(view_) {
 
 	Model::enemies = std::make_shared<EnemyManager>(view->sprites, bullets);
 
-	level = std::make_shared<Level>();
-
-	//enemies->acquire("soldier", Bullet::Blue, glm::vec2(0, 5.0f), Enemy::Soldier);
-	//enemies->acquire("soldier", Bullet::Red, glm::vec2(0, -5.0f), Enemy::Soldier);
+	level = std::make_shared<Level>(enemies);
+	start();
+	//enemies->acquire("soldier", Bullet::Blue, glm::vec2(0, 5.0f));
+	//enemies->acquire("soldier", Bullet::Red, glm::vec2(0, -5.0f));
 
 	//enemies->acquire("hunter", Bullet::Red, glm::vec2(5.0f, 0), Enemy::Hunter);
 	//level->get_wave_enemies("level one", 0, 0);
@@ -58,7 +58,7 @@ void Model::update(float elapsed) {
 	if (player->get_lives() <= 0) {
 		Mode::set_current(std::make_shared< MenuMode >(MenuMode::Message::None));
 		player->reset_player();
-		view->ui->set_health(10);
+		view->ui->set_health(player->get_lives());
 		view->ui->set_score(0);
 	}
 
@@ -67,6 +67,10 @@ void Model::update(float elapsed) {
 	static size_t score = 0;
 
 	bullets->update(elapsed);
+
+	if (level->update(elapsed)) { // if starting a new level
+		player->reset_player(level->get_spawn_point(level->get_current_level()));
+	}
 
 
 	for (BulletManager::iterator b_it = bullets->begin(); b_it != bullets->end();) {
@@ -120,9 +124,10 @@ void Model::update(float elapsed) {
 		}
 
 	}
-
+	/*
 	if (enemies->enemies.size() == 0 || ((size_t)turrets_dead == enemies->enemies.size())) {
 		enemies->enemies.clear();
+
 		lnum += 1;
 		if (lnum == 2) level2();
 		if (lnum == 3) level3();
@@ -133,7 +138,7 @@ void Model::update(float elapsed) {
 		if (lnum == 8) level8();
 		if (lnum == 9) level9();
 	}
-
+	*/
 	// update camera to be out of dead space
 	static const glm::vec2 MARGIN = glm::vec2(
 			View::FieldWidth,
@@ -251,6 +256,11 @@ std::shared_ptr<Enemy> Model::get_closest(glm::vec2 pos) {
 	return closest;
 }
 
+void Model::start() {
+	player->reset_player((level->start_level(0)));
+	level->advance();
+}
+
 void Model::level1() {
 	enemies->acquire("soldier", Bullet::Red, glm::vec2(20, 40.0f));
 	enemies->acquire("soldier", Bullet::Red, glm::vec2(0, 40.0f));
@@ -321,5 +331,3 @@ void Model::level9() {
 	(*(player)).set_position(glm::vec2(0,0));
 	enemies->acquire("boss", Bullet::Red, glm::vec2(40, 50.0f));
 }
-
-
