@@ -90,7 +90,7 @@ turret:
   aim: once
   red sprite: turret_red
   blue sprite: turret_blue
-  firing delay: 2
+  firing delay: 3
   movement: turret
   attacks:
     -
@@ -164,7 +164,7 @@ ninja:
   aim: once
   red sprite: ninja_red
   blue sprite: ninja_blue
-  firing delay: 1.5
+  firing delay: 1
   movement: ninja
   attacks:
     -
