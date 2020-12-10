@@ -142,6 +142,8 @@ void Model::update(float elapsed) {
 	}
 	*/
 	// update camera to be out of dead space
+
+
 	static const glm::vec2 MARGIN = glm::vec2(
 			View::FieldWidth,
 			View::FieldHeight
