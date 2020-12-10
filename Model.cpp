@@ -17,6 +17,10 @@ Load< Sound::Sample > enemy_die(LoadTagDefault, []() -> Sound::Sample const * {
 	return new Sound::Sample(data_path("enemy_die.wav"));
 });
 
+Load< Sound::Sample > enemy_hit(LoadTagDefault, []() -> Sound::Sample const * {
+	return new Sound::Sample(data_path("enemy_hit.wav"));
+});
+
 Load< Sound::Sample > player_shoot_sound(LoadTagDefault, []() -> Sound::Sample const * {
 	return new Sound::Sample(data_path("shoot.wav"));
 });
@@ -77,8 +81,7 @@ void Model::update(float elapsed) {
 
 		bool should_erase = false;
 		const Bullet b = **b_it;
-		turrets_dead = 0;
-		if ((*b_it)->get_age() > 1.0f) {
+		if ((*b_it)->get_age() > 3.0f) {
 			should_erase = true;
 		} else {
 
@@ -86,20 +89,16 @@ void Model::update(float elapsed) {
 				for (EnemyManager::iterator e_it = enemies->begin(); e_it != enemies->end();) {
 					const Enemy e = **e_it;
 					float radius = (e.size().x + e.size().y) / 4.0f; // average of w and h, over 2
-					if (e.move_style == Enemy::MovementStyle::Turret) turrets_dead = false;
-					if (e.move_style == Enemy::MovementStyle::Deadturret) turrets_dead += 1;
-					if (glm::length(e.position() - b.get_position()) < radius + 4.0f) {
+					if (glm::length(e.position() - b.get_position()) < radius + 4.0f && e.get_color() != b.get_color()) {
 						// kill enemy and bullet
-						if (e.get_color() != b.get_color() || e.move_style == Enemy::MovementStyle::Boss) {
-							int health = (**(e_it)).take_damage(1);
-							if (health == 0) {
-								Sound::play(*enemy_die, 1.0f, 0.0f);
-								if ((**(e_it)).move_style == Enemy::MovementStyle::Turret) (**(e_it)).dead_turret();
-								else e_it = enemies->erase(e_it);
-								
-							}
-							score += 100;
-						}
+						int health = (**(e_it)).take_damage(1);
+						if (health == 0) {
+							Sound::play(*enemy_die, 1.0f, 0.0f);
+							if ((**(e_it)).move_style == Enemy::MovementStyle::Turret) (**(e_it)).dead_turret();
+							else e_it = enemies->erase(e_it);
+							
+						} else Sound::play(*enemy_hit, 1.0f, 0.0f);
+						score += 100;
 						view->ui->set_score(score);
 
 						should_erase = true;
@@ -109,8 +108,8 @@ void Model::update(float elapsed) {
 					}
 				}
 			} else {
-				if (glm::length(player->get_position() - b.get_position()) < 8.0f + 4.0f) {
-					if (player->get_lives() > 0 && b.get_color() != player->get_color()) player->hit();
+				if (b.get_color() != player->get_color() && glm::length(player->get_position() - b.get_position()) < 8.0f + 4.0f) {
+					if (player->get_lives() > 0) player->hit();
 					view->ui->set_health(player->get_lives());
 					should_erase = true;
 				}
@@ -124,6 +123,9 @@ void Model::update(float elapsed) {
 		}
 
 	}
+	//hunter_kill();
+
+	//if (enemies->enemies.size() == 0 || turrets_dead()) {
 	/*
 	if (enemies->enemies.size() == 0 || ((size_t)turrets_dead == enemies->enemies.size())) {
 		enemies->enemies.clear();
@@ -240,6 +242,19 @@ float Model::get_bullet_speed() const {
 	return Player::BULLET_SPEED;
 }
 
+void Model::hunter_kill() {
+	for (EnemyManager::iterator e_it = enemies->begin(); e_it != enemies->end();) {
+		if ((**e_it).move_style == Enemy::MovementStyle::Hunter &&
+			(**e_it).get_color() != player->get_color()
+			&& glm::length(player->get_position() - (**e_it).position()) < 8.0f + 4.0f) {	
+			player->hit();
+			view->ui->set_health(player->get_lives());
+			e_it = enemies->erase(e_it);
+			Sound::play(*enemy_die, 1.0f, 0.0f);
+		} else e_it++;
+	}
+}
+
 std::shared_ptr<Enemy> Model::get_closest(glm::vec2 pos) {
 	std::shared_ptr<Enemy> closest = nullptr;
 	float dist = 3.40282e+038f;
@@ -261,10 +276,21 @@ void Model::start() {
 	level->advance();
 }
 
+bool Model::turrets_dead() {
+	int count = 0;
+	for (EnemyManager::iterator e_it = enemies->begin(); e_it != enemies->end(); e_it++) {
+		if ((*e_it)->move_style == Enemy::MovementStyle::Deadturret) {
+			count++;
+		}
+	}
+
+	return count == enemies->enemies.size();
+}
+
 void Model::level1() {
-	enemies->acquire("soldier", Bullet::Red, glm::vec2(20, 40.0f));
+	enemies->acquire("hunter", Bullet::Red, glm::vec2(40, 60.0f));
 	enemies->acquire("soldier", Bullet::Red, glm::vec2(0, 40.0f));
-	enemies->acquire("soldier", Bullet::Blue, glm::vec2(-20, 40.0f));
+	enemies->acquire("hunter", Bullet::Blue, glm::vec2(-40, 60.0f));
 }
 
 void Model::level2() {

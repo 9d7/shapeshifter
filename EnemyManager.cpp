@@ -10,10 +10,11 @@ std::shared_ptr<Enemy> EnemyManager::acquire(
 	Bullet::Color color,
 	const glm::vec2 &pos
 ) {
-
+	
 	if (spr_mgr == nullptr) {
 		throw std::runtime_error("Enemy::acquire called before Enemy::set_managers");
 	}
+
 
 	auto it = enemy_inputs.find(name);
 	if (it == enemy_inputs.end()) {
@@ -37,8 +38,8 @@ std::shared_ptr<Enemy> EnemyManager::acquire(
 		} else {
 			aim_mode = BulletShooter::AimMode::Always;
 		}
-
 		Enemy::MovementStyle move_style;
+		
 		if (EnemyData::str(name, "movement") == "soldier") {
 			move_style = Enemy::MovementStyle::Soldier;
 		} else if (EnemyData::str(name, "movement") == "hunter") {
@@ -75,12 +76,11 @@ std::shared_ptr<Enemy> EnemyManager::acquire(
 				aim_mode,
 				EnemyData::num(name, "firing delay"),
 				move_style,
-				(int)health
+				(int)health,
 			}
 		));
 		it = enemy_inputs.find(name);
 	}
-
 	enemies.emplace_back(new Enemy(it->second, spr_mgr, blt_mgr, pos, color));
 	return enemies.back();
 

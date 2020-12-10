@@ -47,11 +47,26 @@ soldier:
       chance: 1
       bullets:
         -
-          time: 0
-          velocity: 1
+          time: 0.2
+          velocity: 0.5
           angle:    0
-          number: 1
-          color: 0..1
+          number: 3
+          color: 0
+          sequence: serial
+          dispatch: after
+    -
+      chance: 1
+      bullets:
+        -
+          time: 0.2
+          velocity: 0.5
+          angle:    0
+          number: 3
+          color: 1
+          sequence: serial
+          dispatch: after
+          
+
 
 hunter:
   health: 1
@@ -75,15 +90,15 @@ turret:
   aim: once
   red sprite: turret_red
   blue sprite: turret_blue
-  firing delay: 1
+  firing delay: 2
   movement: turret
   attacks:
     -
       chance: 0.5
       bullets:
         -
-          time: 0.05
-          velocity: 1
+          time: 0.04
+          velocity: 0.6
           angle:    -0.175..0.175
           number: 8
           color: 0
@@ -93,8 +108,8 @@ turret:
       chance: 0.5
       bullets:
         -
-          time: 0.05
-          velocity: 1
+          time: 0.04
+          velocity: 0.6
           angle:    -0.175..0.175
           number: 8
           color: 1
@@ -105,7 +120,7 @@ turret:
       bullets:
         -
           time: 0.05
-          velocity: 1
+          velocity: 0.5
           angle:    0
           number: 1
           color: 0..1
@@ -113,7 +128,7 @@ turret:
           dispatch: with
         -
           time: 0.05
-          velocity: 1
+          velocity: 0.5
           angle:    0.524
           number: 1
           color: 0..1
@@ -121,7 +136,7 @@ turret:
           dispatch: with
         -
           time: 0.05
-          velocity: 1
+          velocity: 0.5
           angle:    -0.524
           number: 1
           color: 0..1
@@ -129,7 +144,7 @@ turret:
           dispatch: with
         -
           time: 0.05
-          velocity: 1
+          velocity: 0.5
           angle:    0.262
           number: 1
           color: 0..1
@@ -137,7 +152,7 @@ turret:
           dispatch: with
         -
           time: 0.05
-          velocity: 1
+          velocity: 0.5
           angle:    -0.262
           number: 1
           color: 0..1
@@ -145,11 +160,11 @@ turret:
           dispatch: with
 
 ninja:
-  health: 3
+  health: 2
   aim: once
   red sprite: ninja_red
   blue sprite: ninja_blue
-  firing delay: 0.7
+  firing delay: 1.5
   movement: ninja
   attacks:
     -
@@ -157,26 +172,53 @@ ninja:
       bullets:
         -
           time: 0.05
-          velocity: 1.5
+          velocity: 0.4
           angle:    0
           number: 1
-          color: 0..1
+          color: 0
           sequence: parallel
           dispatch: with
         -
           time: 0.05
-          velocity: 1.5
+          velocity: 0.4
           angle:    0.262
           number: 1
-          color: 0..1
+          color: 0
           sequence: parallel
           dispatch: with
         -
           time: 0.05
-          velocity: 1.5
+          velocity: 0.4
           angle:    -0.262
           number: 1
-          color: 0..1
+          color: 0
+          sequence: parallel
+          dispatch: with
+    -
+      chance: 1
+      bullets:
+        -
+          time: 0.05
+          velocity: 0.4
+          angle:    0
+          number: 1
+          color: 1
+          sequence: parallel
+          dispatch: with
+        -
+          time: 0.05
+          velocity: 0.4
+          angle:    0.262
+          number: 1
+          color: 1
+          sequence: parallel
+          dispatch: with
+        -
+          time: 0.05
+          velocity: 0.4
+          angle:    -0.262
+          number: 1
+          color: 1
           sequence: parallel
           dispatch: with
 
@@ -193,10 +235,10 @@ wizard:
       bullets:
         -
           time: 0.01
-          velocity: 0.5
+          velocity: 0.4
           angle:    -0.35..0.35
           number: 30
-          color: 0.4..1
+          color: 1
           sequence: serial
           dispatch: after
     -
@@ -204,10 +246,10 @@ wizard:
       bullets:
         -
           time: 0.01
-          velocity: 0.5
+          velocity: 0.4
           angle:    -0.35..0.35
           number: 30
-          color: 0..0.6
+          color: 0
           sequence: serial
           dispatch: after
 
@@ -216,7 +258,7 @@ shifter:
   aim: once
   red sprite: shifter_red
   blue sprite: shifter_blue
-  firing delay: 1
+  firing delay: 1.5
   movement: shifter
   attacks:
     -
@@ -224,21 +266,43 @@ shifter:
       bullets:
         -
           time: 0.05
-          velocity: 1
+          velocity: 0.5
           angle:    0
           number: 5
           color: 0
           sequence: serial
           dispatch: after
     -
-      chance: 0.25 #these need to live longer to be effective
+      chance: 1
       bullets:
         -
           time: 0.05
-          velocity: 0.1
+          velocity: 0.5
+          angle:    0
+          number: 5
+          color: 1
+          sequence: serial
+          dispatch: after
+    -
+      chance: 0.5 
+      bullets:
+        -
+          time: 0.05
+          velocity: 0.3
           angle:    0..6.283
-          number: 15
-          color: 0..1
+          number: 20
+          color: 0..0.51
+          sequence: parallel
+          dispatch: with
+    -
+      chance: 0.5 
+      bullets:
+        -
+          time: 0.05
+          velocity: 0.3
+          angle:    0..6.283
+          number: 20
+          color: 0.49..1
           sequence: parallel
           dispatch: with
 
@@ -258,7 +322,7 @@ shield:
           velocity: 0.5
           angle:    0
           number: 1
-          color: 0..1
+          color: 0
           sequence: parallel
           dispatch: with
         -
@@ -266,7 +330,7 @@ shield:
           velocity: 0.5
           angle:    0.524
           number: 1
-          color: 0..1
+          color: 0
           sequence: parallel
           dispatch: with
         -
@@ -274,7 +338,7 @@ shield:
           velocity: 0.5
           angle:    -0.524
           number: 1
-          color: 0..1
+          color: 0
           sequence: parallel
           dispatch: with
         -
@@ -282,7 +346,7 @@ shield:
           velocity: 0.5
           angle:    0.262
           number: 1
-          color: 0..1
+          color: 0
           sequence: parallel
           dispatch: with
         -
@@ -290,7 +354,50 @@ shield:
           velocity: 0.5
           angle:    -0.262
           number: 1
-          color: 0..1
+          color: 0
+          sequence: parallel
+          dispatch: with
+    -
+      chance: 1
+      bullets:
+        -
+          time: 0.05
+          velocity: 0.5
+          angle:    0
+          number: 1
+          color: 1
+          sequence: parallel
+          dispatch: with
+        -
+          time: 0.05
+          velocity: 0.5
+          angle:    0.524
+          number: 1
+          color: 1
+          sequence: parallel
+          dispatch: with
+        -
+          time: 0.05
+          velocity: 0.5
+          angle:    -0.524
+          number: 1
+          color: 1
+          sequence: parallel
+          dispatch: with
+        -
+          time: 0.05
+          velocity: 0.5
+          angle:    0.262
+          number: 1
+          color: 1
+          sequence: parallel
+          dispatch: with
+        -
+          time: 0.05
+          velocity: 0.5
+          angle:    -0.262
+          number: 1
+          color: 1
           sequence: parallel
           dispatch: with
 
@@ -317,7 +424,7 @@ repairman:
       bullets:
         -
           time: 0.05
-          velocity: 1
+          velocity: 0.5
           angle:    0
           number: 1
           color: 0..1
@@ -338,10 +445,10 @@ boss:
       bullets:
         -
           time: 0.01
-          velocity: 0.8
+          velocity: 0.6
           angle:    -0.525..0.525
           number: 50
-          color: 0..0.55
+          color: 0..0.51
           sequence: serial
           dispatch: after
     -
@@ -349,10 +456,10 @@ boss:
       bullets:
         -
           time: 0.01
-          velocity: 0.8
+          velocity: 0.6
           angle:    -0.525..0.525
           number: 50
-          color: 0.45..1
+          color: 0.49..1
           sequence: serial
           dispatch: after
     -
@@ -360,10 +467,21 @@ boss:
       bullets:
         -
           time: 0.05
-          velocity: 1.5
+          velocity: 0.8
           angle:    0
           number: 12
-          color: 0..1
+          color: 0
+          sequence: serial
+          dispatch: after
+    -
+      chance: 0.5
+      bullets:
+        -
+          time: 0.05
+          velocity: 0.8
+          angle:    0
+          number: 12
+          color: 1
           sequence: serial
           dispatch: after
     -

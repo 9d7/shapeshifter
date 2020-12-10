@@ -7,6 +7,7 @@
 #include "glm/geometric.hpp"
 #include "glm/trigonometric.hpp"
 #include <chrono>
+#include <thread>
 #include <stdexcept>
 
 Enemy::Enemy (
@@ -34,6 +35,36 @@ Enemy::Enemy (
 	spr = spr_mgr->from_anim(anim, true);
 	spr->set_position(pos);
 	spr->set_rotation(0.0f);
+
+	unsigned seed = (unsigned)std::chrono::duration_cast<std::chrono::nanoseconds>
+              (std::chrono::high_resolution_clock::now().time_since_epoch()).count();
+    std::default_random_engine generator(seed);
+	if (move_style == MovementStyle::Soldier) {
+		std::uniform_real_distribution<float> dist(80.0, 100.0);
+		speed = dist(generator);
+	} else if (move_style == MovementStyle::Hunter) {
+		std::uniform_real_distribution<float> dist(105.0, 130.0);
+		speed = dist(generator);
+	} else if (move_style == MovementStyle::Turret) {
+		speed = 0.0f;
+	} else if (move_style == MovementStyle::Ninja) {
+		std::uniform_real_distribution<float> dist(105.0, 120.0);
+		speed = dist(generator);
+	} else if (move_style == MovementStyle::Wizard) {
+		std::uniform_real_distribution<float> dist(85.0, 100.0);
+		speed = dist(generator);;
+	} else if (move_style == MovementStyle::Shifter) {
+		std::uniform_real_distribution<float> dist(85.0, 100.0);
+		speed = dist(generator);
+	} else if (move_style == MovementStyle::Shield) {
+		std::uniform_real_distribution<float> dist(95.0, 105.0);
+		speed = dist(generator);
+	} else if (move_style == MovementStyle::Deadturret) {
+		speed = 0;
+	} else if (move_style == MovementStyle::Repairman) {
+		std::uniform_real_distribution<float> dist(110.0, 135.0);
+		speed = dist(generator);
+	}
 }
 
 void Enemy::update(float elapsed, const glm::vec2 &player_pos) {
@@ -66,42 +97,43 @@ void Enemy::move(float elapsed, const glm::vec2 &player_position) {
 	glm::vec2 move_enemy = glm::normalize(player_position - pos);
 	if (move_style == Soldier) {
 		float dist = sqrt(dot(diff, diff));
-		move_enemy = move_enemy * 110.0f * elapsed;
+		move_enemy = move_enemy * speed * elapsed;
 		if (dist > 150.0f) {
 			pos = pos + move_enemy;
-		} else if (dist < 70.0f) {
+		} else if (dist < 50.0f) {
 			pos = pos - move_enemy;
 		} else {
 			shooter.update(elapsed, color, player_position, pos);
 		}
 	} else if (move_style == Hunter) {
-		move_enemy = move_enemy * 150.0f * elapsed;
+		move_enemy = move_enemy * speed * elapsed;
 		pos = pos + move_enemy;
 	} else if (move_style == Turret) {
 		// don't move
-		shooter.update(elapsed, color, player_position, pos);
+		float dist = sqrt(dot(diff, diff));
+		if (dist < 200.0f) shooter.update(elapsed, color, player_position, pos);
 	} else if (move_style == Ninja) {
 		auto perp = glm::vec2(move_enemy.y, -move_enemy.x);
 		if (!strafe_dir) perp = glm::vec2(-perp.x, -perp.y);
-		perp = perp * 200.0f * elapsed;
+		perp = perp * 100.0f * elapsed;
 		strafe += elapsed;
 		if (strafe > 0.4f) {
 			strafe = 0.0f;
 			strafe_dir = !strafe_dir;
 		}
-		move_enemy = move_enemy * 140.0f * elapsed;
+		move_enemy = move_enemy * speed * elapsed;
 		pos = pos + perp;
 		float dist = sqrt(dot(diff, diff));
-		if (dist > 100.0f) {
+		if (dist > 110.0f) {
 			pos = pos + move_enemy;
-		} else if (dist < 30.0f) {
+		} else if (dist < 50.0f) {
 			pos = pos - move_enemy;
 		} else {
 			shooter.update(elapsed, color, player_position, pos);
 		}
 	} else if (move_style == Wizard) {
 		float dist = sqrt(dot(diff, diff));
-		move_enemy = move_enemy * 110.0f * elapsed;
+		move_enemy = move_enemy * speed * elapsed;
 		tp += elapsed;
 		if (dist > 90.0f) {
 			pos = pos + move_enemy;
@@ -134,17 +166,17 @@ void Enemy::move(float elapsed, const glm::vec2 &player_position) {
 			shift = 0.0f;
 		}
 		float dist = sqrt(dot(diff, diff));
-		move_enemy = move_enemy * 110.0f * elapsed;
-		if (dist > 140.0f) {
+		move_enemy = move_enemy * speed * elapsed;
+		if (dist > 150.0f) {
 			pos = pos + move_enemy;
-		} else if (dist < 60.0f) {
+		} else if (dist < 50.0f) {
 			pos = pos - move_enemy;
 		} else {
 			shooter.update(elapsed, color, player_position, pos);
 		}
 	} else if (move_style == Shield) {
 		float dist = sqrt(dot(diff, diff));
-		move_enemy = move_enemy * 120.0f * elapsed;
+		move_enemy = move_enemy * speed * elapsed;
 		if (dist > 20.0f) {
 			pos = pos + move_enemy;
 		}
@@ -161,7 +193,7 @@ void Enemy::move(float elapsed, const glm::vec2 &player_position) {
 		}
 		float dist = sqrt(dot(diff, diff));
 		if (dist < 70.0f) {
-			move_enemy = move_enemy * 150.0f * elapsed;
+			move_enemy = move_enemy * speed * elapsed;
 			pos = pos - move_enemy;
 			perp = glm::vec2(move_enemy.y, -move_enemy.x);
 			perp = perp * 180.0f * elapsed;
@@ -170,7 +202,7 @@ void Enemy::move(float elapsed, const glm::vec2 &player_position) {
 
 		} else if (dist > 75.0f && closest != nullptr) {
 			glm::vec2 move_turret = glm::normalize((*closest).position() - pos);
-			move_turret = move_turret * 150.0f * elapsed;
+			move_turret = move_turret * speed * elapsed;
 			pos = pos + move_turret;
 			perp = glm::vec2(move_turret.y, -move_turret.x);
 			float turret_dist = sqrt(dot((*closest).position() - pos, (*closest).position() - pos));
