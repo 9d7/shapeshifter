@@ -36,6 +36,8 @@ class Model {
 
 		static std::shared_ptr<Enemy> get_closest(glm::vec2 enemy_pos);
 
+		void start();
+
 		static void level1(); 
 		void level2();
 		void level3();

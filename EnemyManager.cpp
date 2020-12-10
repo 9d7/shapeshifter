@@ -86,6 +86,14 @@ std::shared_ptr<Enemy> EnemyManager::acquire(
 
 }
 
+int EnemyManager::get_num_enemies() {
+	int num_dead_turrets = 0;
+	for (auto it = enemies.begin(); it != enemies.end(); it++) {
+		if ((*it)->move_style == Enemy::MovementStyle::Deadturret) num_dead_turrets++;
+	}
+	return int(enemies.size()) - num_dead_turrets;
+}
+
 void EnemyManager::update(float elapsed, const glm::vec2 &player_pos) {
 	for (std::shared_ptr<Enemy> &e : enemies) {
 		e->update(elapsed, player_pos);

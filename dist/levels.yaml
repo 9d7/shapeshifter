@@ -4,16 +4,16 @@
 # center: Room center
 # bounds: How far you are allowed to go in the x and y directions from center
 # room type: what type of room it is and how waves are interpreted. random spawn, boss
-# enemy waves: List of waves in the room. Next wave spawns after a number or all enemies are killed or time expires. If boss, change to health and next boss phase
+# waves: List of waves in the room. Next wave spawns after a number or all enemies are killed or time expires. If boss, change to health and next boss phase
 
 # time limit: Number of seconds before next wave spawns
 # kill limit: Number of kills before next wave spawns. Should default to all enemies dead if no limit is set
-# health limit: Amount of health boss
-# enemies: List of enemies in the wave
+# health limit: Amount of damage boss takes before next wave
 
-# enemy type: The type of enemy
+# enemy name: The type of enemy, with a sequence of [number, color, spawn location] IN THAT ORDER! same ommission rules as default values
 # number: How many enemies of that type you want to spawn in the wave
 # color: What color the enemy should be. "random" can be used instead of a color for a random red or blue. "split" can be used for an even distribution
+# spawn location: radius around the player enemies spawn
 default:
   level:
     spawn: [0.0, 0.0]
@@ -22,7 +22,7 @@ default:
         center: [0.0, 0.0] 
         bounds: [300.0, 300.0] 
         room type: random spawn
-        enemy waves:
+        waves:
           -
             time limit: 10.0
             kill limit: 1
@@ -34,7 +34,7 @@ default:
         center: [400.0, 400.0]
         bounds: [300.0, 300.0] 
         room type: boss
-        enemy waves:
+        waves:
           -
             time limit: 15.0
             kill limit: 3
@@ -57,19 +57,22 @@ level one:
       center: [0.0, 0.0] 
       bounds: [300.0, 300.0] 
       room type: random spawn
-      enemy waves:
+      waves:
         -
           time limit: 10.0
           kill limit: 1
           soldier: [1, blue]
         -
-          hunter: [1, red]
+          turret: [1, red]
           soldier: [1..4, random]
+        -
+          ninja:
+          wizard: [3]
     -
       center: [400.0, 400.0]
       bounds: [300.0, 300.0]
       room type: boss
-      enemy waves:
+      waves:
         -
           time limit: 15.0
           kill limit: 3

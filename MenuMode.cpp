@@ -50,7 +50,7 @@ bool MenuMode::handle_event(const SDL_Event &evt, const glm::uvec2 &window_size)
 	else if (evt.type == SDL_KEYDOWN) {
 		if (evt.key.keysym.scancode == SDL_SCANCODE_P) {
 			Mode::set_current(std::make_shared<PlayMode>(shared_from_this()));
-			Model::level1();
+			
 		}
 	}
 
