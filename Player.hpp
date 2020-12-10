@@ -73,7 +73,7 @@ class Player {
 
 		// Editable values with defaults
 		bool bound = false;
-		int lives = 10;
+		int lives = 20;
 		float hit_cd = 1.0f;
 		Bullet::Color color = Bullet::Color::Blue;
 		bool rotation_lock_active = false;
