@@ -25,7 +25,12 @@ public:
 		"soldier",
 		"ninja",
 		"hunter",
-		"turret"
+		"turret",
+		"shifter",
+		"ninja",
+		"wizard",
+		"shield",
+		"repairman"
 	};
 
 	struct WaveEnemy {
