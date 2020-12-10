@@ -64,6 +64,11 @@ Enemy::Enemy (
 	} else if (move_style == MovementStyle::Repairman) {
 		std::uniform_real_distribution<float> dist(110.0, 135.0);
 		speed = dist(generator);
+	} else if (move_style == MovementStyle::Homing) {
+		std::uniform_real_distribution<float> dist(85.0, 100.0);
+		speed = dist(generator);
+	} else if (move_style == MovementStyle::Boss) {
+		speed = 100.0f;
 	}
 }
 
@@ -220,6 +225,27 @@ void Enemy::move(float elapsed, const glm::vec2 &player_position) {
 		}
 
 		shooter.update(elapsed, color, player_position, pos);
+	} else if (move_style == Homing) {
+		float dist = sqrt(dot(diff, diff));
+		tp += elapsed;
+		if (tp > 3.0f) {
+			tped = true;
+		}
+
+		if (dist < 100.0f) {
+			move_enemy = move_enemy * speed * elapsed;
+			pos = pos + move_enemy;
+		} else {
+			if (tped) {
+				int r = std::rand() % 2;
+				Bullet::Color col;
+				if (r == 1) col = Bullet::Blue;
+				else col = Bullet::Red;
+				Model::spawn_hunter(pos, col);
+				tp = 0.0f;
+				tped = false;
+			}
+		}
 	} else if (move_style == Boss) {
 		boss_move(elapsed, player_position);
 	}

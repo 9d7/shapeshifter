@@ -3,6 +3,7 @@
 #include <memory>
 #include "Level.hpp"
 #include "Animation.hpp"
+#include "Bullet.hpp"
 #include "BulletManager.hpp"
 #include "Enemy.hpp"
 #include "EnemyManager.hpp"
@@ -37,6 +38,7 @@ class Model {
 		bool turrets_dead();
 
 		static std::shared_ptr<Enemy> get_closest(glm::vec2 enemy_pos);
+		static void spawn_hunter(glm::vec2 pos, Bullet::Color col);
 
 		void start();
 

@@ -132,6 +132,8 @@ void Model::update(float elapsed) {
 	}
 
 	// update camera to be out of dead space
+
+
 	static const glm::vec2 MARGIN = glm::vec2(
 			View::FieldWidth,
 			View::FieldHeight
@@ -280,6 +282,10 @@ bool Model::turrets_dead() {
 	}
 
 	return count == enemies->enemies.size();
+}
+
+void Model::spawn_hunter(glm::vec2 pos, Bullet::Color col) {
+	enemies->acquire("hunter", col, pos);
 }
 
 /*

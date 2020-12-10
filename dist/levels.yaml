@@ -56,7 +56,7 @@ level one:
   rooms:
     -
       center: [0.0, 0.0] 
-      bounds: [300.0, 300.0] 
+      bounds: [100.0, 100.0] 
       room type: random spawn
       waves:
         -
