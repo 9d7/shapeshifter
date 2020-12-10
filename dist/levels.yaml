@@ -29,7 +29,7 @@ default:
             soldier: [1, blue]
           -
             hunter: [1, red]
-            soldier: [1..4, blue]
+            soldier: [1..4, blue, 15..30]
       -
         center: [400.0, 400.0]
         bounds: [300.0, 300.0] 
@@ -60,11 +60,12 @@ level one:
       waves:
         -
           time limit: 10.0
-          kill limit: 1
-          soldier: [1, blue]
+          kill limit: 6
+          soldier: [1, random, 50..100]
+          turret: [10, random, 100..150]
         -
           turret: [1, red]
-          soldier: [1..4, random]
+          soldier: [2..5, random, 15..30]
         -
           ninja:
           wizard: [3]

@@ -65,6 +65,17 @@ void Player::hit()
 
 }
 
+void Player::bind(glm::vec2 center, glm::vec2 bounds) {
+	float max_x = center.x + bounds.x;
+	float max_y = center.y + bounds.y;
+	float min_x = center.x - bounds.x;
+	float min_y = center.y - bounds.y;
+	if (position.x > max_x) position.x = max_x;
+	if (position.y > max_y) position.y = max_y;
+	if (position.x > min_x) position.x = min_x;
+	if (position.y > min_y) position.y = min_y;
+}
+
 void Player::set_lives(int new_lives)
 {
 	lives = new_lives;

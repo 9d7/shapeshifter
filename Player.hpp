@@ -38,6 +38,8 @@ class Player {
 			float reset_rotation = 0.0f
 		);
 		void      hit();
+		void      bind(glm::vec2 center, glm::vec2 bounds);
+		void      unbind();
 
 		// set/get functions
 		void set_lives(int new_lives);
