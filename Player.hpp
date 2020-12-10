@@ -61,6 +61,8 @@ class Player {
 		float                   get_rotation() const;
 		AssistMode              get_assist_mode() const;
 		int                     get_lives() const;
+
+		bool is_bound();
 		
 
 	protected:
@@ -70,6 +72,7 @@ class Player {
 		std::shared_ptr<Sprite> sprite;
 
 		// Editable values with defaults
+		bool bound = false;
 		int lives = 10;
 		float hit_cd = 1.0f;
 		Bullet::Color color = Bullet::Color::Blue;
@@ -84,4 +87,10 @@ class Player {
 		glm::vec2 velocity { 0.0f, 0.0f };
 		glm::vec2 position { 0.0f, 0.0f };
 		glm::vec2 friction { 0.0f, 0.0f };
+
+		// Bounding coords
+		float max_x = 0.0f;
+		float max_y = 0.0f;
+		float min_x = 0.0f;
+		float min_y = 0.0f;
 };

@@ -21,6 +21,13 @@ public:
 		"level two"
 	};
 
+	enum LevelStatus {
+		NoAdvance,
+		NextWave,
+		NextRoom,
+		NextLevel
+	};
+
 	int get_current_level();
 	int get_current_room();
 	int get_current_wave();
@@ -45,9 +52,9 @@ public:
 	int start_next_wave(); // increments current_wave, calls spawn, returns wave index. Returns -1 if no more waves
 	int start_next_room();
 	glm::vec2 start_level(int level_number); // set initial values for a level
-	bool advance(); // called when you finish a wave/room/level, i.e. current area is done
+	LevelStatus advance(); // called when you finish a wave/room/level, i.e. current area is done
 
-	bool update(float elapsed);
+	LevelStatus update(float elapsed);
 	void update_limits(float elapsed);
 	
 	bool is_limits_hit();

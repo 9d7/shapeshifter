@@ -71,6 +71,7 @@ Numeric Numeric::parse_num(const YAML::Node& in) {
 }
 
 std::string Numeric::parse_string(const YAML::Node& in) {
+	//printf("huh\n");
 	return std::get<std::string>(parse(in.as<std::string>()));
 }
 

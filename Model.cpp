@@ -72,9 +72,16 @@ void Model::update(float elapsed) {
 
 	bullets->update(elapsed);
 
-	if (level->update(elapsed)) { // if starting a new level
+	Level::LevelStatus level_status = level->update(elapsed);
+	if (level_status == Level::NextLevel) { // if starting a new level, reset the player and teleport where you need them to be
 		player->reset_player(level->get_spawn_point(level->get_current_level()));
+		bind_player();
 	}
+	else if (level_status == Level::NextRoom) { // TODO pause this until player is close enough to the new center
+		player->set_position(level->get_room_center(level->get_current_room())); // TODO remove when above is done and replace with unbind until new center is reached
+		bind_player();
+	}
+	
 
 
 	for (BulletManager::iterator b_it = bullets->begin(); b_it != bullets->end();) {
@@ -123,24 +130,7 @@ void Model::update(float elapsed) {
 		}
 
 	}
-	//hunter_kill();
 
-	//if (enemies->enemies.size() == 0 || turrets_dead()) {
-	/*
-	if (enemies->enemies.size() == 0 || ((size_t)turrets_dead == enemies->enemies.size())) {
-		enemies->enemies.clear();
-
-		lnum += 1;
-		if (lnum == 2) level2();
-		if (lnum == 3) level3();
-		if (lnum == 4) level4();
-		if (lnum == 5) level5();
-		if (lnum == 6) level6();
-		if (lnum == 7) level7();
-		if (lnum == 8) level8();
-		if (lnum == 9) level9();
-	}
-	*/
 	// update camera to be out of dead space
 	static const glm::vec2 MARGIN = glm::vec2(
 			View::FieldWidth,
@@ -238,6 +228,10 @@ void Model::set_mouse_position(const glm::vec2 &position) {
 	view->ui->set_cursor(position);
 }
 
+void Model::bind_player() {
+	player->bind(level->get_room_center(level->get_current_room()), level->get_room_bounds(level->get_current_room()));
+}
+
 float Model::get_bullet_speed() const {
 	return Player::BULLET_SPEED;
 }
@@ -274,6 +268,7 @@ std::shared_ptr<Enemy> Model::get_closest(glm::vec2 pos) {
 void Model::start() {
 	player->reset_player((level->start_level(0)));
 	level->advance();
+	bind_player();
 }
 
 bool Model::turrets_dead() {

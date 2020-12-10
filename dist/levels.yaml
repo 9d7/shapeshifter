@@ -10,10 +10,10 @@
 # kill limit: Number of kills before next wave spawns. Should default to all enemies dead if no limit is set
 # health limit: Amount of damage boss takes before next wave
 
-# enemy name: The type of enemy, with a sequence of [number, color, spawn location] IN THAT ORDER! same ommission rules as default values
+# enemy name: The type of enemy, with a sequence of [number, color, spawn type, radius/xpos, theta/ypos] IN THAT ORDER! same omission rules as default values [xpos, ypos]
 # number: How many enemies of that type you want to spawn in the wave
 # color: What color the enemy should be. "random" can be used instead of a color for a random red or blue. "split" can be used for an even distribution
-# spawn location: radius around the player enemies spawn
+# spawn type: "radius" is the radius around the player enemies spawn, theta is the angle. "point" is the (xpos, ypos) spawn point. Omitting defaults to rand radius/theta
 default:
   level:
     spawn: [0.0, 0.0]
@@ -21,23 +21,23 @@ default:
       -
         center: [0.0, 0.0] 
         bounds: [300.0, 300.0] 
-        room type: random spawn
+        room type: 
         waves:
           -
             time limit: 10.0
             kill limit: 1
-            soldier: [1, blue]
+            soldier: 
           -
-            hunter: [1, red]
-            soldier: [1..4, blue, 15..30]
+            hunter: 
+            soldier: [1..4, blue, point, 50, 50]
       -
         center: [400.0, 400.0]
         bounds: [300.0, 300.0] 
         room type: boss
         waves:
           -
-            time limit: 15.0
-            kill limit: 3
+            time limit: 
+            kill limit: 
             health limit: 25
             boss: [1]
             soldier: [3]
@@ -61,11 +61,11 @@ level one:
         -
           time limit: 10.0
           kill limit: 6
-          soldier: [1, random, 50..100]
-          turret: [10, random, 100..150]
+          soldier: [1..4, blue, point, 50, 50]
+          turret: [10, random]
         -
           turret: [1, red]
-          soldier: [2..5, random, 15..30]
+          soldier: [2..5, random]
         -
           ninja:
           wizard: [3]

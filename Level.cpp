@@ -44,9 +44,8 @@ glm::vec2 Level::start_level(int level_number) {
 	// a vector is treated as a yaml node, isSequence, with each data point in that 
 }
 
-bool Level::advance() {
+Level::LevelStatus Level::advance() {
 	printf("advancing\n");
-	printf("wave: %d\n", current_wave);
 	// Advances to next wave
 	if (start_next_wave() < 0) { 
 		// if no more waves, go to next room
@@ -54,19 +53,20 @@ bool Level::advance() {
 			// if no more rooms in level, go to next level
 			// TODO change this so it goes to an in between screen (a shop? just a "level completed, press X to advance"? TBD)
 			start_level(current_level); //TODO change this to ++ if you want to advance to the next level, rn just restarts the level
-			return true;
+			return NextLevel;
 		}
+		return NextRoom;
 	}
-	return false;
+	return NextWave;
 }
 
-bool Level::update(float elapsed) {
+Level::LevelStatus Level::update(float elapsed) {
 	update_limits(elapsed);
 	if (is_limits_hit()) {
 		printf("limits hit: %f %d %d || %f %d %d\n", time_left, kills_left, boss_health_left, time_limit, kill_limit, boss_health_limit);
 		return advance();
 	}
-	return false;
+	return NoAdvance;
 }
 
 void Level::update_limits(float elapsed) {
@@ -94,6 +94,10 @@ void Level::set_limits() {
 
 int Level::get_current_level() {
 	return current_level;
+}
+
+int Level::get_current_room() {
+	return current_room;
 }
 
 int Level::get_number_of_rooms() {
@@ -141,18 +145,33 @@ Bullet::Color Level::get_enemy_color(const YAML::Node& in) {
 }
 
 glm::vec2 Level::get_enemy_spawn_position(const YAML::Node& in) {
-	// TODO @jinwoo, if you want to edit this to make spawns more robust, go ahead
-	// I just have a lot more things to implement and this is good enough for now
-	// To make more robust, would have to edit the yaml. Easiest way to avoid that is just edit the default
 	float theta = (Numeric(Numeric::Range(0.0f, 6.28f)))();
+	float radius = (Numeric(Numeric::Range(150.0f, 300.0f)))();
 	glm::vec2 spawn_vec = glm::vec2(1.0f, 0.0f);
-	if (in.size() < 3) { // default value
-		float radius = (Numeric(Numeric::Range(150.0f, 300.0f)))();
-		glm::vec2 spawn_pos = glm::rotate(spawn_vec, theta) * radius;
+	glm::vec2 spawn_pos = glm::vec2(0.0f, 0.0f);
+	
+	if (in.size() <= 2) { // default value, no spawn type provided
+		spawn_pos = glm::rotate(spawn_vec, theta) * radius;
 		return spawn_pos; 
 	}
-	float radius = Numeric::parse_num(in[2])();
-	glm::vec2 spawn_pos = glm::rotate(spawn_vec, theta) * radius;
+
+	// spawn type provided
+	std::string spawn_type = Numeric::parse_string(in[2]);
+	if (spawn_type == "point") { // point requires xpos and ypos to be provided 
+		spawn_pos = glm::vec2( Numeric::parse_num(in[3])(), Numeric::parse_num(in[4])() );
+	}
+	else if (in.size() <= 5) { // radius and theta provided
+		radius = Numeric::parse_num(in[3])();
+		theta = Numeric::parse_num(in[4])();
+		spawn_pos = glm::rotate(spawn_vec, theta) * radius;
+	}
+	else if (in.size() <= 4) { // only radius provided
+		radius = Numeric::parse_num(in[3])();
+		spawn_pos = glm::rotate(spawn_vec, theta) * radius;
+	}
+	else { // only spawn type provided (but why do this?)
+		spawn_pos = glm::rotate(spawn_vec, theta) * radius;
+	}
 	return spawn_pos;
 }
 
@@ -188,5 +207,4 @@ void Level::spawn_wave() {
 		}
 	}
 	set_limits();
-	//std::vector<int> limits{ time_limit, kill_limit, boss_health_limit };
 }
