@@ -13,9 +13,9 @@ MenuMode::MenuMode(Message m) {
 	view->draw_ui = false;
 
 	sprites.push_back(view->ui->on_field.from_anim(Animation::find_static("logo"), true));
-	sprites.back()->set_position(glm::vec2(View::FieldWidth / 2.0f, View::FieldHeight * 0.5f));
+	sprites.back()->set_position(glm::vec2(View::FieldWidth / 2.0f, View::FieldHeight * 0.65f));
 	sprites.push_back(view->ui->on_field.from_anim(Animation::find_static("p_to_play"), true));
-	sprites.back()->set_position(glm::vec2(View::FieldWidth / 2.0f, View::FieldHeight * 0.1f));
+	sprites.back()->set_position(glm::vec2(View::FieldWidth / 2.0f, View::FieldHeight * 0.25f));
 
 	if (m == Died) {
 		sprites.push_back(view->ui->on_field.from_anim(Animation::find_dynamic("died"), true));
