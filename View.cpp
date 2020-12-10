@@ -189,3 +189,7 @@ void View::update(float elapsed) {
 void View::update_camera(const glm::vec2 &pos) {
 	camera_position = pos + glm::vec2(ScreenWidth - FieldWidth, ScreenHeight - FieldHeight) / 2.0f;
 }
+
+glm::vec2 View::get_camera_position() {
+	return camera_position;
+}

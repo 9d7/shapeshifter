@@ -90,7 +90,7 @@ std::vector<std::variant<std::string, Numeric>> Numeric::parse_sequence(const YA
 glm::vec2 Numeric::parse_vector(const YAML::Node& in) {
 	//printf("parsing yaml vector\n");
 	std::vector<std::variant<std::string, Numeric>> sequence = parse_sequence(in);
-	glm::vec2 ret = glm::vec2((std::get<Numeric>(sequence[0]))(), std::get<Numeric>(sequence[0])());
+	glm::vec2 ret = glm::vec2((std::get<Numeric>(sequence[0]))(), std::get<Numeric>(sequence[1])());
 	//printf("parsed yaml vector\n");
 	return ret;
 }

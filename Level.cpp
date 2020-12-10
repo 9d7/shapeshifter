@@ -214,7 +214,7 @@ void Level::spawn_wave() {
 		else { // key is an enemy name
 			int number_of_enemies = get_number_of_enemies(it->second);
 			for (int i = 0; i < number_of_enemies; i++) {
-				enemies->acquire(key, get_enemy_color(it->second), get_enemy_spawn_position(it->second));
+				enemies->acquire(key, get_enemy_color(it->second), get_enemy_spawn_position(it->second) + get_room_center(current_room));
 			}
 		}
 	}

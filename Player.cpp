@@ -60,7 +60,7 @@ void Player::reset_player(glm::vec2 reset_position, glm::vec2 reset_velocity, fl
 	velocity = reset_velocity;
 	rotation = reset_rotation;
 	bound = false;
-	set_lives(10);
+	//set_lives(10);
 	update_sprite();
 }
 
@@ -77,6 +77,7 @@ void Player::bind(glm::vec2 center, glm::vec2 bounds) {
 	max_y = center.y + bounds.y;
 	min_x = center.x - bounds.x;
 	min_y = center.y - bounds.y;
+	printf("%f %f\n", center.x, center.y);
 	bound = true;
 }
 

@@ -15,48 +15,13 @@
 # number: How many enemies of that type you want to spawn in the wave
 # color: What color the enemy should be. "random" can be used instead of a color for a random red or blue. "split" can be used for an even distribution
 # spawn type: "radius" is the radius around the player enemies spawn, theta is the angle. "point" is the (xpos, ypos) spawn point. Omitting defaults to rand radius/theta
-default:
-  level:
-    spawn: [0.0, 0.0]
-    rooms:
-      -
-        center: [0.0, 0.0] 
-        bounds: [300.0, 300.0] 
-        room type: 
-        waves:
-          -
-            time limit: 10.0
-            kill limit: 1
-            soldier: 
-          -
-            hunter: 
-            soldier: [1..4, blue, point, 50, 50]
-      -
-        center: [400.0, 400.0]
-        bounds: [300.0, 300.0] 
-        room type: boss
-        waves:
-          -
-            time limit: 
-            kill limit: 
-            health limit: 25
-            boss: [1]
-            soldier: [3]
-          -
-            health limit: 50
-            ninja: [2, split]
-          -
-            health limit: 25
-            hunter: [6]
-
-
 
 level one:
   spawn: [0.0, 0.0]
   rooms:
     -
-      center: [0.0, 0.0] 
-      bounds: [100.0, 100.0] 
+      center: [1000.0, 0.0] 
+      bounds: [200.0, 200.0] 
       room type: random spawn
       waves:
         -
