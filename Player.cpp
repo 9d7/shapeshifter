@@ -60,7 +60,7 @@ void Player::reset_player(glm::vec2 reset_position, glm::vec2 reset_velocity, fl
 	velocity = reset_velocity;
 	rotation = reset_rotation;
 	bound = false;
-	set_lives(10);
+	//set_lives(10);
 	update_sprite();
 }
 
@@ -77,6 +77,7 @@ void Player::bind(glm::vec2 center, glm::vec2 bounds) {
 	max_y = center.y + bounds.y;
 	min_x = center.x - bounds.x;
 	min_y = center.y - bounds.y;
+	printf("%f %f\n", center.x, center.y);
 	bound = true;
 }
 
@@ -105,7 +106,7 @@ void Player::set_rotation(float new_rotation, float elapsed) {
 	if (rotation_lock_active) return set_rotation(rotation);
 	while (glm::abs(rotation) > glm::pi<float>()) rotation -= 2 * glm::pi<float>() * (rotation < 0.0f ? -1.0f : 1.0f);
 
-
+	// Rotation limiter
 	float delta = new_rotation - rotation;
 	float sign = delta < 0.0f ? -1.0f : 1.0f;
 	if ((rotation < 0.0f) != (new_rotation < 0.0f)) {
@@ -122,6 +123,7 @@ void Player::set_rotation(float new_rotation, float elapsed) {
 	else {
 		rotation += max_delta * sign;
 	}
+
 	sprite->set_rotation(rotation);
 }
 

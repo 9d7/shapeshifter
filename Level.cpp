@@ -35,12 +35,16 @@ int Level::start_next_room() {
 	return current_room;
 }
 
-glm::vec2 Level::start_level(int level_number) {
+int Level::start_level(int level_number) {
 	printf("starting %s\n", level_names[level_number].c_str());
 	current_level = level_number;
 	current_room = -1;
 	current_wave = -1;
-	return get_spawn_point(current_level);
+	if (current_level >= level_names.size()) current_level = 0;
+	start_next_room();
+	return current_level;
+
+	// return get_spawn_point(current_level);
 	// a vector is treated as a yaml node, isSequence, with each data point in that 
 }
 
@@ -210,7 +214,7 @@ void Level::spawn_wave() {
 		else { // key is an enemy name
 			int number_of_enemies = get_number_of_enemies(it->second);
 			for (int i = 0; i < number_of_enemies; i++) {
-				enemies->acquire(key, get_enemy_color(it->second), get_enemy_spawn_position(it->second));
+				enemies->acquire(key, get_enemy_color(it->second), get_enemy_spawn_position(it->second) + get_room_center(current_room));
 			}
 		}
 	}

@@ -36,6 +36,7 @@ class View {
 		bool draw_ui = true;
 
 		void update_camera(const glm::vec2 &pos);
+		glm::vec2 get_camera_position();
 
 	private:
 

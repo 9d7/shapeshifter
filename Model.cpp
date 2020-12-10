@@ -61,27 +61,25 @@ Model::Model(std::shared_ptr<View> view_) : view(view_) {
 void Model::update(float elapsed) {
 	if (player->get_lives() <= 0) {
 		Mode::set_current(std::make_shared< MenuMode >(MenuMode::Message::None));
-		player->reset_player();
-		view->ui->set_health(player->get_lives());
+		reset_player();
+		view->ui->set_health(player->get_lives()); // TODO maybe include this in reset_player so you refresh lives at a new level?
 		view->ui->set_score(0);
 	}
 
 	player->update(elapsed);
 	enemies->update(elapsed, player->get_position());
-	static size_t score = 0;
+	static size_t score = 0; //TODO this is dumb, make it a member variable
 
 	bullets->update(elapsed);
-
 	Level::LevelStatus level_status = level->update(elapsed);
 	if (level_status == Level::NextLevel) { // if starting a new level, reset the player and teleport where you need them to be
-		player->reset_player(level->get_spawn_point(level->get_current_level()));
+		reset_player(level->get_spawn_point(level->get_current_level()));
 		bind_player();
 	}
 	else if (level_status == Level::NextRoom) { // TODO pause this until player is close enough to the new center
-		player->set_position(level->get_room_center(level->get_current_room())); // TODO remove when above is done and replace with unbind until new center is reached
+		set_player_position(level->get_room_center(level->get_current_room())); // TODO remove when above is done and replace with unbind until new center is reached
 		bind_player();
 	}
-	
 
 
 	for (BulletManager::iterator b_it = bullets->begin(); b_it != bullets->end();) {
@@ -117,7 +115,7 @@ void Model::update(float elapsed) {
 				}
 			} else {
 				if (b.get_color() != player->get_color() && glm::length(player->get_position() - b.get_position()) < 8.0f + 4.0f) {
-					if (player->get_lives() > 0) player->hit();
+					if (player->get_lives() > 0) //player->hit(); TODOTODOTODO READD++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 					view->ui->set_health(player->get_lives());
 					should_erase = true;
 				}
@@ -135,30 +133,22 @@ void Model::update(float elapsed) {
 	hunter_kill();
 
 	// update camera to be out of dead space
-
-
 	static const glm::vec2 MARGIN = glm::vec2(
 			View::FieldWidth,
 			View::FieldHeight
 	) * 1.0f / 4.0f;
 
-	glm::vec2 space_from_camera_center = ideal_camera_position - player->get_position();
+	//glm::vec2 space_from_camera_center = ideal_camera_position - player->get_position();
+	//glm::vec2 mouse_camera_from_player = (mouse_world_position) - player->get_position();
+	//float asymptote = glm::length(mouse_camera_from_player) / (glm::length(mouse_camera_from_player) + 10.0f) ;
 
-	if (space_from_camera_center.x > MARGIN.x) {
-		ideal_camera_position.x = MARGIN.x + player->get_position().x;
-	}
-	if (-space_from_camera_center.x > MARGIN.x) {
-		ideal_camera_position.x = player->get_position().x - MARGIN.x;
-	}
-
-	if (space_from_camera_center.y > MARGIN.y) {
-		ideal_camera_position.y = MARGIN.y + player->get_position().y;
-	}
-	if (-space_from_camera_center.y > MARGIN.y) {
-		ideal_camera_position.y = player->get_position().y - MARGIN.y;
-	}
-
+	ideal_camera_position = 0.4f * mouse_world_position + 0.6f * player->get_position();
+	
+	
 	camera_position += (ideal_camera_position - camera_position) * glm::pow(CAMERA_SMOOTHNESS, 60 * elapsed);
+	
+	//printf("player %f %f ||| camera %f %f ||| mouse %f %f\n", player->get_position().x, player->get_position().y, view->get_camera_position().x, view->get_camera_position().y, mouse_world_position.x, mouse_world_position.y);
+	//printf("ideal %f %f ||| asymptote %f ||| 1.0 - %f\n", ideal_camera_position.x, ideal_camera_position.y, asymptote, 1.0f - asymptote);
 	set_mouse_position(mouse_ui_position);
 	view->update_camera(camera_position);
 
@@ -237,6 +227,16 @@ void Model::bind_player() {
 	player->bind(level->get_room_center(level->get_current_room()), level->get_room_bounds(level->get_current_room()));
 }
 
+void Model::set_player_position(glm::vec2 new_position) {
+	player->set_position(new_position);
+	view->update_camera(new_position);
+}
+
+void Model::reset_player(glm::vec2 reset_position) {
+	player->reset_player(reset_position);
+	view->update_camera(reset_position);
+}
+
 float Model::get_bullet_speed() const {
 	return Player::BULLET_SPEED;
 }
@@ -280,8 +280,8 @@ std::shared_ptr<Enemy> Model::get_closest(glm::vec2 pos) {
 }
 
 void Model::start() {
-	player->reset_player((level->start_level(0)));
-	level->advance();
+	level->start_level(0);
+	reset_player(level->get_spawn_point(0));
 	bind_player();
 }
 
@@ -298,75 +298,4 @@ bool Model::turrets_dead() {
 
 void Model::spawn_hunter(glm::vec2 pos, Bullet::Color col) {
 	enemies->acquire("hunter", col, pos);
-}
-
-void Model::level1() {
-	enemies->acquire("hunter", Bullet::Red, glm::vec2(40, 60.0f));
-	enemies->acquire("soldier", Bullet::Red, glm::vec2(0, 40.0f));
-	enemies->acquire("hunter", Bullet::Blue, glm::vec2(-40, 60.0f));
-}
-
-void Model::level2() {
-	(*(player)).set_position(glm::vec2(0,0));
-	enemies->acquire("turret", Bullet::Red, glm::vec2(20, 40.0f));
-	enemies->acquire("turret", Bullet::Blue, glm::vec2(-20, 40.0f));
-	enemies->acquire("soldier", Bullet::Blue, glm::vec2(20, -40.0f));
-	enemies->acquire("soldier", Bullet::Red, glm::vec2(-20, 40.0f));
-}
-
-
-
-void Model::level3() {
-	(*(player)).set_position(glm::vec2(0,0));
-	enemies->acquire("soldier", Bullet::Red, glm::vec2(40, 40.0f));
-	enemies->acquire("ninja", Bullet::Blue, glm::vec2(-40, 40.0f));
-}
-
-
-void Model::level4() {
-	(*(player)).set_position(glm::vec2(0,0));
-	enemies->acquire("soldier", Bullet::Red, glm::vec2(40, 40.0f));
-	enemies->acquire("wizard", Bullet::Blue, glm::vec2(-40, 40.0f));
-	enemies->acquire("soldier", Bullet::Red, glm::vec2(40, -40.0f));
-}
-
-
-void Model::level5() {
-	(*(player)).set_position(glm::vec2(0,0));
-	enemies->acquire("turret", Bullet::Red, glm::vec2(40, 40.0f));
-	enemies->acquire("turret", Bullet::Blue, glm::vec2(-40, 40.0f));
-	enemies->acquire("repairman", Bullet::Blue, glm::vec2(40, -40.0f));
-	enemies->acquire("repairman", Bullet::Red, glm::vec2(-40, -40.0f));
-}
-
-
-void Model::level6() {
-	(*(player)).set_position(glm::vec2(0,0));
-	enemies->acquire("shifter", Bullet::Red, glm::vec2(40, 40.0f));
-	enemies->acquire("shifter", Bullet::Blue, glm::vec2(-40, 40.0f));
-	enemies->acquire("shifter", Bullet::Blue, glm::vec2(40, -40.0f));
-	enemies->acquire("shifter", Bullet::Red, glm::vec2(-40, -40.0f));
-}
-
-void Model::level7() {
-	(*(player)).set_position(glm::vec2(0,0));
-	enemies->acquire("shifter", Bullet::Red, glm::vec2(40, 40.0f));
-	enemies->acquire("shifter", Bullet::Blue, glm::vec2(-40, 40.0f));
-	enemies->acquire("shield", Bullet::Blue, glm::vec2(40, 20.0f));
-	enemies->acquire("shield", Bullet::Red, glm::vec2(-40, 20.0f));
-}
-
-void Model::level8() {
-	(*(player)).set_position(glm::vec2(0,0));
-	enemies->acquire("turret", Bullet::Red, glm::vec2(40, 50.0f));
-	enemies->acquire("repairman", Bullet::Blue, glm::vec2(40, -40.0f));
-	enemies->acquire("wizard", Bullet::Red, glm::vec2(40, 40.0f));
-	enemies->acquire("ninja", Bullet::Blue, glm::vec2(-40, 40.0f));
-	enemies->acquire("wizard", Bullet::Blue, glm::vec2(40, -20.0f));
-	enemies->acquire("ninja", Bullet::Red, glm::vec2(-40, -20.0f));
-}
-
-void Model::level9() {
-	(*(player)).set_position(glm::vec2(0,0));
-	enemies->acquire("boss", Bullet::Red, glm::vec2(40, 50.0f));
 }

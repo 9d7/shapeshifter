@@ -51,7 +51,7 @@ public:
 	void spawn_wave();
 	int start_next_wave(); // increments current_wave, calls spawn, returns wave index. Returns -1 if no more waves
 	int start_next_room();
-	glm::vec2 start_level(int level_number); // set initial values for a level
+	int start_level(int level_number); // set initial values for a level
 	LevelStatus advance(); // called when you finish a wave/room/level, i.e. current area is done
 
 	LevelStatus update(float elapsed);
