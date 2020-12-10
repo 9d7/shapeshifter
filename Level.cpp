@@ -139,14 +139,14 @@ Bullet::Color Level::get_random_color() {
 Bullet::Color Level::get_enemy_color(const YAML::Node& in) {
 	if (in.size() < 2) return get_random_color(); 
 	std::string color_type = Numeric::parse_string(in[1]);
-	if (color_type == "red") return Bullet::Blue;
-	else if (color_type == "blue") return Bullet::Red;
+	if (color_type == "blue") return Bullet::Blue;
+	else if (color_type == "red") return Bullet::Red;
 	else return get_random_color(); //TODO implement split
 }
 
 glm::vec2 Level::get_enemy_spawn_position(const YAML::Node& in) {
 	float theta = (Numeric(Numeric::Range(0.0f, 6.28f)))();
-	float radius = (Numeric(Numeric::Range(150.0f, 300.0f)))();
+	float radius = (Numeric(Numeric::Range(150.0f, 250.0f)))();
 	glm::vec2 spawn_vec = glm::vec2(1.0f, 0.0f);
 	glm::vec2 spawn_pos = glm::vec2(0.0f, 0.0f);
 	
@@ -158,7 +158,15 @@ glm::vec2 Level::get_enemy_spawn_position(const YAML::Node& in) {
 	// spawn type provided
 	std::string spawn_type = Numeric::parse_string(in[2]);
 	if (spawn_type == "point") { // point requires xpos and ypos to be provided 
-		spawn_pos = glm::vec2( Numeric::parse_num(in[3])(), Numeric::parse_num(in[4])() );
+		float x_diff = 0.0f;
+		float y_diff = 0.0f;
+		int num_enemies = get_number_of_enemies(in);
+		if (num_enemies > 1) {
+			float displacement = 8.0f * num_enemies; // TODO make this number adjustable
+			x_diff = (Numeric(Numeric::Range(-displacement, displacement)))();
+			y_diff = (Numeric(Numeric::Range(-displacement, displacement)))();
+		}
+		spawn_pos = glm::vec2( Numeric::parse_num(in[3])() + x_diff, Numeric::parse_num(in[4])() + y_diff );
 	}
 	else if (in.size() <= 5) { // radius and theta provided
 		radius = Numeric::parse_num(in[3])();
