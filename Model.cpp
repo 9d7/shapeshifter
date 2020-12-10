@@ -251,6 +251,18 @@ void Model::hunter_kill() {
 	}
 }
 
+void Model::kill_turret(Enemy *e) {
+	printf("searchin\n");
+	for (EnemyManager::iterator e_it = enemies->begin(); e_it != enemies->end(); e_it++) {
+		if (&(**e_it) == e) {
+			printf("found!\n");
+			e_it = enemies->erase(e_it);
+			return;
+		}
+	}
+	printf("not found\n");
+}
+
 std::shared_ptr<Enemy> Model::get_closest(glm::vec2 pos) {
 	std::shared_ptr<Enemy> closest = nullptr;
 	float dist = 3.40282e+038f;

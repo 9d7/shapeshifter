@@ -56,20 +56,62 @@ level one:
   rooms:
     -
       center: [0.0, 0.0] 
-      bounds: [100.0, 100.0] 
+      bounds: [300.0, 300.0] 
       room type: random spawn
       waves:
         -
           time limit: 10.0
-          kill limit: 6
-          soldier: [4..5, blue, point, 50, 50]
-          turret: [2, random]
+          hunter: [1, blue, point, 250, 0]
+          hunter: [1, red, point, -250, 0]
+          soldier: [1, random, point, 0, 150]
         -
-          turret: [1, red]
-          soldier: [2..5, random]
+          time limit: 60.0
+          turret: [1, red, point, 100, 0]
+          soldier: [1..2, red, point, -20..20, 90..110]
+          soldier: [1..2, blue, point,-20..20, -90..-110]
+          turret: [1, blue, point, -100, 0]
+          hunter: [2..3, random]
         -
-          ninja:
-          wizard: [3]
+          time limit: 60.0
+          ninja: [1, red, point, 100, 40..50]
+          ninja: [1, blue, point, -100, -40..50]
+          soldier: [2..3, random]
+        -
+          time limit: 60.0
+          wizard: [1, red, point, 100, 40..50]
+          wizard: [1, blue, point, -100, -40..50]
+          turret: [1, red, point, 0, 150]
+          turret: [1, blue, point, 0, -150]
+          ninja: [1]
+        -
+          time limit: 60.0
+          shield: [1, red, point, 0, 70..90]
+          shield: [1, blue, point, 0, -70..90]
+          turret: [1, red, point, 0, 150]
+          turret: [1, blue, point, 0, -150]
+          hunter: [3..4]
+        -
+          time limit: 60.0
+          shifter: [1, red, point, 100, 0]
+          shifter: [1, blue, point, -100, 0]
+          shifter: [1, blue, point, 0, 100]
+          soldier: [3..4]
+        -
+          time limit: 60.0
+          homing: [1, red, point, 100, 0]
+          homing: [1, blue, point, -100, 0]
+          wizard: [2]
+          ninja: [2]
+        -
+          time limit: 60.0
+          turret: [1, red, point, 150, 150]
+          turret: [1, blue, point, 150, -150]
+          turret: [1, red, point, -150, -150]
+          turret: [1, blue, point, -150, 150]
+          repairman: [1, red, point, 70, 70]
+          repairman: [1, blue, point, 70, -70]
+          repairman: [1, red, point, -70, -70]
+          repairman: [1, blue, point, -70, 70]
     -
       center: [400.0, 400.0]
       bounds: [300.0, 300.0]
