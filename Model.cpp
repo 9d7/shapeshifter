@@ -266,8 +266,8 @@ std::shared_ptr<Enemy> Model::get_closest(glm::vec2 pos) {
 }
 
 void Model::start() {
-	player->reset_player((level->start_level(0)));
-	level->advance();
+	level->start_level(0);
+	player->reset_player();
 	bind_player();
 }
 
@@ -282,6 +282,7 @@ bool Model::turrets_dead() {
 	return count == enemies->enemies.size();
 }
 
+/*
 void Model::level1() {
 	enemies->acquire("hunter", Bullet::Red, glm::vec2(40, 60.0f));
 	enemies->acquire("soldier", Bullet::Red, glm::vec2(0, 40.0f));
@@ -352,3 +353,4 @@ void Model::level9() {
 	(*(player)).set_position(glm::vec2(0,0));
 	enemies->acquire("boss", Bullet::Red, glm::vec2(40, 50.0f));
 }
+*/

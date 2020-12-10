@@ -105,7 +105,7 @@ void Player::set_rotation(float new_rotation, float elapsed) {
 	if (rotation_lock_active) return set_rotation(rotation);
 	while (glm::abs(rotation) > glm::pi<float>()) rotation -= 2 * glm::pi<float>() * (rotation < 0.0f ? -1.0f : 1.0f);
 
-
+	// Rotation limiter
 	float delta = new_rotation - rotation;
 	float sign = delta < 0.0f ? -1.0f : 1.0f;
 	if ((rotation < 0.0f) != (new_rotation < 0.0f)) {
@@ -122,6 +122,7 @@ void Player::set_rotation(float new_rotation, float elapsed) {
 	else {
 		rotation += max_delta * sign;
 	}
+
 	sprite->set_rotation(rotation);
 }
 
