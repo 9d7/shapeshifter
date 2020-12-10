@@ -15,39 +15,6 @@
 # number: How many enemies of that type you want to spawn in the wave
 # color: What color the enemy should be. "random" can be used instead of a color for a random red or blue. "split" can be used for an even distribution
 # spawn type: "radius" is the radius around the player enemies spawn, theta is the angle. "point" is the (xpos, ypos) spawn point. Omitting defaults to rand radius/theta
-default:
-  level:
-    spawn: [0.0, 0.0]
-    rooms:
-      -
-        center: [0.0, 0.0] 
-        bounds: [300.0, 300.0] 
-        room type: 
-        waves:
-          -
-            time limit: 10.0
-            kill limit: 1
-            soldier: 
-          -
-            hunter: 
-            soldier: [1..4, blue, point, 50, 50]
-      -
-        center: [400.0, 400.0]
-        bounds: [300.0, 300.0] 
-        room type: boss
-        waves:
-          -
-            time limit: 
-            kill limit: 
-            health limit: 25
-            boss: [1]
-            soldier: [3]
-          -
-            health limit: 50
-            ninja: [2, split]
-          -
-            health limit: 25
-            hunter: [6]
 
 level one:
   spawn: [0.0, 0.0]
@@ -62,87 +29,87 @@ level one:
           hunter: [1, blue, point, 250, 0]
           hunter: [1, red, point, -250, 0]
           soldier: [1, random, point, 0, 150]
-        # -
-        #   time limit: 60.0
-        #   turret: [1, red, point, 100, 0]
-        #   soldier: [1..2, red, point, -20..20, 90..110]
-        #   soldier: [1..2, blue, point,-20..20, -90..-110]
-        #   turret: [1, blue, point, -100, 0]
-        #   hunter: [2..3, random]
-        # -
-        #   time limit: 60.0
-        #   ninja: [1, red, point, 100, 40..50]
-        #   ninja: [1, blue, point, -100, -40..50]
-        #   soldier: [2..3, random]
-        # -
-        #   time limit: 60.0
-        #   wizard: [1, red, point, 100, 40..50]
-        #   wizard: [1, blue, point, -100, -40..50]
-        #   turret: [1, red, point, 0, 150]
-        #   turret: [1, blue, point, 0, -150]
-        #   ninja: [1]
-        # -
-        #   time limit: 60.0
-        #   shield: [1, red, point, 0, 70..90]
-        #   shield: [1, blue, point, 0, -70..90]
-        #   turret: [1, red, point, 10, 150]
-        #   turret: [1, blue, point, -10, -150]
-        #   hunter: [3..4]
-        # -
-        #   time limit: 60.0
-        #   shifter: [1, red, point, 100, 0]
-        #   shifter: [1, blue, point, -100, 0]
-        #   shifter: [1, blue, point, 0, 100]
-        #   soldier: [3..4]
-        # -
-        #   time limit: 60.0
-        #   homing: [1, red, point, 100, 0]
-        #   homing: [1, blue, point, -100, 0]
-        #   wizard: [1]
-        #   ninja: [1]
-        #   shifter: [2]
-        # -
-        #   time limit: 60.0
-        #   turret: [1, red, point, 150, 150]
-        #   turret: [1, blue, point, 150, -150]
-        #   turret: [1, red, point, -150, -150]
-        #   turret: [1, blue, point, -150, 150]
-        #   repairman: [1, red, point, 70, 70]
-        #   repairman: [1, blue, point, 70, -70]
-        #   repairman: [1, red, point, -70, -70]
-        #   repairman: [1, blue, point, -70, 70]
-        # -
-        #   time limit: 30.0
-        #   turret: [1, red, point, 160, 150]
-        #   turret: [1, red, point, -150, -160]
-        #   shield: [1..3]
-        #   homing: [2..4]
-        # -
-        #   time limit: 30.0
-        #   turret: [1, red, point, 150, 150]
-        #   turret: [1, red, point, -150, -150]
-        #   repairman: [1, red, point, 70, 70]
-        #   repairman: [1, red, point, -70, -70]
-        #   shifter: [1..2]
-        #   soldier: [2]
-        #   ninja: [1]
-        # -
-        #   time limit: 30.0
-        #   turret: [1, red, point, -150, 150]
-        #   turret: [1, red, point, 150, -150]
-        #   wizard: [4, random, radius, 120, 0..3.14]
-        #   shield: [2, random, radius, 100, 3.14..6.28]
-        # -
-        #   time limit: 30.0
-        #   turret: [1, red, radius, 120, 0]
-        #   hunter: [1, red, radius, 120, 0.785]
-        #   shifter: [1, red, radius, 120, 1.571]
-        #   soldier: [1, blue, radius, 120, 2.356]
-        #   ninja: [1, red, radius, 120, 3.142]
-        #   wizard: [1, blue, radius, 120, 3.927]
-        #   shield: [1, red, radius, 120, 4.712]
-        #   homing: [1, blue, radius, 120, 5.498]
-        #   repairman: [1, blue, radius, 120, 6.28]
+        -
+          time limit: 60.0
+          turret: [1, red, point, 100, 0]
+          soldier: [1..2, red, point, -20..20, 90..110]
+          soldier: [1..2, blue, point,-20..20, -90..-110]
+          turret: [1, blue, point, -100, 0]
+          hunter: [2..3, random]
+        -
+          time limit: 60.0
+          ninja: [1, red, point, 100, 40..50]
+          ninja: [1, blue, point, -100, -40..50]
+          soldier: [2..3, random]
+        -
+          time limit: 60.0
+          wizard: [1, red, point, 100, 40..50]
+          wizard: [1, blue, point, -100, -40..50]
+          turret: [1, red, point, 0, 150]
+          turret: [1, blue, point, 0, -150]
+          ninja: [1]
+        -
+          time limit: 60.0
+          shield: [1, red, point, 0, 70..90]
+          shield: [1, blue, point, 0, -70..90]
+          turret: [1, red, point, 10, 150]
+          turret: [1, blue, point, -10, -150]
+          hunter: [3..4]
+        -
+          time limit: 60.0
+          shifter: [1, red, point, 100, 0]
+          shifter: [1, blue, point, -100, 0]
+          shifter: [1, blue, point, 0, 100]
+          soldier: [3..4]
+        -
+          time limit: 60.0
+          homing: [1, red, point, 100, 0]
+          homing: [1, blue, point, -100, 0]
+          wizard: [1]
+          ninja: [1]
+          shifter: [2]
+        -
+          time limit: 60.0
+          turret: [1, red, point, 150, 150]
+          turret: [1, blue, point, 150, -150]
+          turret: [1, red, point, -150, -150]
+          turret: [1, blue, point, -150, 150]
+          repairman: [1, red, point, 70, 70]
+          repairman: [1, blue, point, 70, -70]
+          repairman: [1, red, point, -70, -70]
+          repairman: [1, blue, point, -70, 70]
+        -
+          time limit: 30.0
+          turret: [1, red, point, 160, 150]
+          turret: [1, red, point, -150, -160]
+          shield: [1..3]
+          homing: [2..4]
+        -
+          time limit: 30.0
+          turret: [1, red, point, 150, 150]
+          turret: [1, red, point, -150, -150]
+          repairman: [1, red, point, 70, 70]
+          repairman: [1, red, point, -70, -70]
+          shifter: [1..2]
+          soldier: [2]
+          ninja: [1]
+        -
+          time limit: 30.0
+          turret: [1, red, point, -150, 150]
+          turret: [1, red, point, 150, -150]
+          wizard: [4, random, radius, 120, 0..3.14]
+          shield: [2, random, radius, 100, 3.14..6.28]
+        -
+          time limit: 30.0
+          turret: [1, red, radius, 120, 0]
+          hunter: [1, red, radius, 120, 0.785]
+          shifter: [1, red, radius, 120, 1.571]
+          soldier: [1, blue, radius, 120, 2.356]
+          ninja: [1, red, radius, 120, 3.142]
+          wizard: [1, blue, radius, 120, 3.927]
+          shield: [1, red, radius, 120, 4.712]
+          homing: [1, blue, radius, 120, 5.498]
+          repairman: [1, blue, radius, 120, 6.28]
 
     -
       center: [400.0, 400.0]

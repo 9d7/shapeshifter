@@ -61,6 +61,7 @@ class Player {
 		float                   get_rotation() const;
 		AssistMode              get_assist_mode() const;
 		int                     get_lives() const;
+		float                   get_cd() const;
 
 		bool is_bound();
 		
@@ -72,6 +73,7 @@ class Player {
 		std::shared_ptr<Sprite> sprite;
 
 		// Editable values with defaults
+		float shot_cd = 0.0f;
 		bool bound = false;
 		int lives = 10;
 		float hit_cd = 1.0f;

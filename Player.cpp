@@ -13,6 +13,7 @@ void Player::update(float elapsed) {
 	velocity += force * elapsed;
 	force = glm::vec2(0.0f, 0.0f);
 	if (hit_cd >= 0) hit_cd -= elapsed;
+	if (shot_cd >= 0) shot_cd -= elapsed;
 	if (glm::length(velocity) > MAX_VELOCITY) {
 		velocity = glm::normalize(velocity) * MAX_VELOCITY;
 	}
@@ -46,6 +47,7 @@ void Player::move(const glm::vec2& direction) {
 
 glm::vec2 Player::shoot(const glm::vec2 target_position) {
 	// TODO add slight variation here and a way to control it
+	shot_cd = .25f;
 	glm::vec2 direction(1.0f, 0.0f);
 	glm::vec2 player_to_target = target_position - position;
 	if (player_to_target != glm::vec2(0.0f, 0.0f)) {
@@ -77,7 +79,7 @@ void Player::bind(glm::vec2 center, glm::vec2 bounds) {
 	max_y = center.y + bounds.y;
 	min_x = center.x - bounds.x;
 	min_y = center.y - bounds.y;
-	printf("%f %f\n", center.x, center.y);
+	//printf("%f %f\n", center.x, center.y);
 	bound = true;
 }
 
@@ -183,6 +185,10 @@ Player::AssistMode Player::get_assist_mode() const {
 int Player::get_lives() const
 {
 	return lives;
+}
+
+float Player::get_cd() const {
+	return shot_cd;
 }
 
 bool Player::is_bound() {

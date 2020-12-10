@@ -7,10 +7,7 @@
 #include <string>
 
 Level::Level(std::shared_ptr<EnemyManager> enemy_mgr) {
-
-	//std::unordered_map<std::string, std::variant<ValueType, RoomVector>> test = levels_map[""];
 	levels_yaml = YAML::LoadFile(data_path("levels.yaml"));
-	//printf("yaml: %s\n", levels_yaml.as<std::string>().c_str());
 	enemies = enemy_mgr;
 }
 
@@ -48,9 +45,6 @@ int Level::start_level(int level_number) {
 	if (current_level >= level_names.size()) current_level = 0;
 	start_next_room();
 	return current_level;
-
-	// return get_spawn_point(current_level);
-	// a vector is treated as a yaml node, isSequence, with each data point in that 
 }
 
 Level::LevelStatus Level::advance() {

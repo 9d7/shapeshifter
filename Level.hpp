@@ -17,8 +17,7 @@ public:
 	~Level() = default;
 
 	std::vector<std::string> level_names { // Add levels here in their order
-		"level one",
-		"level two"
+		"level one"
 	};
 
 	enum LevelStatus {
