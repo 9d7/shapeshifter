@@ -284,6 +284,10 @@ bool Model::turrets_dead() {
 	return count == enemies->enemies.size();
 }
 
+void Model::spawn_hunter(glm::vec2 pos, Bullet::Color col) {
+	enemies->acquire("hunter", col, pos);
+}
+
 void Model::level1() {
 	enemies->acquire("hunter", Bullet::Red, glm::vec2(40, 60.0f));
 	enemies->acquire("soldier", Bullet::Red, glm::vec2(0, 40.0f));

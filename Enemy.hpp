@@ -49,6 +49,7 @@ class Enemy {
 			Shield,
 			Deadturret,
 			Repairman,
+			Homing,
 			Boss
 		};
 

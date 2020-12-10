@@ -100,7 +100,7 @@ turret:
           time: 0.04
           velocity: 0.6
           angle:    -0.175..0.175
-          number: 8
+          number: 15
           color: 0
           sequence: serial
           dispatch: after
@@ -111,7 +111,7 @@ turret:
           time: 0.04
           velocity: 0.6
           angle:    -0.175..0.175
-          number: 8
+          number: 15
           color: 1
           sequence: serial
           dispatch: after
@@ -431,6 +431,12 @@ repairman:
           sequence: parallel
           dispatch: with
 
+homing:
+  health: 3
+  red sprite: homing_blue
+  blue sprite: homing_red
+  firing delay: 1
+  movement: homing
 
 boss:
   health: 30

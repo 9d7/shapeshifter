@@ -61,7 +61,7 @@ level one:
         -
           time limit: 10.0
           kill limit: 6
-          soldier: [1..4, blue, point, 50, 50]
+          homing: [1..4, blue, point, 50, 50]
           turret: [10, random]
         -
           turret: [1, red]
