@@ -132,18 +132,8 @@ void Model::update(float elapsed) {
 
 	hunter_kill();
 
-	// update camera to be out of dead space
-	static const glm::vec2 MARGIN = glm::vec2(
-			View::FieldWidth,
-			View::FieldHeight
-	) * 1.0f / 4.0f;
-
-	//glm::vec2 space_from_camera_center = ideal_camera_position - player->get_position();
-	//glm::vec2 mouse_camera_from_player = (mouse_world_position) - player->get_position();
-	//float asymptote = glm::length(mouse_camera_from_player) / (glm::length(mouse_camera_from_player) + 10.0f) ;
-
+	// update camera
 	ideal_camera_position = 0.4f * mouse_world_position + 0.6f * player->get_position();
-	
 	
 	camera_position += (ideal_camera_position - camera_position) * glm::pow(CAMERA_SMOOTHNESS, 60 * elapsed);
 	
@@ -305,7 +295,7 @@ bool Model::turrets_dead() {
 		}
 	}
 
-	return count == enemies->enemies.size();
+	return count == int(enemies->enemies.size());
 }
 
 void Model::spawn_hunter(glm::vec2 pos, Bullet::Color col) {

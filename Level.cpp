@@ -42,7 +42,7 @@ int Level::start_level(int level_number) {
 	current_level = level_number;
 	current_room = -1;
 	current_wave = -1;
-	if (current_level >= level_names.size()) current_level = 0;
+	if (current_level >= int(level_names.size())) current_level = 0;
 	start_next_room();
 	return current_level;
 }
