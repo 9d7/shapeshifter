@@ -1,5 +1,7 @@
 #include "Level.hpp"
 #include "data_path.hpp"
+#include "Mode.hpp"
+#include "MenuMode.hpp"
 #include <map>
 #include <glm/gtx/rotate_vector.hpp>
 #include <string>
@@ -36,6 +38,9 @@ int Level::start_next_room() {
 }
 
 int Level::start_level(int level_number) {
+	hardcode_menu += 1;
+	printf("hardcode == %d\n", hardcode_menu);
+	if (hardcode_menu == 2) Mode::set_current(std::make_shared< MenuMode >(MenuMode::Message::Win));
 	printf("starting %s\n", level_names[level_number].c_str());
 	current_level = level_number;
 	current_room = -1;

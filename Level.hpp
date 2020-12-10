@@ -60,6 +60,8 @@ public:
 	bool is_limits_hit();
 	void set_limits();
 
+	uint8_t hardcode_menu = 0;
+
 protected:
 
 	int current_level = -1;

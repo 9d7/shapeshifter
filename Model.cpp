@@ -60,7 +60,7 @@ Model::Model(std::shared_ptr<View> view_) : view(view_) {
 
 void Model::update(float elapsed) {
 	if (player->get_lives() <= 0) {
-		Mode::set_current(std::make_shared< MenuMode >(MenuMode::Message::None));
+		Mode::set_current(std::make_shared< MenuMode >(MenuMode::Message::Died));
 		reset_player();
 		view->ui->set_health(player->get_lives()); // TODO maybe include this in reset_player so you refresh lives at a new level?
 		view->ui->set_score(0);
