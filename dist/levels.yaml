@@ -120,14 +120,14 @@ level one:
           time limit: 15.0
           kill limit: 3
           health limit: 25
-          boss: [1]
-          soldier: [2]
+          boss: [1, random, point, 400, 500]
+          soldier: [1, random, point, 300..500, 300..500]
         -
           health limit: 50
-          ninja: [1, random]
-          wizard: [1, random]
+          ninja: [1, random, point, 300..500, 300..500]
+          wizard: [1, random, point, 300..500, 300..500]
         -
           health limit: 25
-          shield: [1, random]
-          shifter: [1, random]
-          homing: [1, random]
+          shield: [1, random, point, 300..500, 300..500]
+          shifter: [1, random, point, 300..500, 300..500]
+          homing: [1, random, point, 300..500, 300..500]
