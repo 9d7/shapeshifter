@@ -94,7 +94,7 @@ turret:
   movement: turret
   attacks:
     -
-      chance: 0.5
+      chance: 1
       bullets:
         -
           time: 0.04
@@ -105,7 +105,7 @@ turret:
           sequence: serial
           dispatch: after
     -
-      chance: 0.5
+      chance: 1
       bullets:
         -
           time: 0.04
@@ -116,11 +116,11 @@ turret:
           sequence: serial
           dispatch: after
     -
-      chance: 1
+      chance: 0.5
       bullets:
         -
           time: 0.05
-          velocity: 0.5
+          velocity: 0.25
           angle:    0
           number: 1
           color: 0..1
@@ -128,7 +128,7 @@ turret:
           dispatch: with
         -
           time: 0.05
-          velocity: 0.5
+          velocity: 0.25
           angle:    0.524
           number: 1
           color: 0..1
@@ -136,7 +136,7 @@ turret:
           dispatch: with
         -
           time: 0.05
-          velocity: 0.5
+          velocity: 0.25
           angle:    -0.524
           number: 1
           color: 0..1
@@ -144,7 +144,7 @@ turret:
           dispatch: with
         -
           time: 0.05
-          velocity: 0.5
+          velocity: 0.25
           angle:    0.262
           number: 1
           color: 0..1
@@ -152,7 +152,7 @@ turret:
           dispatch: with
         -
           time: 0.05
-          velocity: 0.5
+          velocity: 0.25
           angle:    -0.262
           number: 1
           color: 0..1
@@ -194,6 +194,22 @@ ninja:
           color: 0
           sequence: parallel
           dispatch: with
+        -
+          time: 0.05
+          velocity: 0.4
+          angle:    0.523
+          number: 1
+          color: 0
+          sequence: parallel
+          dispatch: with
+        -
+          time: 0.05
+          velocity: 0.4
+          angle:    -0.523
+          number: 1
+          color: 0
+          sequence: parallel
+          dispatch: with
     -
       chance: 1
       bullets:
@@ -221,7 +237,22 @@ ninja:
           color: 1
           sequence: parallel
           dispatch: with
-
+        -
+          time: 0.05
+          velocity: 0.4
+          angle:    0.523
+          number: 1
+          color: 1
+          sequence: parallel
+          dispatch: with
+        -
+          time: 0.05
+          velocity: 0.4
+          angle:    -0.523
+          number: 1
+          color: 1
+          sequence: parallel
+          dispatch: with
 
 wizard:
   health: 3

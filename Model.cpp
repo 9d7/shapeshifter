@@ -96,7 +96,8 @@ void Model::update(float elapsed) {
 				for (EnemyManager::iterator e_it = enemies->begin(); e_it != enemies->end();) {
 					const Enemy e = **e_it;
 					float radius = (e.size().x + e.size().y) / 4.0f; // average of w and h, over 2
-					if (glm::length(e.position() - b.get_position()) < radius + 4.0f && e.get_color() != b.get_color()) {
+					if ((glm::length(e.position() - b.get_position()) < radius + 4.0f && e.get_color() != b.get_color()) ||
+						((**(e_it)).move_style == Enemy::MovementStyle::Boss && glm::length(e.position() - b.get_position()) < 8.0f + 4.0f)) {
 						// kill enemy and bullet
 						int health = (**(e_it)).take_damage(1);
 						if (health == 0) {
@@ -130,6 +131,8 @@ void Model::update(float elapsed) {
 		}
 
 	}
+
+	hunter_kill();
 
 	// update camera to be out of dead space
 
@@ -252,15 +255,12 @@ void Model::hunter_kill() {
 }
 
 void Model::kill_turret(Enemy *e) {
-	printf("searchin\n");
 	for (EnemyManager::iterator e_it = enemies->begin(); e_it != enemies->end(); e_it++) {
 		if (&(**e_it) == e) {
-			printf("found!\n");
 			e_it = enemies->erase(e_it);
 			return;
 		}
 	}
-	printf("not found\n");
 }
 
 std::shared_ptr<Enemy> Model::get_closest(glm::vec2 pos) {

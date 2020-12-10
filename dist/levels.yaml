@@ -100,8 +100,9 @@ level one:
           time limit: 60.0
           homing: [1, red, point, 100, 0]
           homing: [1, blue, point, -100, 0]
-          wizard: [2]
-          ninja: [2]
+          wizard: [1]
+          ninja: [1]
+          shifter: [2]
         -
           time limit: 60.0
           turret: [1, red, point, 150, 150]
@@ -112,6 +113,39 @@ level one:
           repairman: [1, blue, point, 70, -70]
           repairman: [1, red, point, -70, -70]
           repairman: [1, blue, point, -70, 70]
+        - 
+          time limit: 30.0
+          turret: [1, red, point, 150, 150]
+          turret: [1, red, point, -150, -150]
+          shield: [1..3]
+          homing: [2..4]
+        - 
+          time limit: 30.0
+          turret: [1, red, point, 150, 150]
+          turret: [1, red, point, -150, -150]
+          repairman: [1, red, point, 70, 70]
+          repairman: [1, red, point, -70, -70]
+          shifter: [1..2]
+          soldier: [2]
+          ninja: [1]
+        - 
+          time limit: 30.0
+          turret: [1, red, point, -150, 150]
+          turret: [1, red, point, 150, -150]
+          wizard: [4, random, radius, 120, random]
+          shield: [2, random, radius, 100, random]
+        - 
+          time limit: 30.0
+          turret: [1, red, radius, 120, 0]
+          hunter: [1, red, radius, 120, 0.785]
+          shifter: [1, red, radius, 120, 1.571]
+          soldier: [1, blue, radius, 120, 2.356]
+          ninja: [1, red, radius, 120, 3.142]
+          wizard: [1, blue, radius, 120, 3.927]
+          shield: [1, red, radius, 120, 4.712]
+          homing: [1, blue, radius, 120, 5.498]
+          repairman: [1, blue, radius, 120, 6.28]
+
     -
       center: [400.0, 400.0]
       bounds: [300.0, 300.0]
@@ -122,10 +156,13 @@ level one:
           kill limit: 3
           health limit: 25
           boss: [1]
-          soldier: [3]
+          soldier: [2]
         -
           health limit: 50
-          ninja: [2, split]
+          ninja: [1, random]
+          wizard: [1, random]
         -
           health limit: 25
-          hunter: [6]
+          shield: [1, random]
+          shifter: [1, random]
+          homing: [1, random]
