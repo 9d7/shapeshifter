@@ -47,7 +47,7 @@ void Player::move(const glm::vec2& direction) {
 
 glm::vec2 Player::shoot(const glm::vec2 target_position) {
 	// TODO add slight variation here and a way to control it
-	shot_cd = .25f;
+	shot_cd = FIRING_SPEED;
 	glm::vec2 direction(1.0f, 0.0f);
 	glm::vec2 player_to_target = target_position - position;
 	if (player_to_target != glm::vec2(0.0f, 0.0f)) {

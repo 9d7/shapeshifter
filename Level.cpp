@@ -36,9 +36,9 @@ int Level::start_next_room() {
 
 int Level::start_level(int level_number) {
 	hardcode_menu += 1;
-	printf("hardcode == %d\n", hardcode_menu);
+	//printf("hardcode == %d\n", hardcode_menu);
 	if (hardcode_menu == 2) Mode::set_current(std::make_shared< MenuMode >(MenuMode::Message::Win));
-	printf("starting %s\n", level_names[level_number].c_str());
+	//printf("starting %s\n", level_names[level_number].c_str());
 	current_level = level_number;
 	current_room = -1;
 	current_wave = -1;
@@ -48,7 +48,7 @@ int Level::start_level(int level_number) {
 }
 
 Level::LevelStatus Level::advance() {
-	printf("advancing\n");
+	//printf("advancing\n");
 	// Advances to next wave
 	if (start_next_wave() < 0) { 
 		// if no more waves, go to next room
@@ -66,7 +66,7 @@ Level::LevelStatus Level::advance() {
 Level::LevelStatus Level::update(float elapsed) {
 	update_limits(elapsed);
 	if (is_limits_hit()) {
-		printf("limits hit: %f %d %d || %f %d %d\n", time_left, kills_left, boss_health_left, time_limit, kill_limit, boss_health_limit);
+		//printf("limits hit: %f %d %d || %f %d %d\n", time_left, kills_left, boss_health_left, time_limit, kill_limit, boss_health_limit);
 		return advance();
 	}
 	return NoAdvance;
@@ -112,7 +112,7 @@ int Level::get_number_of_waves() {
 }
 
 glm::vec2 Level::get_spawn_point(int level) {
-	printf("getting spawn point!\n");
+	//printf("getting spawn point!\n");
 	return Numeric::parse_vector(get_level_info(level, "spawn"));
 }
 
@@ -200,7 +200,7 @@ glm::vec2 Level::get_room_center(int room) {
 }
 
 void Level::spawn_wave() {
-	printf("spawning level %d room %d wave %d\n", current_level, current_room, current_wave);
+	//printf("spawning level %d room %d wave %d\n", current_level, current_room, current_wave);
 	YAML::Node wave = get_wave_info();
 	time_limit = -1.0f;
 	kill_limit = -1;

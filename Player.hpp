@@ -16,6 +16,7 @@ class Player {
 		static constexpr float MAX_VELOCITY = 150.0f;   // TODO make a multiplier that we can adjust on the fly if we want powerups or slowing abilities
 		static constexpr float FRICTION_FORCE = 600.0f; // Currently used for force based friction
 		static constexpr float BULLET_SPEED = 300.0f;   // Same TODO as above
+		static constexpr float FIRING_SPEED = 0.15f;
 
 		enum AssistMode {
 			Off,
